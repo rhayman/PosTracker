@@ -484,6 +484,18 @@ CameraControlSlider::CameraControlSlider(Font f) : Slider("name"), font(f)
 	downButton->setBounds(24, 21, 10, 8);
 }
 
+void CameraControlSlider::buttonClicked(Button * btn) {
+	if ( btn == upButton ) {
+		auto val = getValue();
+		auto inc = getInterval();
+		setValue(val + inc);
+	}
+	if ( btn == downButton ) {
+		auto val = getValue();
+		auto inc = getInterval();
+		setValue(val - inc);
+	}
+}
 void CameraControlSlider::setActive(bool active)
 {
 	m_isActive = active;
@@ -567,7 +579,7 @@ FrameControlSlider::FrameControlSlider(PosTracker * proc, Font f) : Slider("name
 	setMinValue(0);
 	setMaxValue(100);
 	setTextBoxStyle(Slider::NoTextBox, false, 40, 20);
-	
+
 	Label * l = new Label("min");
 	l->setBounds(0, getHeight()+12, 40, 10);
 	font.setHeight(9.0);

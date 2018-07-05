@@ -94,7 +94,7 @@ public:
 	void setActive(bool);
 	bool isActive() { return m_isActive; }
 	void setValues(Array<double>);
-	void buttonClicked(Button * btn) {};
+	void buttonClicked(Button * btn);
 
 private:
 	void paint (Graphics & g) override;
