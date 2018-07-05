@@ -85,7 +85,7 @@ webcam
 
 */
 
-class CameraControlSlider : public Slider
+class CameraControlSlider : public Slider, public Button::Listener
 {
 public:
 	CameraControlSlider(Font f);
@@ -94,6 +94,7 @@ public:
 	void setActive(bool);
 	bool isActive() { return m_isActive; }
 	void setValues(Array<double>);
+	void buttonClicked(Button * btn) {};
 
 private:
 	void paint (Graphics & g) override;
@@ -101,6 +102,8 @@ private:
 	Font font;
 	bool m_isActive;
 	Array<double> valueArray;
+	ScopedPointer<TriangleButton> upButton;
+	ScopedPointer<TriangleButton> downButton;
 };
 
 class FrameControlSlider : public Slider, public Label::Listener, public AsyncUpdater

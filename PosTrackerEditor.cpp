@@ -11,7 +11,7 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	Typeface::Ptr typeface = new CustomTypeface(mis);
 	Font font = Font(typeface);
 
-	desiredWidth = 415;
+	desiredWidth = 425;
 	m_proc = (PosTracker*)parentNode;
 
 	// Video source stuff
@@ -81,12 +81,12 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	__s32 min, max, step;
 	// Brightness slider and label
 	addAndMakeVisible(brightnessSldr = new CameraControlSlider(font));
-	brightnessSldr->setBounds(200, 30, 50,50);
+	brightnessSldr->setBounds(210, 30, 50,50);
 	brightnessSldr->setActive(false);
 	brightnessSldr->addListener(this);
 
 	addAndMakeVisible(brightLbl = new Label("Brightness", "Brightness"));
-	brightLbl->setBounds(190, 18, 70, 20);
+	brightLbl->setBounds(200, 18, 70, 20);
 	brightLbl->setFont(font);
 	brightLbl->setEditable (false, false, false);
 	brightLbl->setJustificationType(Justification::centred);
@@ -94,12 +94,12 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 
 	// Contrast slider and label
 	addAndMakeVisible(contrastSldr = new CameraControlSlider(font));
-	contrastSldr->setBounds(285, 30, 50,50);
+	contrastSldr->setBounds(295, 30, 50,50);
 	contrastSldr->setActive(false);
 	contrastSldr->addListener(this);
 
 	addAndMakeVisible(contrLbl = new Label("Contrast", "Contrast"));
-	contrLbl->setBounds(275, 18, 70, 20);
+	contrLbl->setBounds(285, 18, 70, 20);
 	contrLbl->setFont(font);
 	contrLbl->setEditable (false, false, false);
 	contrLbl->setJustificationType(Justification::centred);
@@ -107,12 +107,12 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 
 	// Exposure slider and label
 	addAndMakeVisible(exposureSldr = new CameraControlSlider(font));
-	exposureSldr->setBounds(360, 30, 50,50);
+	exposureSldr->setBounds(370, 30, 50,50);
 	exposureSldr->setActive(false);
 	exposureSldr->addListener(this);
 
 	addAndMakeVisible(exposureLbl = new Label("Exposure", "Exposure"));
-	exposureLbl->setBounds(350, 18, 70, 20);
+	exposureLbl->setBounds(360, 18, 70, 20);
 	exposureLbl->setFont(font);
 	exposureLbl->setEditable(false, false, false);
 	exposureLbl->setJustificationType(Justification::centred);
@@ -473,6 +473,15 @@ CameraControlSlider::CameraControlSlider(Font f) : Slider("name"), font(f)
 	setTextBoxStyle(Slider::NoTextBox, false, 20, 20);
 	Array<double> v{0,100};
 	setValues(v);
+	setVelocityBasedMode(true);
+
+	addAndMakeVisible(upButton = new TriangleButton(1));
+	upButton->addListener(this);
+	upButton->setBounds(16, 21, 10, 8);
+
+	addAndMakeVisible(downButton = new TriangleButton(2));
+	downButton->addListener(this);
+	downButton->setBounds(24, 21, 10, 8);
 }
 
 void CameraControlSlider::setActive(bool active)
@@ -529,7 +538,7 @@ void CameraControlSlider::paint(Graphics & g)
 	g.setFont(font);
 
 	g.setColour(Colours::darkgrey);
-	g.drawSingleLineText(valueString, getWidth() / 2 - stringWidth / 2, getHeight() / 2 + 3);
+	g.drawSingleLineText(valueString, getWidth() / 2 - stringWidth / 2, getHeight() - 9);
 }
 
 Path CameraControlSlider::makeRotaryPath(double val)
@@ -539,7 +548,7 @@ Path CameraControlSlider::makeRotaryPath(double val)
 	double start;
 	double range;
 	start = -(3 * double_Pi)/4;
-	range = start + (3 * double_Pi)/2 * (double(val) / std::abs(valueArray[1]));
+	range = start + (3 * double_Pi)/2 * (double(std::abs(val)) / std::abs(valueArray[1]));
 	p.addPieSegment(6, 6, getWidth() - 12, getHeight() - 12, start, range, 0.65);
 
 	return p;
