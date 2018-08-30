@@ -3,7 +3,6 @@
 
 
 PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors=true)
-: VisualizerEditor(parentNode, useDefaultParameterEditors)
 {
 	int silksize;
 	const char* silk = CoreServices::getApplicationResource("silkscreenserialized", silksize);

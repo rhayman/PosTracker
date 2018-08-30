@@ -26,13 +26,13 @@ public:
 	void editorShown(Label*, TextEditor& textEditorShown);
 
 	void comboBoxChanged(ComboBox* cb);
-	void buttonEvent(Button* button) override;
-	void updateSettings() override;
+	void buttonEvent(Button* button);
+	void updateSettings();
 	void update();
 
 	void setInfoValue(InfoLabelType, double);
 
-	void sliderValueChanged(Slider * sliderChanged) override;
+	void sliderValueChanged(Slider * sliderChanged);
 
 private:
 	PosTracker * m_proc;
