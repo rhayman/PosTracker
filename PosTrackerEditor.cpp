@@ -1,8 +1,8 @@
 #include "PosTrackerEditor.h"
 #include "PosTracker.h"
 
-
 PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors=true)
+: GenericEditor(parentNode, useDefaultParameterEditors)
 {
 	int silksize;
 	const char* silk = CoreServices::getApplicationResource("silkscreenserialized", silksize);
