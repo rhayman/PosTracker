@@ -80,28 +80,6 @@ bool tracker_init = false;
 int initx = -1;
 int inity = -1;
 
-void cbmouse(int event, int x, int y, int flags, void* userdata) {
-	if ( event == cv::EVENT_LBUTTONDOWN ) {
-		tracking_roi = cv::Rect2d();
-		drawing = true;
-		roi_done = false;
-		tracker_init = false;
-		initx = x;
-		inity = y;
-	}
-	else if ( event == cv::EVENT_MOUSEMOVE ) {
-		if ( drawing ) {
-			tracking_roi = cv::Rect(initx, inity, x-initx, y-inity);
-		}
-	}
-	else if ( event == cv::EVENT_LBUTTONUP ) {
-		drawing = false;
-		roi_done = true;
-		tracker_init = true;
-
-	}
-}
-
 class PosTS
 {
 public:
