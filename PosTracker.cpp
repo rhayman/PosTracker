@@ -85,7 +85,6 @@ class PosTS
 public:
 	PosTS() {};
 	PosTS(struct timeval tv, cv::Mat & src) : m_tv(tv), m_src(src) {};
-	PosTS(TrackerType type) : m_type(type) { makeTracker(type); };
 	~PosTS() {};
 	cv::Mat simpleColorDetect(cv::Mat & frame)
 	{
@@ -281,7 +280,6 @@ void PosTracker::startStreaming()
 		if ( liveStream == true )
 		{
 			cv::namedWindow("Live stream", cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO);
-			cv::setMouseCallback("Live stream", cbmouse, NULL);
 		}
 		threadRunning = true;
 		posBuffer = std::queue<std::shared_ptr<PosTS>>{}; // clear the buffer
@@ -395,13 +393,11 @@ void PosTracker::adjustVideoMask(BORDER edge, int val)
 		case BORDER::TOP: top_border = val; break; // co-ords switched
 		case BORDER::BOTTOM: bottom_border = val; break;
 	}
-	adjustTrackerMask(left_border, top_border, right_border, bottom_border);
 }
 
 void PosTracker::adjustTrackerMask(int left, int top, int right, int bottom) {
 	if ( pos_tracker ) {
 		cv::Rect r(cv::Point(left, top), cv::Point(right, bottom));
-		pos_tracker->updateRoiRect(r);
 	}
 }
 
