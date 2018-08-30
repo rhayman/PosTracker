@@ -3,15 +3,11 @@
 
 #include <EditorHeaders.h>
 
-#include <VisualizerWindowHeaders.h>
-#include <VisualizerEditorHeaders.h>
-#include "PosTrackerCanvas.h"
 #include "common.h"
 
 class CameraControlSlider;
 class FrameControlSlider;
 class InfoLabel;
-class PosTrackerCanvas;
 
 enum class InfoLabelType
 {
@@ -20,7 +16,7 @@ enum class InfoLabelType
 	YPOS
 };
 
-class PosTrackerEditor : public VisualizerEditor, public ComboBox::Listener
+class PosTrackerEditor : public ComboBox::Listener
 {
 public:
 	PosTrackerEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors);
@@ -33,22 +29,16 @@ public:
 	void updateSettings() override;
 	void update();
 
-	Visualizer * createNewCanvas();
-
-	TrackerType getTrackerType();
-
 	void setInfoValue(InfoLabelType, double);
 
 	void sliderValueChanged(Slider * sliderChanged) override;
 
 private:
 	PosTracker * m_proc;
-	PosTrackerCanvas * trackerCanvas;
 
 	ScopedPointer<ComboBox> sourceCombo;
 	ScopedPointer<ComboBox> resolution;
 	ScopedPointer<UtilityButton> refreshBtn;
-	ScopedPointer<ComboBox> trackerTypeCombo;
 
 	ScopedPointer<ToggleButton> showVideo;
 	ScopedPointer<ToggleButton> autoExposure;

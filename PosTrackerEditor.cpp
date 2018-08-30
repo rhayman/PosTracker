@@ -43,18 +43,6 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	refreshBtn->setTooltip("Refresh the list of devices");
 	refreshBtn->addListener(this);
 
-	addAndMakeVisible(trackerTypeCombo = new ComboBox("Tracker"));
-	trackerTypeCombo->setBounds(70, 80, 60, 20);
-	trackerTypeCombo->setTooltip("Tracker algorithm");
-	trackerTypeCombo->setTextWhenNothingSelected (("Resolution/ fps"));
-	trackerTypeCombo->setTextWhenNoChoicesAvailable (("Resolution / fps"));
-	trackerTypeCombo->setJustificationType (Justification::centredLeft);
-	trackerTypeCombo->setEditableText (false);
-	for (int i = 0; i < trackerTypes.size(); ++i)
-		trackerTypeCombo->addItem(trackerTypes[i], i+1);
-	trackerTypeCombo->setSelectedId(1, dontSendNotification);
-	trackerTypeCombo->addListener(this);
-
 	addAndMakeVisible(showVideo = new ToggleButton("Show video"));
 	showVideo->setBounds(5, 105, 100, 20);
 	showVideo->setTooltip("Show the video stream");
@@ -319,9 +307,6 @@ void PosTrackerEditor::comboBoxChanged(ComboBox* cb)
 		showVideo->setEnabled(true);
 		updateSettings();
 	}
-	else if ( cb == trackerTypeCombo ) {
-
-	}
 }
 
 void PosTrackerEditor::updateSettings()
@@ -442,23 +427,6 @@ void PosTrackerEditor::updateSettings()
 
 void PosTrackerEditor::update()
 {}
-
-Visualizer * PosTrackerEditor::createNewCanvas() {
-	trackerCanvas = new PosTrackerCanvas(m_proc);
-	return trackerCanvas;
-}
-
-TrackerType PosTrackerEditor::getTrackerType() {
-	int sel = trackerTypeCombo->getSelectedId();
-	if ( sel == 1 )
-		return TrackerType::kBoosting;
-	else if ( sel == 2 )
-		return TrackerType::kKCF;
-	else if ( sel == 3 )
-		return TrackerType::kMedianFlow;
-	else if ( sel == 4 )
-		return TrackerType::kMIL;
-}
 
 /*
 ------------------ CAMERACONTROLSLIDER CLASS -------------------
