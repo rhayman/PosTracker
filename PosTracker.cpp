@@ -327,8 +327,7 @@ void PosTracker::run()
 			if ( !frame.empty() )
 			{
 				lock.enter();
-				pos_tracker->m_tv = tv;
-				pos_tracker->m_src = frame;
+				pos_tracker = std::make_shared<PosTS>(tv, frame);
 				roi = pos_tracker->simpleColorDetect(frame);
 				// pos_tracker->detect();
 
