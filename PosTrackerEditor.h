@@ -17,7 +17,7 @@ enum class InfoLabelType
 	YPOS
 };
 
-class PosTrackerEditor : public ComboBox::Listener
+class PosTrackerEditor : public GenericEditor, public ComboBox::Listener
 {
 public:
 	PosTrackerEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors);
