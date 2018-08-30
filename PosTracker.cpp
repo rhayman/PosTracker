@@ -72,13 +72,6 @@ timeval_subtract (struct timeval *result, struct timeval *x, struct timeval *y)
   return x->tv_sec < y->tv_sec;
 };
 
-// callbacks and such for roi selection for tracking
-cv::Rect2d tracking_roi;
-void drawROIRectangle(cv::Mat img) {
-	if ( ! tracking_roi.empty() ) {
-		cv::rectangle(img, tracking_roi, cv::Scalar(0,0,255));
-	}
-}
 
 // void drawRect()
 bool drawing = false;
@@ -167,40 +160,6 @@ public:
 		return cpy;
 	}
 
-	void mserDetect()
-	{
-		// this is REALLY slow
-		cv::Ptr<cv::MSER> detector = cv::MSER::create(5, 10, 50);
-		std::vector<std::vector<cv::Point>> msers;
-		std::vector<cv::Rect> bboxes;
-		detector->detectRegions(m_src, msers, bboxes);
-		std::cout << "bboxes.size() " << bboxes.size() << std::endl;
-	}
-	void initTracker() {
-		if ( tracker && tracking_roi.width > 0 && roi_done) {
-			tracker->init(m_src, tracking_roi);
-			tracker_init = false;
-		}
-	}
-	cv::Ptr<cv::Tracker> makeTracker(TrackerType type) {
-		if ( type == TrackerType::kBoosting)
-			return makeBoostingTracker();
-		else if ( type == TrackerType::kKCF )
-			return makeKCFTracker();
-		else if ( type == TrackerType::kMedianFlow )
-			return makeMedianFlowTracker();
-		else if ( type == TrackerType::kMIL )
-			return makeMILTracker();
-	}
-	void detect()
-	{
-		if ( tracker_init ) {
-			initTracker();
-		}
-		if ( ! tracking_roi.empty() && roi_done ) {
-			tracker->update(m_src, tracking_roi);
-		}
-	}
 	void blobDetect(std::vector<cv::Point2f> & centre, std::vector<float> & radius)
 	{
 		cv::Mat m_blah = processFrame(m_src);
@@ -220,56 +179,7 @@ public:
 			m_xy[1] = (juce::uint32)__centre.y;
 		}
 	}
-	cv::Ptr<cv::Tracker> makeMILTracker() {
-		auto params = cv::TrackerMIL::Params();
-		params.samplerInitInRadius = 3.0;
-		params.samplerSearchWinSize = 25.0;
-		params.samplerInitMaxNegNum = 65;
-		params.samplerTrackInRadius = 4.0;
-		params.samplerTrackMaxPosNum = 10000;
-		params.samplerTrackMaxNegNum = 65;
-		params.featureSetNumFeatures = 250;
-		return cv::TrackerMIL::create(params);
-	}
-	cv::Ptr<cv::Tracker> makeBoostingTracker() {
-		auto params = cv::TrackerBoosting::Params();
-		params.iterationInit = 3;
-		params.numClassifiers = 3;
-		params.samplerOverlap = 2;
-		params.samplerSearchFactor = 2;
-		return cv::TrackerBoosting::create(params);
-	}
-	cv::Ptr<cv::Tracker> makeMedianFlowTracker() {
-		auto params = cv::TrackerMedianFlow::Params();
-		params.maxLevel = 10;
-		params.maxMedianLengthOfDisplacementDifference = 10;
-		params.pointsInGrid = 10;
-		params.termCriteria = cv::TermCriteria(0, 20, 0.3);
-		params.winSize = cv::Size(3, 3);
-		params.winSizeNCC = cv::Size(30, 30);
-		return cv::TrackerMedianFlow::create(params);
-	}
-	cv::Ptr<cv::Tracker> makeKCFTracker() {
-		auto params = cv::TrackerKCF::Params();
-		params.detect_thresh = 0.5;
-		params.sigma = 0.2;
-		params.lambda = 0.99;
-		params.interp_factor = 0.075;
-		params.output_sigma_factor = 0.0625;
-		params.resize = true;
-		params.max_patch_size = 6400;
-		params.split_coeff = true;
-		params.wrap_kernel = true;
-		params.desc_npca = cv::TrackerKCF::MODE::CN; // cv::TrackerKCF::MODE::GRAY or cv::TrackerKCF::MODE::CN
-		params.desc_pca = cv::TrackerKCF::MODE::CN; // cv::TrackerKCF::MODE::GRAY or cv::TrackerKCF::MODE::CN
-		params.compress_feature = true;
-		params.compressed_size = 2;
-		params.pca_learning_rate = 0.05;
-		return cv::TrackerKCF::create(params);
-	}
-	void updateRoiRect(cv::Rect rect) {
-		roi_rect = rect;
-	}
+
 	struct timeval getTimeVal() { return m_tv; }
 	juce::uint32 * getPos()
 	{
@@ -286,8 +196,6 @@ public:
 	juce::uint32 m_xy[2];
 	struct timeval m_tv;
 	std::vector<cv::KeyPoint> kps;
-	TrackerType m_type;
-	cv::Ptr<cv::Tracker> tracker = makeTracker(m_type);
 	cv::Rect roi_rect = cv::Rect(left_mat_edge, top_mat_edge, right_mat_edge-left_mat_edge, bottom_mat_edge-top_mat_edge);
 };
 
@@ -431,10 +339,6 @@ void PosTracker::run()
 	if ( ! pathFrame.empty() )
 		pathFrame = cv::Scalar(0);
 
-	TrackerType this_tracker_type = getTrackerType();
-	pos_tracker = std::make_shared<PosTS>(this_tracker_type);
-	tracking_roi = cv::Rect2d();
-
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
 
 	while ( threadRunning )
@@ -466,9 +370,6 @@ void PosTracker::run()
 						cv::line(pathFrame, pts[0], pts[1], cv::Scalar(0,255,0), 2, cv::LINE_8);
 						cv::addWeighted(frame, 1.0, pathFrame, 0.5, 0.0, frame);
 					}
-					drawROIRectangle(frame);
-					if ( ! tracking_roi.empty() )
-						cv::rectangle(frame, tracking_roi, cv::Scalar(0,0,255));
 					cv::rectangle(frame, cv::Point(double(xy[0])-3, double(xy[1])-3), cv::Point(double(xy[0])+3, double(xy[1])+3), cv::Scalar(0,255,0), -1,1);
 					cv::imshow("Live stream", frame);
 					cv::waitKey(1);
