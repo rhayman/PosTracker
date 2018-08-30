@@ -2,6 +2,7 @@
 #define POSTRACKEREDITOR_H_
 
 #include <EditorHeaders.h>
+#include "PosTracker.h"
 
 #include "common.h"
 
