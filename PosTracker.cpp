@@ -486,11 +486,6 @@ void PosTracker::run()
 	std::cout << std::endl;
 }
 
-TrackerType PosTracker::getTrackerType() {
-	auto ed = static_cast<PosTrackerEditor*>(getEditor());
-	return ed->getTrackerType();
-}
-
 void PosTracker::adjustBrightness(int val)
 {
 	if ( currentCam )

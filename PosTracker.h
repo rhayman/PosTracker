@@ -84,8 +84,6 @@ public:
 	int getCurrentFormatIdx() { return currentFormatIdx; }
 	Formats * getCurrentFormat();
 
-	TrackerType getTrackerType();
-
 	void saveCustomParametersToXml(XmlElement* xml) override;
 	void loadCustomParametersFromXml() override;
 
