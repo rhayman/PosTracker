@@ -483,7 +483,7 @@ int Camera::set_control_value(__u32 id, int val)
 			control_str = "contrast";
 		else if ( id == V4L2_CID_EXPOSURE_ABSOLUTE )
 			control_str = "exposure";
-		std::cout << "Setting " << control_str " failed.\n"
+		std::cout << "Setting " << control_str << " failed.\n"
 		errno_exit("VIDIOC_S_CTRL");
 	}
 	return 0;
