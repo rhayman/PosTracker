@@ -450,8 +450,10 @@ int Camera::switch_exposure_type(int autoOrManual)
 	CLEAR(control);
 	control.id = V4L2_CID_EXPOSURE_AUTO;
 	control.value = autoOrManual;
-	if ( -1 == xioctl(fd, VIDIOC_S_CTRL, &control) )
+	if ( -1 == xioctl(fd, VIDIOC_S_CTRL, &control) ) {
+		std::cout << "Switching exposure type failed.\n";
 		errno_exit("VIDIOC_S_CTRL");
+	}
 	return 0;
 }
 
@@ -473,8 +475,17 @@ int Camera::set_control_value(__u32 id, int val)
 	if ( val < queryctrl.minimum )
 		val = queryctrl.minimum;
 	control.value = val;
-	if ( -1 == xioctl(fd, VIDIOC_S_CTRL, &control) )
+	if ( -1 == xioctl(fd, VIDIOC_S_CTRL, &control) ) {
+		std::string control_str = "";
+		if ( id == V4L2_CID_BRIGHTNESS )
+			control_str = "brightness";
+		else if ( id == V4L2_CID_CONTRAST )
+			control_str = "contrast";
+		else if ( id == V4L2_CID_EXPOSURE_ABSOLUTE )
+			control_str = "exposure";
+		std::cout << "Setting " << control_str " failed.\n"
 		errno_exit("VIDIOC_S_CTRL");
+	}
 	return 0;
 }
 
