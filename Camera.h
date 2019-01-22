@@ -31,9 +31,9 @@ public:
 	bool started() { return has_started; }
 
 	int open_device();
-	int init_device();
+	void init_device();
 	void uninit_device();
-	int start_device();
+	void start_device();
 	/*
 	Reads the buffer and returns an openCV matrix & a timeval struct
 	(in time.h) of the time when the first data byte was captured
@@ -45,7 +45,7 @@ public:
 	int get_control_values(__u32, __s32 &, __s32 &, __s32 &);
 	int set_control_value(__u32, int);
 	int switch_exposure_type(int);
-	int set_format(); // overloads below method using zero index
+	void set_format(); // overloads below method using zero index
 	int set_format(const unsigned int /* index into availableFormats */);
 	int set_format(const std::string /* overloads with string of format from Formats::get_description()*/);
 	int set_format(const Formats * /* overloads with Format*/);

@@ -73,7 +73,7 @@ int Camera::set_framerate(const unsigned int fps)
 	return 0;
 }
 
-int Camera::set_format()
+void Camera::set_format()
 {
 	unsigned int idx = 0;
 	set_format(idx);
@@ -293,7 +293,7 @@ int Camera::open_device()
 	return 0;
 }
 
-int Camera::init_device()
+void Camera::init_device()
 {
 	struct v4l2_capability cap;
 	if (-1 == xioctl(fd, VIDIOC_QUERYCAP, &cap))
@@ -318,7 +318,7 @@ int Camera::init_device()
 	is_initialized = true;
 }
 
-int Camera::start_device()
+void Camera::start_device()
 {
 	enum v4l2_buf_type type;
 	for (unsigned int i = 0; i < n_buffers; ++i)
