@@ -4,11 +4,9 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/features2d.hpp>
 #include <opencv2/features2d/features2d.hpp>
-#include <opencv2/tracking.hpp>
 #include "PosTracker.h"
 #include "PosTrackerEditor.h"
 #include "Camera.h"
-#include "/home/robin/Dropbox/Programming/c/utils/opencvmagic.h"
 
 #include <array>
 #include <vector>
