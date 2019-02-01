@@ -87,7 +87,7 @@ public:
 	cv::Mat simpleColorDetect(cv::Mat & frame)
 	{
 		if ( ! frame.empty() ) {
-			cv::extractChannel(frame, red_channel, 2);
+			cv::extractChannel(frame, red_channel, 0);
 			cv::Mat roi = red_channel(roi_rect);
 			auto roi_mask = mask(roi_rect);
 			// cv::GaussianBlur(roi, roi, cv::Size(7,7), 3.0, 3.0);
