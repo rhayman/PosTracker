@@ -277,11 +277,11 @@ void PosTracker::startStreaming()
 	{
 		if ( liveStream == true )
 		{
-			cv::namedWindow("Live stream", cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO);
+			cv::namedWindow("Live stream", cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO & WINDOW_GUI_NORMAL);
 		}
 		threadRunning = true;
 		posBuffer = std::queue<std::shared_ptr<PosTS>>{}; // clear the buffer
-		startThread();
+		startThread(); // calls run()
 	}
 }
 
