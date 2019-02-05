@@ -255,13 +255,24 @@ void PosTracker::stopRecording()
 
 void PosTracker::openCamera()
 {
-	if ( ! currentCam->ready() )
-		currentCam->open_device();
-	if ( ! currentCam->initialized() )
-		currentCam->init_device();
-	if ( ! currentCam->started() )
-		currentCam->start_device();
-	camReady = true;
+	if ( ! currentCam->ready() ) {
+		if ( currentCam->open_device() == 0)
+			camReady = true;
+		else
+			camReady = false;
+	}
+	if ( ! currentCam->initialized() ) {
+		if ( currentCam->init_device() == 0)
+			camReady = true;
+		else
+			camReady = false;
+	}
+	if ( ! currentCam->started() ) {
+		if ( currentCam->start_device() == 0)
+			camReady = true;
+		else
+			camReady = false;
+	}
 }
 
 void PosTracker::stopCamera()
