@@ -325,7 +325,7 @@ int Camera::init_device()
 	return 0;
 }
 
-void Camera::start_device()
+int Camera::start_device()
 {
 	enum v4l2_buf_type type;
 	for (unsigned int i = 0; i < n_buffers; ++i)

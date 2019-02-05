@@ -33,7 +33,7 @@ public:
 	int open_device();
 	int init_device();
 	void uninit_device();
-	void start_device();
+	int start_device();
 	/*
 	Reads the buffer and returns an openCV matrix & a timeval struct
 	(in time.h) of the time when the first data byte was captured
