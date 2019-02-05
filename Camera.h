@@ -31,7 +31,7 @@ public:
 	bool started() { return has_started; }
 
 	int open_device();
-	void init_device();
+	int init_device();
 	void uninit_device();
 	void start_device();
 	/*
@@ -45,7 +45,7 @@ public:
 	int get_control_values(__u32, __s32 &, __s32 &, __s32 &);
 	int set_control_value(__u32, int);
 	int switch_exposure_type(int);
-	void set_format(); // overloads below method using zero index
+	int set_format(); // overloads below method using zero index
 	int set_format(const unsigned int /* index into availableFormats */);
 	int set_format(const std::string /* overloads with string of format from Formats::get_description()*/);
 	int set_format(const Formats * /* overloads with Format*/);

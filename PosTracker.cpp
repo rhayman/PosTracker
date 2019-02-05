@@ -470,8 +470,12 @@ std::vector<std::string> PosTracker::getDeviceFormats()
 
 void PosTracker::setDeviceFormat(std::string format)
 {
-	if ( ! currentCam->ready() )
-		currentCam->open_device();
+	if ( ! currentCam->ready() ) {
+		if ( currentCam->open_device() == 0)
+			camReady = true;
+		else
+			camReady = false;
+	}
 	std::vector<Formats*> formats = currentCam->get_formats();
 	for ( auto & f : formats)
 	{

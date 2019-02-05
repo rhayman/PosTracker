@@ -73,10 +73,10 @@ int Camera::set_framerate(const unsigned int fps)
 	return 0;
 }
 
-void Camera::set_format()
+int Camera::set_format()
 {
 	unsigned int idx = 0;
-	set_format(idx);
+	return set_format(idx);
 }
 
 int Camera::set_format(const unsigned int index)
@@ -89,8 +89,10 @@ int Camera::set_format(const unsigned int index)
 	struct v4l2_format fmt;
 	CLEAR(fmt);
 	fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	if ( -1 == xioctl(fd, VIDIOC_G_FMT, &fmt) )
-		errno_exit("Could not get parameters");
+	if ( -1 == xioctl(fd, VIDIOC_G_FMT, &fmt) ) {
+		std::cout << "Could not get parameters" << std::endl;
+		return 1;
+	}
 
 	fmt.fmt.pix.width = thisfmt->width;
 	fmt.fmt.pix.height = thisfmt->height;
@@ -99,10 +101,7 @@ int Camera::set_format(const unsigned int index)
 	// thisfmt.print();
 
 	if ( -1 == xioctl(fd, VIDIOC_S_FMT, &fmt) )
-	{
-		errno_exit("Cannot set frame size on the device");
 		return 1;
-	}
 	else
 	{
 		std::cout << "Set frame size to " << thisfmt->width << "x" << thisfmt->height;
@@ -121,15 +120,19 @@ int Camera::set_format(const unsigned int index)
 	struct v4l2_streamparm streamparm;
 	CLEAR(streamparm);
 	streamparm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	if ( -1 == xioctl(fd, VIDIOC_G_PARM, &streamparm) )
-		errno_exit("Cannot set parameters on the device");
+	if ( -1 == xioctl(fd, VIDIOC_G_PARM, &streamparm) ) {
+		std::cout << "Cannot set parameters on the device" << std::endl;
+		return 1;
+	}
 
 	if ( streamparm.parm.capture.capability == V4L2_CAP_TIMEPERFRAME )
 	{
 		streamparm.parm.capture.timeperframe.numerator = thisfmt->numerator;
 		streamparm.parm.capture.timeperframe.denominator = thisfmt->denominator;
-		if ( -1 == xioctl(fd, VIDIOC_S_PARM, &streamparm) )
-			errno_exit("Cannot set frame rate on device");
+		if ( -1 == xioctl(fd, VIDIOC_S_PARM, &streamparm) ) {
+			std::cout << "Cannot set frame rate on device" << std::endl;
+			return 1;
+		}
 		else
 		{
 			std::cout << "Set frame rate to " << (double)thisfmt->denominator / (double)thisfmt->numerator;
@@ -137,8 +140,10 @@ int Camera::set_format(const unsigned int index)
 		}
 
 	}
-	else
-		errno_exit("Cannot set frame rate on device");
+	else {
+		std::cout << "Cannot set frame rate on device" << std::endl;
+		return 1;
+	}
 	currentFmt = thisfmt;
 	std::cout << *currentFmt << std::endl;
 	return 0;
@@ -151,7 +156,7 @@ int Camera::set_format(const std::string format)
 	for (int i = 0; i < allFormats.size(); ++i)
 	{
 		if ( format.compare(allFormats.at(i)) == 0)
-			set_format(i);
+			return set_format(i);
 	}
 	return 0;
 }
@@ -162,7 +167,7 @@ int Camera::set_format(const Formats * format)
 	for (int i = 0; i < formats.size(); ++i)
 	{
 		if ( format == formats.at(i) )
-			set_format(i);
+			return set_format(i);
 	}
 	return 0;
 }
@@ -252,7 +257,7 @@ std::vector<Formats*> Camera::get_formats()
 			}
 			else
 				fprintf(stderr, "Continuous framesize not supported for: %s\n", dev_name.c_str());
-			frmsize.index++;	
+			frmsize.index++;
 		}
 		fmt.index++;
 	}
@@ -267,13 +272,13 @@ int Camera::open_device()
 	{
 		fprintf(stderr, "Cannot identify '%s': %d, %s\n",
 				 dev_name.c_str(), errno, strerror(errno));
-		exit(EXIT_FAILURE);
+		return 1;
 	}
 
 	if (!S_ISCHR(st.st_mode))
 	{
 		fprintf(stderr, "%s is no devicen", dev_name.c_str());
-		exit(EXIT_FAILURE);
+		return 1;
 
 	}
 
@@ -283,7 +288,7 @@ int Camera::open_device()
 	{
 		fprintf(stderr, "Cannot open '%s': %d, %s\n",
 				 dev_name.c_str(), errno, strerror(errno));
-		exit(EXIT_FAILURE);
+		return 1;
 	}
 
 	fprintf(stdout, "Successfully opened %s\n", dev_name.c_str());
@@ -293,7 +298,7 @@ int Camera::open_device()
 	return 0;
 }
 
-void Camera::init_device()
+int Camera::init_device()
 {
 	struct v4l2_capability cap;
 	if (-1 == xioctl(fd, VIDIOC_QUERYCAP, &cap))
@@ -302,7 +307,7 @@ void Camera::init_device()
 		{
 			fprintf(stderr, "%s is no V4L2 device\\n",
 					 dev_name.c_str());
-			exit(EXIT_FAILURE);
+			return 1;
 		}
 		else
 			errno_exit("VIDIOC_QUERYCAP");
@@ -311,11 +316,13 @@ void Camera::init_device()
 	{
 		fprintf(stderr, "%s is no video capture device\\n",
 				 dev_name.c_str());
-		exit(EXIT_FAILURE);
+		return 1;
 	}
 	init_mmap();
 
 	is_initialized = true;
+
+	return 0;
 }
 
 void Camera::start_device()
@@ -328,13 +335,18 @@ void Camera::start_device()
 		buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		buf.memory = V4L2_MEMORY_MMAP;
 		buf.index = i;
-		if ( -1 == xioctl(fd, VIDIOC_QBUF, &buf) )
-			errno_exit("VIDIOC_QBUF");
+		if ( -1 == xioctl(fd, VIDIOC_QBUF, &buf) ) {
+			std::cout << "VIDIOC_QBUF" << std::endl;
+			return 1;
+		}
 	}
 	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	if ( -1 == xioctl(fd, VIDIOC_STREAMON, &type) )
-		errno_exit("VIDIOC_STREAMON");
+	if ( -1 == xioctl(fd, VIDIOC_STREAMON, &type) ) {
+		std::cout << "VIDIOC_STREAMON" << std::endl;
+		return 1;
+	}
 	has_started = true;
+	return 0;
 }
 
 int Camera::stop_device()
@@ -343,8 +355,10 @@ int Camera::stop_device()
 	{
 		enum v4l2_buf_type type;
 		type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-		if ( -1 == xioctl(fd, VIDIOC_STREAMOFF, &type) )
-			errno_exit("VIDIOC_STREAMOFF");
+		if ( -1 == xioctl(fd, VIDIOC_STREAMOFF, &type) ) {
+			std::cout << "VIDIOC_STREAMOFF" << std::endl;
+			return 1;
+		}
 	}
 	has_started = false;
 	return 0;
@@ -368,7 +382,7 @@ int Camera::read_frame(cv::Mat & result, struct timeval &tv)
 	{
 		if (EINTR == errno)
 		{
-			errno_exit("select");
+			std::cout << "select" << std::endl;
 			result = cv::Mat();
 			return 1;
 		}
@@ -394,7 +408,7 @@ int Camera::read_frame(cv::Mat & result, struct timeval &tv)
 		{
 			case EAGAIN:
 			{
-				errno_exit("EAGAIN");
+				std::cout << "EAGAIN" << std::endl;
 				result = cv::Mat();
 				return 1;
 			}
@@ -403,7 +417,7 @@ int Camera::read_frame(cv::Mat & result, struct timeval &tv)
 			// https://linuxtv.org/downloads/v4l-dvb-apis/uapi/v4l/capture.c.html
 			default:
 			{
-				errno_exit("VIDIOC_DQBUF");
+				std::cout << "VIDIOC_DQBUF" << std::endl;
 				result = cv::Mat();
 				return 1;
 			}
@@ -426,7 +440,7 @@ int Camera::read_frame(cv::Mat & result, struct timeval &tv)
 	if (-1 == xioctl(fd, VIDIOC_QBUF, &buf))
 	{
 		result = cv::Mat();
-		errno_exit("VIDIOC_QBUF");
+		std::cout << "VIDIOC_QBUF" << std::endl;
 		return 1;
 	}
 	return 0;
@@ -451,8 +465,8 @@ int Camera::switch_exposure_type(int autoOrManual)
 	control.id = V4L2_CID_EXPOSURE_AUTO;
 	control.value = autoOrManual;
 	if ( -1 == xioctl(fd, VIDIOC_S_CTRL, &control) ) {
-		std::cout << "Switching exposure type failed.\n";
-		errno_exit("VIDIOC_S_CTRL");
+		std::cout << "VIDIOC_S_CTRL: Switching exposure type failed.\n";
+		return 1;
 	}
 	return 0;
 }
@@ -464,8 +478,8 @@ int Camera::set_control_value(__u32 id, int val)
 	queryctrl.id = id;
 	if ( -1 == xioctl(fd, VIDIOC_QUERYCTRL, &queryctrl) )
 	{
-		std::cout << "Could not set control value" << std::endl;
-		errno_exit("VIDIOC_QUERYCTRL");
+		std::cout << "VIDIOC_QUERYCTRL: Could not set control value" << std::endl;
+		return 1;
 	}
 	struct v4l2_control control;
 	CLEAR(control);
@@ -483,8 +497,8 @@ int Camera::set_control_value(__u32 id, int val)
 			control_str = "contrast";
 		else if ( id == V4L2_CID_EXPOSURE_ABSOLUTE )
 			control_str = "exposure";
-		std::cout << "Setting " << control_str << " failed.\n";
-		errno_exit("VIDIOC_S_CTRL");
+		std::cout << "VIDIOC_S_CTRL: Setting " << control_str << " failed.\n";
+		return 1;
 	}
 	return 0;
 }
