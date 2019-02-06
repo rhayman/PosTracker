@@ -209,7 +209,7 @@ void PosTracker::process(AudioSampleBuffer& buffer)
 {
 		setTimestampAndSamples(CoreServices::getGlobalTimestamp(), 1);
 		juce::uint64 tmp_ts = CoreServices::getGlobalTimestamp();
-		std::cout << tmp_ts << std::endl;
+		std::cout << tmp_ts << "," << std::endl;
 		lock.enter();
 		while ( ! posBuffer.empty() )
 		{
