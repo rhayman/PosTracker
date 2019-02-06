@@ -334,7 +334,7 @@ void PosTrackerEditor::updateSettings()
 	}
 	else
 	{
-		// DEAL WITH THIS PROPERLY
+		return;
 	}
 	if ( m_proc->isCamReady() )
 	{

@@ -331,6 +331,8 @@ void PosTracker::run()
 		if ( camReady )
 		{
 			juce::int64 st = cv::getTickCount();
+			juce::uint64 tmp_ts = getTimestamp(1);
+			std::cout << tmp_ts << std::endl;
 			currentCam->read_frame(frame, tv);
 
 			if ( !frame.empty() )
