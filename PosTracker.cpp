@@ -208,6 +208,8 @@ PosTracker::~PosTracker()
 void PosTracker::process(AudioSampleBuffer& buffer)
 {
 		setTimestampAndSamples(CoreServices::getGlobalTimestamp(), 1);
+		juce::uint64 tmp_ts = CoreServices::getGlobalTimestamp();
+		std::cout << tmp_ts << std::endl;
 		lock.enter();
 		while ( ! posBuffer.empty() )
 		{
@@ -331,8 +333,6 @@ void PosTracker::run()
 		if ( camReady )
 		{
 			juce::int64 st = cv::getTickCount();
-			juce::uint64 tmp_ts = getTimestamp(0);
-			std::cout << tmp_ts << std::endl;
 			currentCam->read_frame(frame, tv);
 
 			if ( !frame.empty() )
