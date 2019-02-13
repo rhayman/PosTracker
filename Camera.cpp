@@ -13,6 +13,7 @@
 
 Camera::~Camera()
 {
+	std::cout << "Camera destructor called\n";
 	if (n_buffers > 0)
 	{
 		for (int i = 0; i < n_buffers; i++)
