@@ -18,7 +18,7 @@ Camera::~Camera()
 		for (int i = 0; i < n_buffers; i++)
 		{
 			if ( -1 == munmap(buffers[i].start, buffers[i].length))
-				errno_exit("munmap");
+				errno_exit("munmap in Camera destructor");
 		}
 	}
 	if ( fd > -1 )
@@ -587,7 +587,7 @@ void Camera::uninit_device()
 		for (int i = 0; i < n_buffers; ++i)
 		{
 			if ( -1 == munmap(buffers[i].start, buffers[i].length) )
-				errno_exit("munmap");
+				errno_exit("munmap in uninit_device()");
 		}
 		free(buffers);
 	}
