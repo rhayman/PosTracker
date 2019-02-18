@@ -13,20 +13,20 @@
 
 Camera::~Camera()
 {
-	std::cout << "Camera destructor called\n";
-	if (n_buffers > 0)
-	{
-		for (int i = 0; i < n_buffers; i++)
-		{
-			if ( buffers[i].length > 0 ) {
-				std::cout << "buffers i length = " << buffers[i].length << std::endl;
-				if ( -1 == munmap(buffers[i].start, buffers[i].length))
-					errno_exit("munmap in Camera destructor");
-			}
-		}
-	}
-	if ( fd > -1 )
-		close(fd);
+	// std::cout << "Camera destructor called\n";
+	// if (n_buffers > 0)
+	// {
+	// 	for (int i = 0; i < n_buffers; i++)
+	// 	{
+	// 		if ( buffers[i].length > 0 ) {
+	// 			std::cout << "buffers i length = " << buffers[i].length << std::endl;
+	// 			if ( -1 == munmap(buffers[i].start, buffers[i].length))
+	// 				errno_exit("munmap in Camera destructor");
+	// 		}
+	// 	}
+	// }
+	// if ( fd > -1 )
+	// 	close(fd);
 }
 
 int Camera::set_framesize(const unsigned int width, const unsigned int height)
