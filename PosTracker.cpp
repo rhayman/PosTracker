@@ -288,8 +288,7 @@ void PosTracker::startStreaming()
 	{
 		if ( liveStream == true )
 		{
-			cv::namedWindow("Live stream", cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO & cv::WINDOW_GUI_NORMAL);
-			std::cout << "get_dev_name(): " << currentCam->get_dev_name() << std::endl;
+			cv::namedWindow(currentCam->get_dev_name(), cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO & cv::WINDOW_GUI_NORMAL);
 		}
 		threadRunning = true;
 		posBuffer = std::queue<std::shared_ptr<PosTS>>{}; // clear the buffer
@@ -356,7 +355,7 @@ void PosTracker::run()
 						cv::addWeighted(frame, 1.0, pathFrame, 0.5, 0.0, frame);
 					}
 					cv::rectangle(frame, cv::Point(double(xy[0])-3, double(xy[1])-3), cv::Point(double(xy[0])+3, double(xy[1])+3), cv::Scalar(0,255,0), -1,1);
-					cv::imshow("Live stream", frame);
+					cv::imshow(currentCam->get_dev_name(), frame);
 					cv::waitKey(1);
 
 					double fps = cv::getTickFrequency() / (cv::getTickCount() - st);
