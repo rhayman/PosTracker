@@ -220,7 +220,6 @@ void PosTracker::process(AudioSampleBuffer& buffer)
 
 void PosTracker::createEventChannels()
 {
-	std::cout << "createEventChannels called" << std::endl;
 	EventChannel * chan = new EventChannel(EventChannel::UINT32_ARRAY, 1, 3, CoreServices::getGlobalSampleRate(), this);
 	chan->setName("Position");
 	chan->setDescription("x-y position of animal");
@@ -311,7 +310,7 @@ void PosTracker::showLiveStream(bool val)
 {
 	liveStream = val;
 	if ( liveStream == false ){
-		cv::destroyAllWindows();
+		cv::destroyWindow(currentCam->get_dev_name());
 	}
 }
 
