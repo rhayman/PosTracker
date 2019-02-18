@@ -19,6 +19,7 @@ Camera::~Camera()
 		for (int i = 0; i < n_buffers; i++)
 		{
 			if ( buffers[i].length > 0 ) {
+				std::cout << "buffers i length = " << buffers[i].length() << std::endl;
 				if ( -1 == munmap(buffers[i].start, buffers[i].length))
 					errno_exit("munmap in Camera destructor");
 			}
