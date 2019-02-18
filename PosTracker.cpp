@@ -535,7 +535,7 @@ void PosTracker::createNewCamera(std::string dev_name)
 	for ( auto & dev : devices )
 	{
 		if ( dev.compare(dev_name) == 0 )
-			std::unqiue_ptr<Camera> currentCam = std::make_unique<Camera>(dev_name);
+			std::unique_ptr<Camera> currentCam = std::make_unique<Camera>(dev_name);
 	}
 }
 
