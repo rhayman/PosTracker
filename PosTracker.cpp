@@ -529,13 +529,13 @@ void PosTracker::createNewCamera(std::string dev_name)
 			currentCam->uninit_device();
 			currentCam->close_device();
 		}
-		delete currentCam;
+		currentCam.release();
 	}
 	std::vector<std::string> devices = Camera::get_devices();
 	for ( auto & dev : devices )
 	{
 		if ( dev.compare(dev_name) == 0 )
-			currentCam = std::make_unique<Camera>(dev_name);
+			std::unqiue_ptr<Camera> currentCam = std::make_unique<Camera>(dev_name);
 	}
 }
 
