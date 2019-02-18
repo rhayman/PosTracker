@@ -9,8 +9,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "common.h"
 
-
-
 class Camera
 {
 public:

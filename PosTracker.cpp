@@ -12,7 +12,7 @@
 #include <vector>
 
 cv::Mat mask;
-cv::Mat displayMask;
+// cv::Mat displayMask;
 cv::Mat pathFrame;
 cv::Mat debug_frame;
 // values for excluding points outside the mask for use in PosTS class below

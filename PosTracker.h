@@ -5,6 +5,8 @@
 #include <fstream>
 #include <memory>
 
+#include <opencv2/opencv.hpp>
+
 #include <queue>
 #include "common.h"
 #include <ProcessorHeaders.h>
@@ -102,6 +104,8 @@ private:
 
 	CriticalSection lock;
 	CriticalSection displayMutex;
+
+	cv::Mat displayMask;
 
 	int brightness = 50;
 	int contrast = 50;
