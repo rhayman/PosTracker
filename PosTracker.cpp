@@ -521,7 +521,7 @@ std::vector<std::string> PosTracker::getDeviceList()
 
 void PosTracker::createNewCamera(std::string dev_name)
 {
-	if ( currentCam != nullptr )
+	if ( currentCam )
 	{
 		if ( currentCam->ready() )
 		{
@@ -535,7 +535,7 @@ void PosTracker::createNewCamera(std::string dev_name)
 	for ( auto & dev : devices )
 	{
 		if ( dev.compare(dev_name) == 0 )
-			currentCam = new Camera(dev_name);
+			currentCam = std::make_unique<Camera>(dev_name);
 	}
 }
 

@@ -95,7 +95,7 @@ private:
 	bool liveStream = false;
 	int currentCameraIdx = -1;
 	int currentFormatIdx = -1;
-	Camera * currentCam = nullptr;
+	std::unique_ptr<Camera> currentCam;
 
 	std::shared_ptr<PosTS> pos_tracker;
 
