@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include <queue>
 #include "common.h"
