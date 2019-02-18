@@ -525,9 +525,9 @@ void PosTracker::createNewCamera(std::string dev_name)
 	{
 		if ( currentCam->ready() )
 		{
-			currentCam.stop_device();
-			currentCam.uninit_device();
-			currentCam.close_device();
+			currentCam->stop_device();
+			currentCam->uninit_device();
+			currentCam->close_device();
 		}
 		currentCam.reset();
 	}
@@ -543,9 +543,9 @@ std::pair<int,int> PosTracker::getResolution()
 {
 	if ( currentCam )
 	{
-		if ( currentCam.get_current_format() )
+		if ( currentCam->get_current_format() )
 		{
-			auto format = currentCam.get_current_format();
+			auto format = currentCam->get_current_format();
 			return std::make_pair<int,int>(format->width, format->height);
 		}
 	}
@@ -601,7 +601,7 @@ void PosTracker::loadCustomParametersFromXml()
 			createNewCamera(deviceXml->getStringAttribute("Camera").toStdString());
 		if ( deviceXml->hasAttribute("Format") )
 		{
-			if ( currentCam.ready() )
+			if ( currentCam->ready() )
 			{
 				getDeviceList();
 			}
