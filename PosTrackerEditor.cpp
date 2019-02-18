@@ -11,7 +11,7 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	Font font = Font(typeface);
 
 	desiredWidth = 425;
-	m_proc = (PosTracker*)parentNode;
+	m_proc = (PosTracker*)getProcessor();
 
 	// Video source stuff
 	addAndMakeVisible(sourceCombo = new ComboBox("sourceCombo"));
