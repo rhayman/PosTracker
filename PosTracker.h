@@ -72,7 +72,6 @@ public:
 	bool autoExposure() { return auto_exposure; }
 
 	void adjustVideoMask(BORDER, int val);
-	// void adjustTrackerMask(int, int, int, int);
 	void makeVideoMask();
 	int getVideoMask(BORDER);
 

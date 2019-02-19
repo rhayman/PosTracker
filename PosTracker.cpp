@@ -422,6 +422,8 @@ void PosTracker::run()
 	}
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
+	auto r = displayMask->getROIRect();
+	std::cout << "r " << r << std::endl;
 
 	while ( threadRunning )
 	{
@@ -495,12 +497,6 @@ void PosTracker::adjustVideoMask(BORDER edge, int val)
 {
 	displayMask->setEdge(edge, val);
 }
-
-// void PosTracker::adjustTrackerMask(int left, int top, int right, int bottom) {
-// 	if ( pos_tracker ) {
-// 		cv::Rect r(cv::Point(left, top), cv::Point(right, bottom));
-// 	}
-// }
 
 void PosTracker::makeVideoMask()
 {
