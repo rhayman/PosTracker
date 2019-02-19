@@ -434,13 +434,9 @@ void PosTracker::run()
 				lock.enter();
 				pos_tracker = std::make_shared<PosTS>(tv, frame);
 				cv::Mat displayMask_mask = displayMask->getMask();
-				printTypeInfo("displayMask_mask", displayMask_mask);
-				printTypeInfo("frame", frame);
 				pos_tracker->setMask(displayMask_mask);
 				pos_tracker->setROIRect(displayMask->getROIRect());
-				std::cout << "About to do simpleColorDetect()\n";
 				roi = pos_tracker->simpleColorDetect(frame);
-				std::cout << "Done simpleColorDetect()\n";
 
 				if ( liveStream == true )
 				{
@@ -450,6 +446,8 @@ void PosTracker::run()
 					ed->setInfoValue(InfoLabelType::XPOS, (double)xy[0]);
 					ed->setInfoValue(InfoLabelType::YPOS, (double)xy[1]);
 					std::cout << "About to do bitwise_and\n";
+					printTypeInfo("displayMask_mask", displayMask_mask);
+					printTypeInfo("frame", frame);
 					cv::bitwise_and(frame, displayMask_mask, frame, displayMask_mask);
 					std::cout << "done bitwise_and\n";
 					if ( pts[1].x > 0 && pts[1].y > 0  && path_overlay == true )
