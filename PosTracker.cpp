@@ -134,6 +134,7 @@ public:
 	PosTS(struct timeval tv, cv::Mat & src) : m_tv(tv), m_src(src) {};
 	~PosTS() {};
 	void setROIRect(cv::Rect roi) { roi_rect = roi; }
+	void setMask(cv::Mat m) { mask = m; }
 	cv::Mat simpleColorDetect(cv::Mat & frame)
 	{
 		if ( ! frame.empty() ) {
@@ -222,6 +223,7 @@ public:
 	struct timeval m_tv;
 	std::vector<cv::KeyPoint> kps;
 	cv::Rect roi_rect;
+	cv::Mat mask;
 };
 
 PosTracker::PosTracker() : GenericProcessor("Pos Tracker"), Thread("PosTrackerThread")
@@ -389,6 +391,7 @@ void PosTracker::run()
 				lock.enter();
 				pos_tracker = std::make_shared<PosTS>(tv, frame);
 				displayMask_mask = displayMask->getMask();
+				pos_tracker->setMask(displayMask_mask);
 				pos_tracker->setROIRect(displayMask_mask);
 				roi = pos_tracker->simpleColorDetect(frame);
 
