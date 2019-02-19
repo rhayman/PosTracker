@@ -373,8 +373,8 @@ void PosTracker::run()
 	struct timeval tv;
 	std::vector<cv::Point2d> pts{2};
 	unsigned int count = 0;
-	if ( ! DisplayMask->getPathFrame().empty() ) {
-		DisplayMask->setPathFrame(cv::Scalar(0));
+	if ( ! displayMask->getPathFrame().empty() ) {
+		displayMask->setPathFrame(cv::Scalar(0));
 	}
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
@@ -405,7 +405,7 @@ void PosTracker::run()
 					cv::bitwise_and(frame, displayMask_mask, frame, mask);
 					if ( pts[1].x > 0 && pts[1].y > 0  && path_overlay == true )
 					{
-						cv::Mat pathFrame = DisplayMask->getPathFrame();
+						cv::Mat pathFrame = displayMask->getPathFrame();
 						cv::line(pathFrame, pts[0], pts[1], cv::Scalar(0,255,0), 2, cv::LINE_8);
 						cv::addWeighted(frame, 1.0, pathFrame, 0.5, 0.0, frame);
 					}
@@ -474,7 +474,7 @@ void PosTracker::makeVideoMask()
 			lock.enter();
 			std::pair<int, int> res = getResolution();
 			// update the "locally global" values of the edges
-			DisplayMask->makeMask(res.second, res.first);
+			displayMask->makeMask(res.second, res.first);
 			// left_mat_edge = left_border;
 			// right_mat_edge = right_border;
 			// top_mat_edge = top_border;
@@ -493,15 +493,15 @@ void PosTracker::makeVideoMask()
 
 int PosTracker::getVideoMask(BORDER edge)
 {
-	return DisplayMask->getEdge(edge);
+	return displayMask->getEdge(edge);
 }
 
 void PosTracker::overlayPath(bool state)
 {
 	 path_overlay = state;
-	 if ( ! DisplayMask->getPathFrame().empty() )
+	 if ( ! displayMask->getPathFrame().empty() )
 	 {
-		DisplayMask->setPathFrame(cv::Scalar(0));
+		displayMask->setPathFrame(cv::Scalar(0));
 	 	debug_frame = cv::Scalar(0);
 	 }
 }
