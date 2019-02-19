@@ -11,15 +11,10 @@
 #include <array>
 #include <vector>
 
-cv::Mat mask;
+// cv::Mat mask;
 // cv::Mat displayMask;
-cv::Mat pathFrame;
+// cv::Mat pathFrame;
 cv::Mat debug_frame;
-// values for excluding points outside the mask for use in PosTS class below
-int left_mat_edge;
-int right_mat_edge;
-int top_mat_edge;
-int bottom_mat_edge;
 
 // originally nabbed this from:
 // https://www.gnu.org/software/libc/manual/html_node/Elapsed-Time.html
@@ -77,6 +72,56 @@ bool roi_done = false;
 bool tracker_init = false;
 int initx = -1;
 int inity = -1;
+
+/*
+A class for decorating the video output frame with a windowed border,
+the path of the animal, and maybe other stuff if I can be bothered...
+*/
+class DisplayMask
+{
+public:
+	DisplayMask() {};
+	DisplayMask(cv::Mat mask) : m_displayMask(mask) {};
+	~DisplayMask() {};
+	void makeMask(int width, int height)
+	{
+		mask = cv::Mat::ones(width, height, CV_8UC1);
+		cv::rectangle(mask, cv::Point(m_left_mat_edge, m_top_mat_edge), cv::Point(m_right_mat_edge, m_bottom_mat_edge), cv::Scalar(0), -1, 8, 0);
+		mask.copyTo(m_displayMask);
+		mask.copyTo(m_pathFrame);
+		cv::cvtColor(displayMask, displayMask, cv::COLOR_GRAY2BGR);
+		cv::cvtColor(pathFrame, pathFrame, cv::COLOR_GRAY2BGR);
+
+	}
+	cv::Mat getMask() { return m_displayMask; }
+	cv::Mat getPathFrame() { return pathFrame; }
+	void setPathFrame(cv::Mat p) { m_pathFrame = m; }
+	void setEdge(BORDER, int)
+	{
+		if ( ! m_displayMask.empty() ) {
+
+		}
+	};
+	int getEdge(BORDER edge)
+	{
+		switch (edge) {
+			case BORDER::LEFT: return m_left_mat_edge;
+			case BORDER::RIGHT: return m_right_mat_edge;
+			case BORDER::TOP: return m_top_mat_edge; // co-ords switched
+			case BORDER::BOTTOM: return m_bottom_mat_edge;
+		}
+	};
+private:
+	cv::Mat m_displayMask;
+	cv::Mat m_pathFrame;
+	// values for excluding points outside the mask for use in PosTS class below
+	// and the display of the bounding box for the windowed video output
+	int m_left_mat_edge;
+	int m_right_mat_edge;
+	int m_top_mat_edge;
+	int m_bottom_mat_edge;
+};
+
 
 class PosTS
 {
@@ -188,6 +233,7 @@ PosTracker::~PosTracker()
 		currentCam->uninit_device();
 		currentCam->close_device();
 	}
+	displayMask.reset();
 }
 
 	void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
@@ -320,8 +366,9 @@ void PosTracker::run()
 	struct timeval tv;
 	std::vector<cv::Point2d> pts{2};
 	unsigned int count = 0;
-	if ( ! pathFrame.empty() )
-		pathFrame = cv::Scalar(0);
+	if ( ! DisplayMask->getPathFrame().empty() ) {
+		DisplayMask->setPathFrame(cv::Scalar(0));
+	}
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
 
@@ -346,10 +393,11 @@ void PosTracker::run()
 					pts[count%2] = cv::Point2d(double(xy[0]), double(xy[1]));
 					ed->setInfoValue(InfoLabelType::XPOS, (double)xy[0]);
 					ed->setInfoValue(InfoLabelType::YPOS, (double)xy[1]);
-
-					cv::bitwise_and(frame, displayMask, frame, mask);
+					displayMask_mask = displayMask->getMask();
+					cv::bitwise_and(frame, displayMask_mask, frame, mask);
 					if ( pts[1].x > 0 && pts[1].y > 0  && path_overlay == true )
 					{
+						cv::Mat pathFrame = DisplayMask->getPathFrame();
 						cv::line(pathFrame, pts[0], pts[1], cv::Scalar(0,255,0), 2, cv::LINE_8);
 						cv::addWeighted(frame, 1.0, pathFrame, 0.5, 0.0, frame);
 					}
@@ -393,13 +441,14 @@ void PosTracker::adjustExposure(int val)
 
 void PosTracker::adjustVideoMask(BORDER edge, int val)
 {
-	switch (edge)
-	{
-		case BORDER::LEFT: left_border = val; break;
-		case BORDER::RIGHT: right_border = val; break;
-		case BORDER::TOP: top_border = val; break; // co-ords switched
-		case BORDER::BOTTOM: bottom_border = val; break;
-	}
+	displayMask->setEdge(edge, val);
+	// switch (edge)
+	// {
+	// 	case BORDER::LEFT: left_border = val; break;
+	// 	case BORDER::RIGHT: right_border = val; break;
+	// 	case BORDER::TOP: top_border = val; break; // co-ords switched
+	// 	case BORDER::BOTTOM: bottom_border = val; break;
+	// }
 }
 
 void PosTracker::adjustTrackerMask(int left, int top, int right, int bottom) {
@@ -417,17 +466,18 @@ void PosTracker::makeVideoMask()
 			lock.enter();
 			std::pair<int, int> res = getResolution();
 			// update the "locally global" values of the edges
-			left_mat_edge = left_border;
-			right_mat_edge = right_border;
-			top_mat_edge = top_border;
-			bottom_mat_edge = bottom_border;
+			DisplayMask->makeMask(res.second, res.first);
+			// left_mat_edge = left_border;
+			// right_mat_edge = right_border;
+			// top_mat_edge = top_border;
+			// bottom_mat_edge = bottom_border;
 			// do the masking
-			mask = cv::Mat::ones(res.second, res.first, CV_8UC1);
-			cv::rectangle(mask, cv::Point(left_border, top_border), cv::Point(right_border, bottom_border), cv::Scalar(0), -1, 8, 0);
-			mask.copyTo(displayMask);
-			mask.copyTo(pathFrame);
-			cv::cvtColor(displayMask, displayMask, cv::COLOR_GRAY2BGR);
-			cv::cvtColor(pathFrame, pathFrame, cv::COLOR_GRAY2BGR);
+			// mask = cv::Mat::ones(res.second, res.first, CV_8UC1);
+			// cv::rectangle(mask, cv::Point(left_border, top_border), cv::Point(right_border, bottom_border), cv::Scalar(0), -1, 8, 0);
+			// mask.copyTo(displayMask);
+			// mask.copyTo(pathFrame);
+			// cv::cvtColor(displayMask, displayMask, cv::COLOR_GRAY2BGR);
+			// cv::cvtColor(pathFrame, pathFrame, cv::COLOR_GRAY2BGR);
 			lock.exit();
 		}
 	}
@@ -435,21 +485,15 @@ void PosTracker::makeVideoMask()
 
 int PosTracker::getVideoMask(BORDER edge)
 {
-	switch (edge)
-	{
-		case BORDER::LEFT: return left_border;
-		case BORDER::RIGHT: return right_border;
-		case BORDER::TOP: return top_border; // co-ords switched
-		case BORDER::BOTTOM: return bottom_border;
-	}
+	return DisplayMask->getEdge(edge);
 }
 
 void PosTracker::overlayPath(bool state)
 {
 	 path_overlay = state;
-	 if ( ! pathFrame.empty() )
+	 if ( ! DisplayMask->getPathFrame().empty() )
 	 {
-		pathFrame = cv::Scalar(0);
+		DisplayMask->setPathFrame(cv::Scalar(0));
 	 	debug_frame = cv::Scalar(0);
 	 }
 }

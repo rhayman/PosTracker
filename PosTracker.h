@@ -5,14 +5,13 @@
 #include <fstream>
 #include <memory>
 
-#include <opencv2/opencv.hpp>
-
 #include <queue>
 #include "common.h"
 #include <ProcessorHeaders.h>
 
 class Camera;
 class PosTS;
+class DisplayMask;
 class PosTrackerEditor;
 
 class PosTracker : public GenericProcessor, public Thread
@@ -101,11 +100,10 @@ private:
 	std::unique_ptr<Camera> currentCam;
 
 	std::shared_ptr<PosTS> pos_tracker;
+	std::unique_ptr<Displaymask> displayMask;
 
 	CriticalSection lock;
 	CriticalSection displayMutex;
-
-	cv::Mat displayMask;
 
 	int brightness = 50;
 	int contrast = 50;
