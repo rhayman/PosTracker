@@ -369,6 +369,11 @@ void PosTracker::run()
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
 
+	GenericProcessor* dest = getDestNode();
+	if ( dest ) {
+		if ( dest->isMerger() )
+			std::cout << "got a merger" << std::endl;
+	}
 
 	while ( threadRunning )
 	{
