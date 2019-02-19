@@ -183,7 +183,7 @@ public:
 		if ( ! frame.empty() ) {
 			cv::extractChannel(frame, red_channel, 0);
 			cv::Mat roi = red_channel(roi_rect);
-			cv::Mat roi_mask = mask(roi_rect, CV_8UC1);
+			// cv::Mat roi_mask = mask(roi_rect);
 			// cv::GaussianBlur(roi, roi, cv::Size(7,7), 3.0, 3.0);
 			cv::threshold(roi, roi, 200, 1000, cv::THRESH_BINARY);
 			// cv::erode(roi, roi, kern, cv::Point(-1,-1), 1);
@@ -207,7 +207,7 @@ public:
 				maxloc.y = static_cast<int>(y_centroid) + roi_rect.y;
 			}
 			else {
-				cv::minMaxLoc(roi, NULL, NULL, NULL, &maxloc, ~roi_mask);
+				cv::minMaxLoc(roi, NULL, NULL, NULL, &maxloc, ~roi);
 				maxloc.x = maxloc.x + roi_rect.x;
 				maxloc.y = maxloc.y + roi_rect.y;
 			}
