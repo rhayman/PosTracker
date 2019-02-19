@@ -119,18 +119,19 @@ class DisplayMask
 {
 public:
 	DisplayMask() {};
-	DisplayMask(cv::Mat mask) : m_displayMask(mask) {};
+	DisplayMask(cv::Mat mask) : m_displayMask(m_mask) {};
 	~DisplayMask() {};
 	void makeMask(int width, int height)
 	{
-		cv::Mat mask = cv::Mat::ones(width, height, CV_8UC1);
+		m_mask = cv::Mat::ones(width, height, CV_8UC1);
 		cv::rectangle(mask, cv::Point(m_left_mat_edge, m_top_mat_edge), cv::Point(m_right_mat_edge, m_bottom_mat_edge), cv::Scalar(0), -1, 8, 0);
-		mask.copyTo(m_displayMask);
-		mask.copyTo(m_pathFrame);
+		m_mask.copyTo(m_displayMask);
+		m_mask.copyTo(m_pathFrame);
 		cv::cvtColor(m_displayMask, m_displayMask, cv::COLOR_GRAY2BGR);
 		cv::cvtColor(m_pathFrame, m_pathFrame, cv::COLOR_GRAY2BGR);
 
 	}
+	cv::Mat getSingleChannelMask() { return m_mask; }
 	cv::Mat getMask() { return m_displayMask; }
 	cv::Mat getPathFrame() { return m_pathFrame; }
 	void setPathFrame(cv::Scalar p) { m_pathFrame = p; }
@@ -159,6 +160,7 @@ public:
 private:
 	cv::Mat m_displayMask;
 	cv::Mat m_pathFrame;
+	cv::Mat m_mask;
 	// values for excluding points outside the mask for use in PosTS class below
 	// and the display of the bounding box for the windowed video output
 	int m_left_mat_edge = 0;
@@ -444,7 +446,7 @@ void PosTracker::run()
 					pts[count%2] = cv::Point2d(double(xy[0]), double(xy[1]));
 					ed->setInfoValue(InfoLabelType::XPOS, (double)xy[0]);
 					ed->setInfoValue(InfoLabelType::YPOS, (double)xy[1]);
-					cv::bitwise_and(frame, displayMask_mask, frame);
+					cv::bitwise_and(frame, displayMask_mask, frame, displayMask->getSingleChannelMask());
 					if ( pts[1].x > 0 && pts[1].y > 0  && path_overlay == true )
 					{
 						cv::Mat pathFrame = displayMask->getPathFrame();
