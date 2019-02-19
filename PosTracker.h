@@ -100,7 +100,7 @@ private:
 	std::unique_ptr<Camera> currentCam;
 
 	std::shared_ptr<PosTS> pos_tracker;
-	std::unique_ptr<Displaymask> displayMask;
+	std::unique_ptr<DisplayMask> displayMask;
 
 	CriticalSection lock;
 	CriticalSection displayMutex;
