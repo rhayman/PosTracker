@@ -120,10 +120,10 @@ private:
 	cv::Mat m_pathFrame;
 	// values for excluding points outside the mask for use in PosTS class below
 	// and the display of the bounding box for the windowed video output
-	int m_left_mat_edge;
-	int m_right_mat_edge;
-	int m_top_mat_edge;
-	int m_bottom_mat_edge;
+	int m_left_mat_edge = 0;
+	int m_right_mat_edge = 0;
+	int m_top_mat_edge = 0;
+	int m_bottom_mat_edge = 0;
 };
 
 
