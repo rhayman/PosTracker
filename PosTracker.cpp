@@ -96,7 +96,7 @@ public:
 	cv::Mat getMask() { return m_displayMask; }
 	cv::Mat getPathFrame() { return m_pathFrame; }
 	void setPathFrame(cv::Scalar p) { m_pathFrame = p; }
-	void setEdge(BORDER, int)
+	void setEdge(BORDER edge, int val)
 	{
 		switch (edge) {
 			case BORDER::LEFT: m_left_mat_edge = val; break;
