@@ -418,7 +418,7 @@ void PosTracker::run()
 	if ( ! displayMask->getPathFrame().empty() ) {
 		displayMask->setPathFrame(cv::Scalar(0));
 	}
-	printTypeInfo("displayMask->getPathFrame().size()", displayMask->getPathFrame());
+	printTypeInfo("displayMask pathFrame = ", displayMask->getPathFrame());
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
 
@@ -438,7 +438,9 @@ void PosTracker::run()
 				printTypeInfo("frame", frame);
 				pos_tracker->setMask(displayMask_mask);
 				pos_tracker->setROIRect(displayMask->getROIRect());
+				std::cout << "About to do simpleColorDetect()\n";
 				roi = pos_tracker->simpleColorDetect(frame);
+				std::cout << "Done simpleColorDetect()\n";
 
 				if ( liveStream == true )
 				{
