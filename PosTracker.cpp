@@ -124,7 +124,7 @@ public:
 	void makeMask(int width, int height)
 	{
 		m_mask = cv::Mat::ones(width, height, CV_8UC1);
-		cv::rectangle(mask, cv::Point(m_left_mat_edge, m_top_mat_edge), cv::Point(m_right_mat_edge, m_bottom_mat_edge), cv::Scalar(0), -1, 8, 0);
+		cv::rectangle(m_mask, cv::Point(m_left_mat_edge, m_top_mat_edge), cv::Point(m_right_mat_edge, m_bottom_mat_edge), cv::Scalar(0), -1, 8, 0);
 		m_mask.copyTo(m_displayMask);
 		m_mask.copyTo(m_pathFrame);
 		cv::cvtColor(m_displayMask, m_displayMask, cv::COLOR_GRAY2BGR);
