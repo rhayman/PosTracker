@@ -95,7 +95,7 @@ public:
 	}
 	cv::Mat getMask() { return m_displayMask; }
 	cv::Mat getPathFrame() { return m_pathFrame; }
-	void setPathFrame(cv::Mat p) { m_pathFrame = m; }
+	void setPathFrame(cv::Mat p) { m_pathFrame = p; }
 	void setEdge(BORDER, int)
 	{
 		if ( ! m_displayMask.empty() ) {
@@ -110,6 +110,10 @@ public:
 			case BORDER::TOP: return m_top_mat_edge; // co-ords switched
 			case BORDER::BOTTOM: return m_bottom_mat_edge;
 		}
+	};
+	cv::Rect getROIRect()
+	{
+		return cv::Rect(m_left_mat_edge, m_top_mat_edge, m_right_mat_edge-m_left_mat_edge, m_bottom_mat_edge-m_top_mat_edge);
 	};
 private:
 	cv::Mat m_displayMask;
@@ -129,6 +133,7 @@ public:
 	PosTS() {};
 	PosTS(struct timeval tv, cv::Mat & src) : m_tv(tv), m_src(src) {};
 	~PosTS() {};
+	void setROIRect(cv::Rect roi) { roi_rect = roi; }
 	cv::Mat simpleColorDetect(cv::Mat & frame)
 	{
 		if ( ! frame.empty() ) {
@@ -154,13 +159,13 @@ public:
 				double x_centroid, y_centroid;
 				x_centroid = centroids.at<double>(biggestComponent, 0);
 				y_centroid = centroids.at<double>(biggestComponent, 1);
-				maxloc.x = static_cast<int>(x_centroid) + left_mat_edge;
-				maxloc.y = static_cast<int>(y_centroid) + top_mat_edge;
+				maxloc.x = static_cast<int>(x_centroid) + roi_rect.x;
+				maxloc.y = static_cast<int>(y_centroid) + roi_rect.y;
 			}
 			else {
 				cv::minMaxLoc(roi, NULL, NULL, NULL, &maxloc, ~roi_mask);
-				maxloc.x = maxloc.x + left_mat_edge;
-				maxloc.y = maxloc.y + top_mat_edge;
+				maxloc.x = maxloc.x + roi_rect.x;
+				maxloc.y = maxloc.y + roi_rect.y;
 			}
 			m_xy[0] = (juce::uint32)maxloc.x;
 			m_xy[1] = (juce::uint32)maxloc.y;
@@ -216,7 +221,7 @@ public:
 	juce::uint32 m_xy[2];
 	struct timeval m_tv;
 	std::vector<cv::KeyPoint> kps;
-	cv::Rect roi_rect = cv::Rect(left_mat_edge, top_mat_edge, right_mat_edge-left_mat_edge, bottom_mat_edge-top_mat_edge);
+	cv::Rect roi_rect;
 };
 
 PosTracker::PosTracker() : GenericProcessor("Pos Tracker"), Thread("PosTrackerThread")
@@ -383,8 +388,9 @@ void PosTracker::run()
 			{
 				lock.enter();
 				pos_tracker = std::make_shared<PosTS>(tv, frame);
+				displayMask_mask = displayMask->getMask();
+				pos_tracker->setROIRect(displayMask_mask);
 				roi = pos_tracker->simpleColorDetect(frame);
-				// pos_tracker->detect();
 
 				if ( liveStream == true )
 				{
@@ -393,7 +399,6 @@ void PosTracker::run()
 					pts[count%2] = cv::Point2d(double(xy[0]), double(xy[1]));
 					ed->setInfoValue(InfoLabelType::XPOS, (double)xy[0]);
 					ed->setInfoValue(InfoLabelType::YPOS, (double)xy[1]);
-					displayMask_mask = displayMask->getMask();
 					cv::bitwise_and(frame, displayMask_mask, frame, mask);
 					if ( pts[1].x > 0 && pts[1].y > 0  && path_overlay == true )
 					{
