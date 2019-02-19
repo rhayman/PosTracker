@@ -95,7 +95,7 @@ public:
 	}
 	cv::Mat getMask() { return m_displayMask; }
 	cv::Mat getPathFrame() { return m_pathFrame; }
-	void setPathFrame(cv::Mat p) { m_pathFrame = p; }
+	void setPathFrame(cv::Scalar p) { m_pathFrame = p; }
 	void setEdge(BORDER, int)
 	{
 		if ( ! m_displayMask.empty() ) {
