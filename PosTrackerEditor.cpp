@@ -344,9 +344,7 @@ void PosTrackerEditor::updateSettings()
 		int width = resolution.first;
 		int height = resolution.second;
 
-		std::cout << "About to call m_proc->getVideoMask(BORDER::LEFT)" << std::endl;
 		int left = m_proc->getVideoMask(BORDER::LEFT);
-		std::cout << "About to call m_proc->getVideoMask(BORDER::RIGHT)" << std::endl;
 		int right = m_proc->getVideoMask(BORDER::RIGHT);
 		int top = m_proc->getVideoMask(BORDER::TOP);
 		int bottom = m_proc->getVideoMask(BORDER::BOTTOM);

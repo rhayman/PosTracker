@@ -201,13 +201,13 @@ public:
 				double x_centroid, y_centroid;
 				x_centroid = centroids.at<double>(biggestComponent, 0);
 				y_centroid = centroids.at<double>(biggestComponent, 1);
-				maxloc.x = static_cast<int>(x_centroid) + roi_rect.width;
-				maxloc.y = static_cast<int>(y_centroid) + roi_rect.height;
+				maxloc.x = static_cast<int>(x_centroid) + roi_rect.x;
+				maxloc.y = static_cast<int>(y_centroid) + roi_rect.y;
 			}
 			else {
 				cv::minMaxLoc(roi, NULL, NULL, NULL, &maxloc, ~roi_mask);
-				maxloc.x = maxloc.x + roi_rect.width;
-				maxloc.y = maxloc.y + roi_rect.height;
+				maxloc.x = maxloc.x + roi_rect.x;
+				maxloc.y = maxloc.y + roi_rect.y;
 			}
 			m_xy[0] = (juce::uint32)maxloc.x;
 			m_xy[1] = (juce::uint32)maxloc.y;
@@ -494,11 +494,11 @@ void PosTracker::adjustVideoMask(BORDER edge, int val)
 	displayMask->setEdge(edge, val);
 }
 
-void PosTracker::adjustTrackerMask(int left, int top, int right, int bottom) {
-	if ( pos_tracker ) {
-		cv::Rect r(cv::Point(left, top), cv::Point(right, bottom));
-	}
-}
+// void PosTracker::adjustTrackerMask(int left, int top, int right, int bottom) {
+// 	if ( pos_tracker ) {
+// 		cv::Rect r(cv::Point(left, top), cv::Point(right, bottom));
+// 	}
+// }
 
 void PosTracker::makeVideoMask()
 {
