@@ -440,6 +440,7 @@ void PosTracker::run()
 				pos_tracker->setMask(displayMask_mask);
 				pos_tracker->setROIRect(displayMask->getROIRect());
 				roi = pos_tracker->simpleColorDetect(frame);
+				std::cout << "here " <<  std::endl;
 
 				if ( liveStream == true )
 				{
