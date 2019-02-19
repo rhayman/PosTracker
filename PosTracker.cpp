@@ -11,49 +11,6 @@
 #include <array>
 #include <vector>
 
-cv::Mat debug_frame;
-
-void printTypeInfo(const std::string name, const cv::Mat& A, bool print=false)
-{
-  std::string r;
-  int type = A.type();
-  uchar depth = type & CV_MAT_DEPTH_MASK;
-  uchar chans = 1 + (type >> CV_CN_SHIFT);
-  switch (depth)
-  {
-    case CV_8U:   r = "8U"; break;
-    case CV_8S:   r = "8S"; break;
-    case CV_16U:  r = "16U"; break;
-    case CV_16S:  r = "16S"; break;
-    case CV_32S:  r = "32S"; break;
-    case CV_32F:  r = "32F"; break;
-    case CV_64F:  r = "64F"; break;
-    default:      r = "User"; break;
-  }
-
-  r += "C";
-  r += (chans+'0');
-  std::cout << "\n" << name << " is " << r << " with size = " << A.size() << 
-        " and " << A.channels() << " channels" << std::endl;
-  cv::Mat singleChannel;
-  std::cout << name << ".channels() = " << A.channels() << std::endl;
-  if (A.channels() > 1)
-  {
-    cv::Mat planes[A.channels()];
-    cv::split(A, planes);
-    singleChannel = planes[0];
-  }
-  else
-    singleChannel = A;
-  double minVal, maxVal;
-  int minLoc, maxLoc;
-  cv::minMaxIdx(singleChannel, &minVal, &maxVal, &minLoc, &maxLoc);
-  std::cout << "min location: value = " << minLoc << ": " << minVal << std::endl;
-  std::cout << "max location: value = " << maxLoc << ": " << maxVal << std::endl;
-};
-
-
-
 // originally nabbed this from:
 // https://www.gnu.org/software/libc/manual/html_node/Elapsed-Time.html
 // then adpated to work with timespec struct as third arg (*y)
@@ -102,14 +59,6 @@ timeval_subtract (struct timeval *result, struct timeval *x, struct timeval *y)
   /* Return 1 if result is negative. */
   return x->tv_sec < y->tv_sec;
 };
-
-
-// void drawRect()
-bool drawing = false;
-bool roi_done = false;
-bool tracker_init = false;
-int initx = -1;
-int inity = -1;
 
 /*
 A class for decorating the video output frame with a windowed border,
@@ -439,7 +388,6 @@ void PosTracker::run()
 
 				if ( liveStream == true )
 				{
-					// auto pb = posBuffer.front();
 					auto xy = pos_tracker->getPos();
 					pts[count%2] = cv::Point2d(double(xy[0]), double(xy[1]));
 					ed->setInfoValue(InfoLabelType::XPOS, (double)xy[0]);
@@ -517,10 +465,7 @@ void PosTracker::overlayPath(bool state)
 {
 	 path_overlay = state;
 	 if ( ! displayMask->getPathFrame().empty() )
-	 {
 		displayMask->setPathFrame(cv::Scalar(0));
-	 	debug_frame = cv::Scalar(0);
-	 }
 }
 
 AudioProcessorEditor* PosTracker::createEditor()
