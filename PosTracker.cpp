@@ -418,7 +418,6 @@ void PosTracker::run()
 	if ( ! displayMask->getPathFrame().empty() ) {
 		displayMask->setPathFrame(cv::Scalar(0));
 	}
-	printTypeInfo("displayMask pathFrame = ", displayMask->getPathFrame());
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
 
@@ -445,11 +444,7 @@ void PosTracker::run()
 					pts[count%2] = cv::Point2d(double(xy[0]), double(xy[1]));
 					ed->setInfoValue(InfoLabelType::XPOS, (double)xy[0]);
 					ed->setInfoValue(InfoLabelType::YPOS, (double)xy[1]);
-					std::cout << "About to do bitwise_and\n";
-					printTypeInfo("displayMask_mask", displayMask_mask);
-					printTypeInfo("frame", frame);
-					cv::bitwise_and(frame, displayMask_mask, frame, displayMask_mask);
-					std::cout << "done bitwise_and\n";
+					cv::bitwise_and(frame, displayMask_mask, frame);
 					if ( pts[1].x > 0 && pts[1].y > 0  && path_overlay == true )
 					{
 						cv::Mat pathFrame = displayMask->getPathFrame();
