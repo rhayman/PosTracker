@@ -422,8 +422,7 @@ void PosTracker::run()
 	}
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
-	auto r = displayMask->getROIRect();
-	std::cout << "r " << r << std::endl;
+
 
 	while ( threadRunning )
 	{
@@ -507,6 +506,8 @@ void PosTracker::makeVideoMask()
 			lock.enter();
 			std::pair<int, int> res = getResolution();
 			displayMask->makeMask(res.second, res.first);
+			auto r = displayMask->getROIRect();
+			std::cout << "r " << r << std::endl;
 			lock.exit();
 		}
 	}
