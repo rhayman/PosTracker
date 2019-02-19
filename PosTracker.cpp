@@ -13,6 +13,47 @@
 
 cv::Mat debug_frame;
 
+void printTypeInfo(const std::string name, const cv::Mat& A, bool print=false)
+{
+  std::string r;
+  int type = A.type();
+  uchar depth = type & CV_MAT_DEPTH_MASK;
+  uchar chans = 1 + (type >> CV_CN_SHIFT);
+  switch (depth)
+  {
+    case CV_8U:   r = "8U"; break;
+    case CV_8S:   r = "8S"; break;
+    case CV_16U:  r = "16U"; break;
+    case CV_16S:  r = "16S"; break;
+    case CV_32S:  r = "32S"; break;
+    case CV_32F:  r = "32F"; break;
+    case CV_64F:  r = "64F"; break;
+    default:      r = "User"; break;
+  }
+
+  r += "C";
+  r += (chans+'0');
+  std::cout << "\n" << name << " is " << r << " with size = " << A.size() << 
+        " and " << A.channels() << " channels" << std::endl;
+  cv::Mat singleChannel;
+  std::cout << name << ".channels() = " << A.channels() << std::endl;
+  if (A.channels() > 1)
+  {
+    cv::Mat planes[A.channels()];
+    cv::split(A, planes);
+    singleChannel = planes[0];
+  }
+  else
+    singleChannel = A;
+  double minVal, maxVal;
+  int minLoc, maxLoc;
+  cv::minMaxIdx(singleChannel, &minVal, &maxVal, &minLoc, &maxLoc);
+  std::cout << "min location: value = " << minLoc << ": " << minVal << std::endl;
+  std::cout << "max location: value = " << maxLoc << ": " << maxVal << std::endl;
+};
+
+
+
 // originally nabbed this from:
 // https://www.gnu.org/software/libc/manual/html_node/Elapsed-Time.html
 // then adpated to work with timespec struct as third arg (*y)

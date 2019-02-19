@@ -11,8 +11,6 @@
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
 
-#include <opencv2/core.hpp>
-
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
 struct buffer {
@@ -161,82 +159,6 @@ const std::array<std::string, 4> frm_type = {
 	"Discrete",
 	"Step-wise",
 	"Continuous"
-};
-
-template <typename T>
-void printTypeInfo(const std::string name, const cv::Mat& A, bool print=false)
-{
-  std::string r;
-  int type = A.type();
-  uchar depth = type & CV_MAT_DEPTH_MASK;
-  uchar chans = 1 + (type >> CV_CN_SHIFT);
-  switch (depth)
-  {
-    case CV_8U:   r = "8U"; break;
-    case CV_8S:   r = "8S"; break;
-    case CV_16U:  r = "16U"; break;
-    case CV_16S:  r = "16S"; break;
-    case CV_32S:  r = "32S"; break;
-    case CV_32F:  r = "32F"; break;
-    case CV_64F:  r = "64F"; break;
-    default:      r = "User"; break;
-  }
-
-  r += "C";
-  r += (chans+'0');
-  std::cout << "\n" << name << " is " << r << " with size = " << A.size() << 
-        " and " << A.channels() << " channels" << std::endl;
-  cv::Mat singleChannel;
-  std::cout << name << ".channels() = " << A.channels() << std::endl;
-  if (A.channels() > 1)
-  {
-    cv::Mat planes[A.channels()];
-    cv::split(A, planes);
-    singleChannel = planes[0];
-  }
-  else
-    singleChannel = A;
-  double minVal, maxVal;
-  int minLoc, maxLoc;
-  cv::minMaxIdx(singleChannel, &minVal, &maxVal, &minLoc, &maxLoc);
-  std::cout << "min location: value = " << minLoc << ": " << minVal << std::endl;
-  std::cout << "max location: value = " << maxLoc << ": " << maxVal << std::endl;
-
-  if (print) // print out the middle bit
-  {
-    unsigned int start_row, start_col, end_row, end_col;
-    if ( singleChannel.rows <= 10 ) {
-      start_row = 0;
-      end_row = singleChannel.rows - 1;
-    }
-    else {
-      unsigned int midrow = singleChannel.rows / 2;
-      start_row = midrow - 5;
-      end_row = midrow + 5;
-    }
-    if ( singleChannel.cols <= 10 ) {
-      start_col = 0;
-      end_col = singleChannel.cols - 1;
-    }
-    else {
-      unsigned int midcol = singleChannel.cols / 2;
-      start_col = midcol - 5;
-      end_col = midcol + 5;
-    }
-    for (int i = start_row; i < end_row; ++i)
-    {
-      for (int j = start_col; j < end_col; ++j)
-      {
-        if ( (std::is_same<T, uchar>::value) )
-          std::cout << static_cast<int>(singleChannel.at<T>(i,j)) << "   ";
-        else
-          std::cout << singleChannel.at<T>(i,j) << "   ";
-      }
-
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-  }
 };
 
 #endif
