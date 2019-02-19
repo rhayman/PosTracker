@@ -452,6 +452,7 @@ void PosTracker::adjustExposure(int val)
 
 void PosTracker::adjustVideoMask(BORDER edge, int val)
 {
+	std::cout << "adjustVideoMask()" << std::endl;
 	displayMask->setEdge(edge, val);
 	// switch (edge)
 	// {
