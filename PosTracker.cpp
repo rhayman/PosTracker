@@ -11,11 +11,6 @@
 #include <array>
 #include <vector>
 
-#include "../utils/opencvmagic.h"
-
-// cv::Mat mask;
-// cv::Mat displayMask;
-// cv::Mat pathFrame;
 cv::Mat debug_frame;
 
 // originally nabbed this from:
