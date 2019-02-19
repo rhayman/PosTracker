@@ -233,6 +233,7 @@ PosTracker::PosTracker() : GenericProcessor("Pos Tracker"), Thread("PosTrackerTh
 {
 	setProcessorType (PROCESSOR_TYPE_SOURCE);
 	sendSampleCount = true; // only sending events
+	displayMask = std::make_unique<DisplayMask>();
 }
 
 PosTracker::~PosTracker()
