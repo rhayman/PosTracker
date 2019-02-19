@@ -390,7 +390,7 @@ void PosTracker::run()
 			{
 				lock.enter();
 				pos_tracker = std::make_shared<PosTS>(tv, frame);
-				displayMask_mask = displayMask->getMask();
+				cv::Mat displayMask_mask = displayMask->getMask();
 				pos_tracker->setMask(displayMask_mask);
 				pos_tracker->setROIRect(displayMask_mask);
 				roi = pos_tracker->simpleColorDetect(frame);
