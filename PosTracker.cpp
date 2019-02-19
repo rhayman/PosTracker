@@ -98,8 +98,11 @@ public:
 	void setPathFrame(cv::Scalar p) { m_pathFrame = p; }
 	void setEdge(BORDER, int)
 	{
-		if ( ! m_displayMask.empty() ) {
-
+		switch (edge) {
+			case BORDER::LEFT: m_left_mat_edge = val; break;
+			case BORDER::RIGHT: m_right_mat_edge = val; break;
+			case BORDER::TOP: m_top_mat_edge = val; break; // co-ords switched
+			case BORDER::BOTTOM: m_bottom_mat_edge = val; break;
 		}
 	};
 	int getEdge(BORDER edge)
@@ -107,7 +110,7 @@ public:
 		switch (edge) {
 			case BORDER::LEFT: return m_left_mat_edge;
 			case BORDER::RIGHT: return m_right_mat_edge;
-			case BORDER::TOP: return m_top_mat_edge; // co-ords switched
+			case BORDER::TOP: return m_top_mat_edge;// co-ords switched
 			case BORDER::BOTTOM: return m_bottom_mat_edge;
 		}
 	};
