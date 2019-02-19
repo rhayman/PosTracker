@@ -183,10 +183,7 @@ public:
 		if ( ! frame.empty() ) {
 			cv::extractChannel(frame, red_channel, 0);
 			cv::Mat roi = red_channel(roi_rect);
-			// cv::Mat roi_mask = mask(roi_rect);
-			// cv::GaussianBlur(roi, roi, cv::Size(7,7), 3.0, 3.0);
 			cv::threshold(roi, roi, 200, 1000, cv::THRESH_BINARY);
-			// cv::erode(roi, roi, kern, cv::Point(-1,-1), 1);
 			cv::Mat labels, stats, centroids;
 			int nlabels = cv::connectedComponentsWithStats(roi, labels, stats, centroids, 8, CV_32S, cv::CCL_WU);
 			cv::Size stats_size = stats.size();
@@ -506,8 +503,6 @@ void PosTracker::makeVideoMask()
 			lock.enter();
 			std::pair<int, int> res = getResolution();
 			displayMask->makeMask(res.second, res.first);
-			auto r = displayMask->getROIRect();
-			std::cout << "r " << r << std::endl;
 			lock.exit();
 		}
 	}
