@@ -207,6 +207,8 @@ public:
 				maxloc.y = static_cast<int>(y_centroid) + roi_rect.y;
 			}
 			else {
+				printTypeInfo("roi", roi);
+				printTypeInfo("roi_mask", roi_mask);
 				cv::minMaxLoc(roi, NULL, NULL, NULL, &maxloc, ~roi_mask);
 				maxloc.x = maxloc.x + roi_rect.x;
 				maxloc.y = maxloc.y + roi_rect.y;
