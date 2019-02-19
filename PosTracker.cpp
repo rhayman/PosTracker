@@ -380,6 +380,7 @@ void PosTracker::run()
 	if ( ! displayMask->getPathFrame().empty() ) {
 		displayMask->setPathFrame(cv::Scalar(0));
 	}
+	std::cout << "displayMask->getPathFrame().size() " << displayMask->getPathFrame().size() << std::endl;
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
 
@@ -453,15 +454,7 @@ void PosTracker::adjustExposure(int val)
 
 void PosTracker::adjustVideoMask(BORDER edge, int val)
 {
-	std::cout << "adjustVideoMask()" << std::endl;
 	displayMask->setEdge(edge, val);
-	// switch (edge)
-	// {
-	// 	case BORDER::LEFT: left_border = val; break;
-	// 	case BORDER::RIGHT: right_border = val; break;
-	// 	case BORDER::TOP: top_border = val; break; // co-ords switched
-	// 	case BORDER::BOTTOM: bottom_border = val; break;
-	// }
 }
 
 void PosTracker::adjustTrackerMask(int left, int top, int right, int bottom) {
@@ -478,19 +471,7 @@ void PosTracker::makeVideoMask()
 		{
 			lock.enter();
 			std::pair<int, int> res = getResolution();
-			// update the "locally global" values of the edges
 			displayMask->makeMask(res.second, res.first);
-			// left_mat_edge = left_border;
-			// right_mat_edge = right_border;
-			// top_mat_edge = top_border;
-			// bottom_mat_edge = bottom_border;
-			// do the masking
-			// mask = cv::Mat::ones(res.second, res.first, CV_8UC1);
-			// cv::rectangle(mask, cv::Point(left_border, top_border), cv::Point(right_border, bottom_border), cv::Scalar(0), -1, 8, 0);
-			// mask.copyTo(displayMask);
-			// mask.copyTo(pathFrame);
-			// cv::cvtColor(displayMask, displayMask, cv::COLOR_GRAY2BGR);
-			// cv::cvtColor(pathFrame, pathFrame, cv::COLOR_GRAY2BGR);
 			lock.exit();
 		}
 	}
