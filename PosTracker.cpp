@@ -436,9 +436,9 @@ void PosTracker::run()
 				lock.enter();
 				pos_tracker = std::make_shared<PosTS>(tv, frame);
 				cv::Mat displayMask_mask = displayMask->getMask();
-				std::cout << "displayMask_mask.size() " << displayMask_mask.size() << std::endl;
 				pos_tracker->setMask(displayMask_mask);
 				pos_tracker->setROIRect(displayMask->getROIRect());
+				std::cout << "before simpleColorDetect() " << std::endl;
 				roi = pos_tracker->simpleColorDetect(frame);
 				std::cout << "here " <<  std::endl;
 
