@@ -85,16 +85,16 @@ public:
 	~DisplayMask() {};
 	void makeMask(int width, int height)
 	{
-		mask = cv::Mat::ones(width, height, CV_8UC1);
+		cv::Mat mask = cv::Mat::ones(width, height, CV_8UC1);
 		cv::rectangle(mask, cv::Point(m_left_mat_edge, m_top_mat_edge), cv::Point(m_right_mat_edge, m_bottom_mat_edge), cv::Scalar(0), -1, 8, 0);
 		mask.copyTo(m_displayMask);
 		mask.copyTo(m_pathFrame);
-		cv::cvtColor(displayMask, displayMask, cv::COLOR_GRAY2BGR);
-		cv::cvtColor(pathFrame, pathFrame, cv::COLOR_GRAY2BGR);
+		cv::cvtColor(m_displayMask, m_displayMask, cv::COLOR_GRAY2BGR);
+		cv::cvtColor(m_pathFrame, m_pathFrame, cv::COLOR_GRAY2BGR);
 
 	}
 	cv::Mat getMask() { return m_displayMask; }
-	cv::Mat getPathFrame() { return pathFrame; }
+	cv::Mat getPathFrame() { return m_pathFrame; }
 	void setPathFrame(cv::Mat p) { m_pathFrame = m; }
 	void setEdge(BORDER, int)
 	{
