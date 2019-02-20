@@ -246,7 +246,6 @@ PosTracker::~PosTracker()
 	xy_ts[2] = juce::uint32(time_delta * 1e6);
 	BinaryEventPtr event = BinaryEvent::createBinaryEvent(messageChannel, CoreServices::getGlobalTimestamp(), xy_ts, sizeof(juce::uint32)*3);
 	addEvent(messageChannel, event, 0);
-	std::cout << "adding event " << std::endl;
 }
 
 void PosTracker::process(AudioSampleBuffer& buffer)
@@ -258,7 +257,6 @@ void PosTracker::process(AudioSampleBuffer& buffer)
 			std::shared_ptr<PosTS> p = std::move(posBuffer.front());
 			sendTimeStampedPosToMidiBuffer(std::move(p));
 			posBuffer.pop();
-			std::cout << "popping\n";
 		}
 		lock.exit();
 }
@@ -414,8 +412,10 @@ void PosTracker::run()
 					ed->setInfoValue(InfoLabelType::FPS, fps);
 					++count;
 				}
-				posBuffer.push(pos_tracker);
-				std::cout << "posBuffer size = " << posBuffer.size() << std::endl;
+				if ( CoreServices::getRecordingStatus() ) {
+					posBuffer.push(pos_tracker);
+					std::cout << "posBuffer size = " << posBuffer.size() << std::endl;
+				}
 
 				lock.exit();
 			}
