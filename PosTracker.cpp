@@ -258,6 +258,7 @@ void PosTracker::process(AudioSampleBuffer& buffer)
 			std::shared_ptr<PosTS> p = std::move(posBuffer.front());
 			sendTimeStampedPosToMidiBuffer(std::move(p));
 			posBuffer.pop();
+			std::cout << "popping\n";
 		}
 		lock.exit();
 }
