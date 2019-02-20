@@ -415,6 +415,8 @@ void PosTracker::run()
 					++count;
 				}
 				posBuffer.push(pos_tracker);
+				std::cout << "posBuffer size = " << posBuffer.size() << std::endl;
+
 				lock.exit();
 			}
 		}
