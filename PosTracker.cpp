@@ -412,10 +412,8 @@ void PosTracker::run()
 					ed->setInfoValue(InfoLabelType::FPS, fps);
 					++count;
 				}
-				if ( CoreServices::getRecordingStatus() ) {
+				if ( CoreServices::getRecordingStatus() )
 					posBuffer.push(pos_tracker);
-					std::cout << "posBuffer size = " << posBuffer.size() << std::endl;
-				}
 
 				lock.exit();
 			}
