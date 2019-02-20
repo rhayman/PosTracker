@@ -246,6 +246,7 @@ PosTracker::~PosTracker()
 	xy_ts[2] = juce::uint32(time_delta * 1e6);
 	BinaryEventPtr event = BinaryEvent::createBinaryEvent(messageChannel, CoreServices::getGlobalTimestamp(), xy_ts, sizeof(juce::uint32)*3);
 	addEvent(messageChannel, event, 0);
+	std::cout << "adding event " << std::endl;
 }
 
 void PosTracker::process(AudioSampleBuffer& buffer)
