@@ -44,13 +44,7 @@ public:
 	void sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p);
 
 	void createNewCamera(std::string dev_name);
-	std::string getDeviceName()
-	{
-		if ( currentCam )
-			return currentCam->get_dev_name();
-		else
-			return "";
-	}
+	std::string getDeviceName();
 	std::vector<std::string> getDeviceList();
 	std::string getFormatName();
 	void openCamera();
