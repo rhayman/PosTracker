@@ -581,10 +581,12 @@ void PosTracker::saveCustomParametersToXml(XmlElement* xml)
 	paramXml->setAttribute("Brightness", getBrightness());
 	paramXml->setAttribute("Contrast", getContrast());
 	paramXml->setAttribute("Exposure", getExposure());
-	paramXml->setAttribute("LeftBorder", left_border);
-	paramXml->setAttribute("RightBorder", right_border);
-	paramXml->setAttribute("TopBorder", top_border);
-	paramXml->setAttribute("BottomBorder", bottom_border);
+	if ( displayMask ) {
+		paramXml->setAttribute("LeftBorder", displayMask->getEdge(BORDER::LEFT));
+		paramXml->setAttribute("RightBorder", displayMask->getEdge(BORDER::RIGHT));
+		paramXml->setAttribute("TopBorder", displayMask->getEdge(BORDER::TOP));
+		paramXml->setAttribute("BottomBorder", displayMask->getEdge(BORDER::BOTTOM));
+	}
 	paramXml->setAttribute("AutoExposure", auto_exposure);
 	paramXml->setAttribute("OverlayPath", path_overlay);
 
@@ -604,13 +606,13 @@ void PosTracker::loadCustomParametersFromXml()
 		if ( paramXml->hasAttribute("Exposure"))
 			exposure = paramXml->getIntAttribute("Exposure");
 		if ( paramXml->hasAttribute("LeftBorder") )
-			left_border = paramXml->getIntAttribute("LeftBorder");
+			displayMask->setEdge(BORDER::LEFT, paramXml->getIntAttribute("LeftBorder"));
 		if ( paramXml->hasAttribute("RightBorder") )
-			right_border = paramXml->getIntAttribute("RightBorder");
+			displayMask->setEdge(BORDER::RIGHT, paramXml->getIntAttribute("RightBorder"));
 		if ( paramXml->hasAttribute("TopBorder") )
-			top_border = paramXml->getIntAttribute("TopBorder");
+			displayMask->setEdge(BORDER::TOP, paramXml->getIntAttribute("TopBorder"));
 		if ( paramXml->hasAttribute("BottomBorder") )
-			bottom_border = paramXml->getIntAttribute("BottomBorder");
+			displayMask->setEdge(BORDER::BOTTOM, paramXml->getIntAttribute("BottomBorder"));
 		if ( paramXml->hasAttribute("AutoExposure") )
 			auto_exposure = paramXml->getBoolAttribute("AutoExposure");
 		if ( paramXml->hasAttribute("OverlayPath") )
