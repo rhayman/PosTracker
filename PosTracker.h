@@ -12,7 +12,6 @@
 class Camera;
 class PosTS;
 class DisplayMask;
-class PosTrackerEditor;
 
 class PosTracker : public GenericProcessor, public Thread
 {
