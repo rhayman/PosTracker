@@ -523,8 +523,10 @@ Formats * PosTracker::getCurrentFormat()
 
 std::string PosTracker::getDeviceName()
 {
-	if ( currentCam )
-		return currentCam->get_dev_name();
+	if ( currentCam ) {
+		m_dev_name = currentCam->get_dev_name();
+		return m_dev_name;
+	}
 	else
 		return "";
 }

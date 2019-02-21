@@ -43,6 +43,7 @@ public:
 	void sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p);
 
 	void createNewCamera(std::string dev_name);
+	std::string getDevName() { return m_dev_name; }
 	std::string getDeviceName();
 	std::vector<std::string> getDeviceList();
 	std::string getFormatName();
@@ -88,7 +89,7 @@ public:
 	void loadCustomParametersFromXml() override;
 
 private:
-
+	std::string m_dev_name;
 	std::ofstream ofs;
 	bool camReady = false;
 	bool threadRunning = false;
