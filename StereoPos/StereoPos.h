@@ -3,6 +3,8 @@
 
 #include <ProcessorHeaders.h>
 
+class CalibrateCamera;
+
 class StereoPos : public GenericProcessor
 {
 public:
@@ -28,6 +30,7 @@ public:
 	void loadCustomParametersFromXml() override;
 
 private:
+	std::unique_ptr<CalibrateCamera> calibrator;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StereoPos);
 };
 #endif
