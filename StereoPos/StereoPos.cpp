@@ -1,7 +1,7 @@
 #include "StereoPos.h"
 #include "StereoPosEditor.h"
 #include "../PosTracker/PosTracker.h"
-#include "../PosTracker/Camera.h"
+// #include "../PosTracker/Camera.h"
 
 StereoPos::StereoPos() : GenericProcessor("Stereo Pos")
 {
