@@ -1,6 +1,7 @@
 #include "StereoPos.h"
 #include "StereoPosEditor.h"
 #include "../PosTracker/PosTracker.h"
+#include "../PosTracker/Camera.h"
 
 StereoPos::StereoPos() : GenericProcessor("Stereo Pos")
 {
@@ -29,7 +30,7 @@ void StereoPos::testFcn() {
 		PosTracker* video_A = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_A ) {
 			std::cout << "video_A->getDeviceName() " << video_A->getDeviceName() << std::endl;
-			auto thiscam = video_A->getCurrentCamera();
+			std::shared_ptr<Camera> thiscam = video_A->getCurrentCamera();
 			std::cout << "thiscam->get_dev_name() " << thiscam->get_dev_name() << std::endl;
 		}
 		maybe_merger->switchIO(1); // sourceNodeA
