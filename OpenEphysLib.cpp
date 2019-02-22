@@ -22,7 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <PluginInfo.h>
-#include "PosTracker.h"
+#include "PosTracker/PosTracker.h"
+#include "StereoPos/StereoPos.h"
 #include <string>
 #ifdef WIN32
 #include <Windows.h>
