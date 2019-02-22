@@ -355,6 +355,8 @@ void PosTracker::showLiveStream(bool val)
 	}
 }
 
+
+
 void PosTracker::run()
 {
 	cv::Mat frame,  roi;
@@ -366,12 +368,6 @@ void PosTracker::run()
 	}
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
-
-	// GenericProcessor* dest = getDestNode();
-	// if ( dest ) {
-	// 	if ( dest->isMerger() )
-	// 		std::cout << "got a merger" << std::endl;
-	// }
 
 	while ( threadRunning )
 	{
@@ -556,7 +552,7 @@ void PosTracker::createNewCamera(std::string dev_name)
 	for ( auto & dev : devices )
 	{
 		if ( dev.compare(dev_name) == 0 )
-			currentCam = std::make_unique<Camera>(dev_name);
+			currentCam = std::make_shared<Camera>(dev_name);
 	}
 }
 

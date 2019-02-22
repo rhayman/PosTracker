@@ -27,8 +27,11 @@ void StereoPos::testFcn() {
 	if ( maybe_merger->isMerger() ) {
 		maybe_merger->switchIO(0); // sourceNodeA
 		PosTracker* video_A = (PosTracker*)maybe_merger->getSourceNode();
-		if ( video_A )
+		if ( video_A ) {
 			std::cout << "video_A->getDeviceName() " << video_A->getDeviceName() << std::endl;
+			auto thiscam = video_A->getCurrentCamera();
+			std::cout << "thiscam->get_dev_name() " << thiscam->get_dev_name() << std::endl;
+		}
 		maybe_merger->switchIO(1); // sourceNodeA
 		PosTracker* video_B = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_B ) {

@@ -78,6 +78,7 @@ public:
 	std::vector<std::string> getDeviceFormats();
 	void setDeviceFormat(std::string);
 
+	std::shared_ptr<Camera> getCurrentCamera() { return currentCam; }
 	int getCurrentCameraIdx() { return currentCameraIdx; }
 	void setCurrentCameraIdx(int idx) { currentCameraIdx = idx; }
 
@@ -96,7 +97,7 @@ private:
 	bool liveStream = false;
 	int currentCameraIdx = -1;
 	int currentFormatIdx = -1;
-	std::unique_ptr<Camera> currentCam;
+	std::shared_ptr<Camera> currentCam;
 
 	std::shared_ptr<PosTS> pos_tracker;
 	std::unique_ptr<DisplayMask> displayMask;
