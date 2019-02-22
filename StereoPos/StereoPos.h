@@ -2,6 +2,7 @@
 #define STEREOPOS_H_
 
 #include <ProcessorHeaders.h>
+#include <memory>
 
 class CalibrateCamera;
 
