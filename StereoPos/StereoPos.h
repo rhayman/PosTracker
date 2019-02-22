@@ -10,7 +10,7 @@ class StereoPos : public GenericProcessor
 {
 public:
 	StereoPos();
-	~StereoPos() { calibrator.reset(); }
+	~StereoPos();
 
 	bool isSource() const override { return false; }
 	bool isSink() const override { return false; }
