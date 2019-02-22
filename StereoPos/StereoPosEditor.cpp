@@ -40,10 +40,10 @@ void StereoPosEditor::buttonEvent(Button * button)
 		String time = intervalText->getText();
 		int interval = time.getIntValue();
 		std::cout << "interval " << interval << std::endl;
-		int a = clock() / CLOCKS_PER_SEC;
-		while (clock() / CLOCKS_PER_SEC -a < 3) {
-			std::cout << a << std::endl;
-			a = clock() / CLOCKS_PER_SEC;
+		int count = 0;
+		while (count < 5) {
+			std::cout << count << std::endl;
+			sleep(1);
 		}
 		m_proc->testFcn();
 	}
