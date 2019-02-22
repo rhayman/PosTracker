@@ -41,12 +41,9 @@ void StereoPosEditor::buttonEvent(Button * button)
 		int interval = time.getIntValue();
 		std::cout << "interval " << interval << std::endl;
 		int a = clock() / CLOCKS_PER_SEC;
-		while (true) {
-			while (clock() / CLOCKS_PER_SEC -a < 1) {
-				std::cout << a << std::endl;
-				a = clock() / CLOCKS_PER_SEC;
-			}
-
+		while (clock() / CLOCKS_PER_SEC -a < 3) {
+			std::cout << a << std::endl;
+			a = clock() / CLOCKS_PER_SEC;
 		}
 		m_proc->testFcn();
 	}
