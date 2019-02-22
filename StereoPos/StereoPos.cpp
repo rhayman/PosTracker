@@ -28,8 +28,8 @@ public:
 				cv::cornerSubPix(grey, corners, cv::Size(5,5), cv::Size(-1,-1), cv::TermCriteria(cv::CV_TERMCRIT_EPS, cv::CV_TERMCRIT_ITER, 30, 0.1));
 			}
 		}
-	}
-private:
+	};
+// private:
 
 };
 
