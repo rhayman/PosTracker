@@ -37,6 +37,7 @@ StereoPos::StereoPos() : GenericProcessor("Stereo Pos")
 {
 	setProcessorType (PROCESSOR_TYPE_FILTER);
 	sendSampleCount = false;
+	calibrator = std::make_unique<CalibrateCamera>();
 }
 
 void StereoPos::process(AudioSampleBuffer& buffer)
@@ -60,7 +61,6 @@ void StereoPos::testFcn() {
 		PosTracker* video_A = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_A ) {
 			std::shared_ptr<Camera> thiscam = video_A->getCurrentCamera();
-			calibrator = std::make_unique<CalibrateCamera>();
 			video_A->openCamera();
 			if ( video_A->isCamReady() ) {
 				cv::Mat img;
