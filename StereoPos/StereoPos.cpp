@@ -26,13 +26,13 @@ void StereoPos::testFcn() {
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
 		maybe_merger->switchIO(0); // sourceNodeA
-		PosTracker* video_0 = (PosTracker*)maybe_merger->getSourceNode();
-		if ( video_0 )
-			std::cout << "video_0->getDevName() " << video_0->getDevName() << std::endl;
+		PosTracker* video_A = (PosTracker*)maybe_merger->getSourceNode();
+		if ( video_A )
+			std::cout << "video_A->getDeviceName() " << video_A->getDeviceName() << std::endl;
 		maybe_merger->switchIO(1); // sourceNodeA
-		PosTracker* video_1 = (PosTracker*)maybe_merger->getSourceNode();
+		PosTracker* video_B = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_1 ) {
-			auto res = video_1->getResolution();
+			std::cout << "video_B->getDeviceName() " << video_B->getDeviceName() << std::endl;
 		}
 	}
 }
