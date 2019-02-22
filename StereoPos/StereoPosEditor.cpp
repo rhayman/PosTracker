@@ -13,18 +13,30 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	m_proc = (StereoPos*)getProcessor();
 
 	// add controls etc
-	addAndMakeVisible(testButton = new ToggleButton("Test button"));
-	testButton->setBounds(5, 105, 100, 20);
-	testButton->setTooltip("testing various things");
-	testButton->addListener(this);
-	testButton->setEnabled(true);
+	addAndMakeVisible(intervalText = new TextEditor(String("Interval")));
+	intervalText->setBounds(5, 5, 80, 20);
+	intervalText->setTooltip("Interval between frame captures");
+	intervalText->addListener(this);
+	
+	intervalLabel = new Label("IntervalTime", "Interval (s)");
+	intervalLabel->setBounds(90, 5, 80, 20);
+	intervalLabel->setFont(font);
+	intervalLabel->setEditable (false, false, false);
+	intervalLabel->setJustificationType(Justification::centredLeft);
+	intervalLabel->setColour (TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(intervalLabel);
+
+	addAndMakeVisible(captureButton = new UtilityButton("Capture"), Font ("Small Text", 10, Font::plain));
+	captureButton->setBounds(5, 35, 80, 20);
+	captureButton->setTooltip("testing various things");
+	captureButton->addListener(this);
+
 
 }
 
 void StereoPosEditor::buttonEvent(Button * button)
 {
-	if ( button == testButton ) {
-		
-			m_proc->testFcn();
-		}
+	if ( button == captureButton ) {
+		m_proc->testFcn();
+	}
 }

@@ -20,7 +20,9 @@ public:
 private:
 	StereoPos * m_proc;
 
-	ScopedPointer<ToggleButton> testButton;
+	ScopedPointer<TextEditor> intervalText;
+	ScopedPointer<Label> intervalLabel;
+	ScopedPointer<UtilityButton> captureButton;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StereoPosEditor);
 };
