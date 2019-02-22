@@ -22,8 +22,8 @@ public:
 		{
 			cv::Mat grey;
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
-			std::cout << "grey.size() " << grey.size() << std::endl;
-			cv::imshow("test", grey);
+			std::cout << "greyimgs[i].size() " << imgs[i].size() << std::endl;
+			cv::imshow("test", imgs[i]);
 				cv::waitKey(5);
 			bool found = false;
 			found = cv::findChessboardCorners(imgs[i], board_size, corners, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
