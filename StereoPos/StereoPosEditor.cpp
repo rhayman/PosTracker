@@ -44,6 +44,7 @@ void StereoPosEditor::buttonEvent(Button * button)
 		while (count < 5) {
 			std::cout << count << std::endl;
 			sleep(1);
+			++count;
 		}
 		m_proc->testFcn();
 	}
