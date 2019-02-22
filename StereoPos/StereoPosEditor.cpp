@@ -1,5 +1,5 @@
 #include "StereoPosEditor.h"
-#include <ctime>
+#include <unistd.h>
 
 StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors=true)
 	: GenericEditor(parentNode, useDefaultParameterEditors)
