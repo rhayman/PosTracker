@@ -1,7 +1,11 @@
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include "StereoPos.h"
 #include "StereoPosEditor.h"
 #include "../PosTracker/PosTracker.h"
-// #include "../PosTracker/Camera.h"
+#include "../PosTracker/Camera.h"
 
 StereoPos::StereoPos() : GenericProcessor("Stereo Pos")
 {
@@ -30,8 +34,8 @@ void StereoPos::testFcn() {
 		PosTracker* video_A = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_A ) {
 			std::cout << "video_A->getDeviceName() " << video_A->getDeviceName() << std::endl;
-			// std::shared_ptr<Camera> thiscam = video_A->getCurrentCamera();
-			// std::cout << "thiscam->get_dev_name() " << thiscam->get_dev_name() << std::endl;
+			std::shared_ptr<Camera> thiscam = video_A->getCurrentCamera();
+			std::cout << "thiscam->get_dev_name() " << thiscam->get_dev_name() << std::endl;
 		}
 		maybe_merger->switchIO(1); // sourceNodeA
 		PosTracker* video_B = (PosTracker*)maybe_merger->getSourceNode();
