@@ -78,7 +78,7 @@ void StereoPos::testFcn() {
 				std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
 				std::vector<cv::Mat> ims;
 				ims.push_back(img);
-				cv::imshow("test", ims[i]);
+				cv::imshow("test", img);
 				cv::waitKey(5);
 				// calibrator->setup(ims);
 			}
