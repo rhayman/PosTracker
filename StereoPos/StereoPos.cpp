@@ -79,7 +79,7 @@ void StereoPos::testFcn() {
 				ims.push_back(img);
 				cv::imshow("test", img);
 				cv::waitKey(5);
-				// calibrator->setup(ims);
+				calibrator->setup(ims);
 			}
 		}
 		maybe_merger->switchIO(1); // sourceNodeA
