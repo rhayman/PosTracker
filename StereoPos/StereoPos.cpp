@@ -31,7 +31,7 @@ public:
 	}
 private:
 
-}
+};
 
 StereoPos::StereoPos() : GenericProcessor("Stereo Pos")
 {
