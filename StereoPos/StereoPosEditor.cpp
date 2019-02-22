@@ -1,4 +1,5 @@
 #include "StereoPosEditor.h"
+#include <ctime>
 
 StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors=true)
 	: GenericEditor(parentNode, useDefaultParameterEditors)
@@ -16,7 +17,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	addAndMakeVisible(intervalText = new TextEditor(String("Interval")));
 	intervalText->setBounds(5, 25, 80, 20);
 	intervalText->setTooltip("Interval between frame captures");
-	
+
 	intervalLabel = new Label("IntervalTime", "Interval(s)");
 	intervalLabel->setBounds(90, 25, 90, 20);
 	intervalLabel->setFont(font);
@@ -36,6 +37,17 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 void StereoPosEditor::buttonEvent(Button * button)
 {
 	if ( button == captureButton ) {
+		String time = intervalText->getText();
+		int interval = time.getIntValue();
+		std::cout << "interval " << interval << std::endl;
+		int a = clock() / CLOCKS_PER_SEC;
+		while (true) {
+			while (clock() / CLOCKS_PER_SEC -a < 1) {
+				std::cout << a << std::endl;
+				a = clock() / CLOCKS_PER_SEC;
+			}
+
+		}
 		m_proc->testFcn();
 	}
 }
