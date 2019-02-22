@@ -7,6 +7,8 @@
 #include "../PosTracker/PosTracker.h"
 #include "../PosTracker/Camera.h"
 
+#include <vector>
+
 const unsigned double board_width = 13.7;
 const unsigned double board_height = 14.8;
 const unsigned double square_size = 1.1;
