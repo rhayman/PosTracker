@@ -23,8 +23,6 @@ public:
 			cv::Mat grey;
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
 			std::cout << "greyimgs[i].size() " << imgs[i].size() << std::endl;
-			cv::imshow("test", imgs[i]);
-				cv::waitKey(5);
 			bool found = false;
 			found = cv::findChessboardCorners(imgs[i], board_size, corners, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
 			if ( found ) {
@@ -80,7 +78,9 @@ void StereoPos::testFcn() {
 				std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
 				std::vector<cv::Mat> ims;
 				ims.push_back(img);
-				calibrator->setup(ims);
+				cv::imshow("test", ims[i]);
+				cv::waitKey(5);
+				// calibrator->setup(ims);
 			}
 		}
 		maybe_merger->switchIO(1); // sourceNodeA
