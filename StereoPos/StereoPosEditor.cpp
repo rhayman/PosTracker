@@ -26,7 +26,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	intervalLabel->setColour (TextEditor::textColourId, Colours::grey);
 	addAndMakeVisible(intervalLabel);
 
-	addAndMakeVisible(captureButton = new UtilityButton("Capture"), Font ("Small Text", 10, Font::plain));
+	addAndMakeVisible(captureButton = new UtilityButton("Capture", Font ("Small Text", 10, Font::plain)));
 	captureButton->setBounds(5, 35, 80, 20);
 	captureButton->setTooltip("testing various things");
 	captureButton->addListener(this);
