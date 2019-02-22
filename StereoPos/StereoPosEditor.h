@@ -24,6 +24,8 @@ private:
 	ScopedPointer<Label> intervalLabel;
 	ScopedPointer<UtilityButton> captureButton;
 
+	const unsigned int nCalibrationImagesToCaputure = 20;
+
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StereoPosEditor);
 };
 

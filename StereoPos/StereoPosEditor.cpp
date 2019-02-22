@@ -39,11 +39,13 @@ void StereoPosEditor::buttonEvent(Button * button)
 	if ( button == captureButton ) {
 		String time = intervalText->getText();
 		int interval = time.getIntValue();
+		if ( interval <= 0 )
+			interval = 1;
 		std::cout << "interval " << interval << std::endl;
-		int count = 0;
-		while (count < 5) {
+		unsigned int count = 0;
+		while (count < nCalibrationImagesToCaputure) {
 			std::cout << count << std::endl;
-			sleep(1);
+			sleep(interval);
 			++count;
 		}
 		m_proc->testFcn();
