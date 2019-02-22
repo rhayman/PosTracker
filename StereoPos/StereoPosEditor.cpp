@@ -14,11 +14,11 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 
 	// add controls etc
 	addAndMakeVisible(intervalText = new TextEditor(String("Interval")));
-	intervalText->setBounds(5, 5, 80, 20);
+	intervalText->setBounds(5, 25, 80, 20);
 	intervalText->setTooltip("Interval between frame captures");
 	
-	intervalLabel = new Label("IntervalTime", "Interval (s)");
-	intervalLabel->setBounds(90, 5, 80, 20);
+	intervalLabel = new Label("IntervalTime", "Interval(s)");
+	intervalLabel->setBounds(90, 25, 90, 20);
 	intervalLabel->setFont(font);
 	intervalLabel->setEditable (false, false, false);
 	intervalLabel->setJustificationType(Justification::centredLeft);
@@ -26,7 +26,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	addAndMakeVisible(intervalLabel);
 
 	addAndMakeVisible(captureButton = new UtilityButton("Capture", Font ("Small Text", 10, Font::plain)));
-	captureButton->setBounds(5, 35, 80, 20);
+	captureButton->setBounds(5, 55, 80, 20);
 	captureButton->setTooltip("testing various things");
 	captureButton->addListener(this);
 
