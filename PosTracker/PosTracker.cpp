@@ -231,7 +231,7 @@ PosTracker::~PosTracker()
 	displayMask.reset();
 }
 
-	void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
+void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
 {
 	xy = p->getPos();
 	tv = p->getTimeVal();

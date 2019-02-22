@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace Plugin;
 //Number of plugins defined on the library. Can be of different types (Processors, RecordEngines, etc...)
-#define NUM_PLUGINS 1
+#define NUM_PLUGINS 2
 
 extern "C" EXPORT void getLibInfo(Plugin::LibraryInfo* info)
 {
@@ -51,34 +51,16 @@ extern "C" EXPORT int getPluginInfo(int index, Plugin::PluginInfo* info)
 	//one case per plugin. This example is for a processor which connects directly to the signal chain
 	case 0:
 		info->type = Plugin::PLUGIN_TYPE_PROCESSOR; //Type of plugin. See "Source/Processors/PluginManager/OpenEphysPlugin.h" for complete info about the different type structures
-		//For processor
 		info->processor.name = "Pos Tracker"; //Processor name shown in the GUI
 		info->processor.type = Plugin::SourceProcessor; //Type of processor. Can be FilterProcessor, SourceProcessor, SinkProcessor or UtilityProcessor. Specifies where on the processor list will appear
 		info->processor.creator = &(Plugin::createProcessor<PosTracker>); //Class factory pointer. Replace "ExampleProcessor" with the name of your class.
 		break;
-/**
-Examples for other plugin types
-
-For a RecordEngine, which provides formats for recording data
-	case x:
-		info->type = Plugin::RecordEnginePlugin;
-		info->recordEngine.name = "Record Engine Name";
-		info->recordEngine.creator = &(Plugin::createRecordEngine<RecordEngineClassName>);
+	case 1:
+		info->type = Plugin::PLUGIN_TYPE_PROCESSOR; //Type of plugin. See "Source/Processors/PluginManager/OpenEphysPlugin.h" for complete info about the different type structures
+		info->processor.name = "Stereo Pos"; //Processor name shown in the GUI
+		info->processor.type = Plugin::FilterProcessor; //Type of processor. Can be FilterProcessor, SourceProcessor, SinkProcessor or UtilityProcessor. Specifies where on the processor list will appear
+		info->processor.creator = &(Plugin::createProcessor<StereoPos>); //Class factory pointer. Replace "ExampleProcessor" with the name of your class.
 		break;
-
-For a DataThread, which allows to use the existing SourceNode to connect to an asynchronous data source, such as acquisition hardware
-	case x:
-		info->type = Plugin::DatathreadPlugin;
-		info->dataThread.name = "Source name"; //Name that will appear on the processor list
-		info->dataThread.creator = &createDataThread<DataThreadClassName>;
-
-For a FileSource, which allows importing data formats into the FileReader
-	case x:
-		info->type = Plugin::FileSourcePlugin;
-		info->fileSource.name = "File Source Name";
-		info->fileSource.extensions = "xxx;xxx;xxx"; //Semicolon separated list of supported extensions. Eg: "txt;dat;info;kwd"
-		info->fileSource.creator = &(Plugin::createFileSource<FileSourceClassName>);
-**/
 	default:
 		return -1;
 		break;
