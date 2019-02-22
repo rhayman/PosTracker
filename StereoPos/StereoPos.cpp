@@ -36,6 +36,12 @@ void StereoPos::testFcn() {
 			std::cout << "video_A->getDeviceName() " << video_A->getDeviceName() << std::endl;
 			std::shared_ptr<Camera> thiscam = video_A->getCurrentCamera();
 			std::cout << "thiscam->get_dev_name() " << thiscam->get_dev_name() << std::endl;
+			if ( video_A->isCamReady() ) {
+				cv::Mat img;
+				struct timeval tv;
+				thiscam->read_frame(img, tv);
+				std::cout << img.size() << std::endl;
+			}
 		}
 		maybe_merger->switchIO(1); // sourceNodeA
 		PosTracker* video_B = (PosTracker*)maybe_merger->getSourceNode();
