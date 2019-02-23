@@ -30,13 +30,19 @@ public:
 			if ( found ) {
 				std::cout << "Got a chess board" << std::endl;
 				cv::cornerSubPix(grey, corners, cv::Size(5,5), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 30, 0.1));
-				cv::drawChessboardCorners(grey, board_size, corners, found);
+				cv::Mat col;
+				grey.copyTo(col);
+				cv::cvtColor(col, col, cv::COLOR_GRAY2BGR);
+				cv::drawChessboardCorners(col, board_size, corners, found);
+				if ( showImages ) {
+					cv::imshow("grey", col);
+					cv::waitKey(1);
 			}
 		}
 	};
 private:
-	double m_width = 137;
-	double m_height = 148;
+	double m_width = 11;
+	double m_height = 12;
 	double m_size = 11;
 };
 
