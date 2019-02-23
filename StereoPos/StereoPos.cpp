@@ -8,16 +8,13 @@
 #include "../PosTracker/PosTracker.h"
 #include "../PosTracker/Camera.h"
 
-const double board_width = 13.7;
-const double board_height = 14.8;
-const double square_size = 1.1;
-
 class CalibrateCamera {
 public:
 	CalibrateCamera() {};
+	CalibrateCamera(double width, double height, double size) : m_width(width), m_height(height), m_size(size) {};
 	~CalibrateCamera() {};
 	void setup(std::vector<cv::Mat> imgs, bool showImages=false) {
-		cv::Size board_size = cv::Size(board_width, board_height);
+		cv::Size board_size = cv::Size(m_width, m_height);
 		std::vector<cv::Point2f> corners;
 		for (int i = 0; i < imgs.size(); ++i)
 		{
@@ -25,12 +22,9 @@ public:
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
 			std::cout << "greyimgs[i].size() " << imgs[i].size() << std::endl;
 			if ( showImages ) {
-				cv::namedWindow("grey", cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO & cv::WINDOW_GUI_NORMAL);
 				cv::imshow("grey", grey);
 				cv::waitKey(1);
 			}
-			else
-				cv::destroyWindow("grey");
 			bool found = false;
 			found = cv::findChessboardCorners(imgs[i], board_size, corners, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
 			if ( found ) {
@@ -40,8 +34,10 @@ public:
 			}
 		}
 	};
-// private:
-
+private:
+	double m_width = 137;
+	double m_height = 148;
+	double m_size = 11;
 };
 
 StereoPos::StereoPos() : GenericProcessor("Stereo Pos")
@@ -69,11 +65,22 @@ AudioProcessorEditor * StereoPos::createEditor() {
 
 }
 
+void StereoPos::showCapturedImages(bool show) {
+	if ( show )
+		cv::namedWindow("grey", cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO & cv::WINDOW_GUI_NORMAL);
+	else
+		cv::destroyWindow("grey");
+
+}
+
 void StereoPos::testFcn() {
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
 		auto ed = static_cast<StereoPosEditor*>(getEditor());
 		bool showImages = ed->showCapturedImages();
+		double board_width = ed->getBoardDims(BOARDPROP::kWidth);
+		double board_height = ed->getBoardDims(BOARDPROP::kHeight);
+		double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
 		maybe_merger->switchIO(0); // sourceNodeA
 		PosTracker* video_A = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_A ) {
@@ -89,6 +96,7 @@ void StereoPos::testFcn() {
 					std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
 					std::vector<cv::Mat> ims;
 					ims.push_back(img);
+					calibrator = CalibrateCamera(board_width, board_height, board_size);
 					calibrator->setup(ims, showImages);
 				}
 			}

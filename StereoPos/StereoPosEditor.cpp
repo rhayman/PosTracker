@@ -37,6 +37,20 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	showVideoCapture->addListener(this);
 	showVideoCapture->setEnabled(true);
 
+	addAndMakeVisible(boardWidthText = new TextEditor(String("Board width")));
+	boardWidthText->setBounds(165, 25, 80, 20);
+	boardWidthText->setTooltip("Width of the board");
+	boardWidthText->setText(board_width);
+
+	addAndMakeVisible(boardHeightText = new TextEditor(String("Board height")));
+	boardHeightText->setBounds(165, 55, 80, 20);
+	boardHeightText->setTooltip("Height of the board");
+	boardHeightText->setText(board_height);
+
+	addAndMakeVisible(boardSquareSizeText = new TextEditor(String("Square size")));
+	boardSquareSizeText->setBounds(165, 85, 80, 20);
+	boardSquareSizeText->setTooltip("The size of each square");
+	boardSquareSizeText->setText(square_size);
 }
 
 void StereoPosEditor::buttonEvent(Button * button)
@@ -55,6 +69,22 @@ void StereoPosEditor::buttonEvent(Button * button)
 		}
 		m_proc->testFcn();
 	}
-	if ( button == showVideoCapture )
+	if ( button == showVideoCapture ) {
 		m_setShowCapture = showVideoCapture->getToggleState();
+		m_proc->showCapturedImages();
+	}
+}
+
+double StereoPosEditor::getBoardDims(BOARDPROP prop) {
+	switch (prop) {
+		case BOARDPROP::kWidth: {
+			return boardWidthText->getDoubleValue();
+		}
+		case BOARDPROP::kHeight: {
+			return boardHeightText->getDoubleValue();
+		}
+		case BOARDPROP::kSquareSize: {
+			return boardSquareSizeText->getDoubleValue();
+		}
+	}
 }
