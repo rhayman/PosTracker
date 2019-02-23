@@ -40,9 +40,9 @@ private:
 
 	bool m_setShowCapture = false;
 
-	String board_width("137");
-	String board_height("148");
-	String square_size("11");
+	String board_width = String("137");
+	String board_height = String("148");
+	String square_size = String("11");
 
 	const unsigned int nCalibrationImagesToCaputure = 1;
 
