@@ -26,7 +26,7 @@ public:
 				cv::waitKey(1);
 			}
 			bool found = false;
-			found = cv::findChessboardCorners(imgs[i], board_size, corners, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
+			found = cv::findChessboardCorners(grey, board_size, corners, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
 			if ( found ) {
 				std::cout << "Got a chess board" << std::endl;
 				cv::cornerSubPix(grey, corners, cv::Size(5,5), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 30, 0.1));
