@@ -22,6 +22,7 @@ public:
 	bool isReady() override { return true; }
 
 	void testFcn();
+	void showCapturedImages(bool);
 
 	void updateSettings();
 
