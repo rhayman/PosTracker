@@ -78,13 +78,13 @@ void StereoPosEditor::buttonEvent(Button * button)
 double StereoPosEditor::getBoardDims(BOARDPROP prop) {
 	switch (prop) {
 		case BOARDPROP::kWidth: {
-			return boardWidthText->getText()->getDoubleValue();
+			return boardWidthText->getText().getDoubleValue();
 		}
 		case BOARDPROP::kHeight: {
-			return boardHeightText->getText()->getDoubleValue();
+			return boardHeightText->getText().getDoubleValue();
 		}
 		case BOARDPROP::kSquareSize: {
-			return boardSquareSizeText->getText()->getDoubleValue();
+			return boardSquareSizeText->getText().getDoubleValue();
 		}
 	}
 }
