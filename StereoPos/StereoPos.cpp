@@ -74,7 +74,7 @@ AudioProcessorEditor * StereoPos::createEditor() {
 
 void StereoPos::showCapturedImages(bool show) {
 	if ( show )
-		cv::namedWindow("grey", cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO & cv::WINDOW_GUI_NORMAL);
+		cv::namedWindow("grey", cv::WINDOW_NORMAL);
 	else
 		cv::destroyWindow("grey");
 
