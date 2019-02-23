@@ -25,6 +25,7 @@ public:
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
 			std::cout << "greyimgs[i].size() " << imgs[i].size() << std::endl;
 			if ( showImages ) {
+				cv::namedWindow("grey", cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO & cv::WINDOW_GUI_NORMAL);
 				cv::imshow("grey", grey);
 				cv::waitKey(1);
 			}
