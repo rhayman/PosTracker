@@ -37,6 +37,7 @@ public:
 				if ( showImages ) {
 					cv::imshow("grey", col);
 					cv::waitKey(1);
+				}
 			}
 		}
 	};
