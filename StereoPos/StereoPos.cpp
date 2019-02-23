@@ -85,11 +85,12 @@ void StereoPos::testFcn() {
 				cv::Mat img;
 				struct timeval tv;
 				thiscam->read_frame(img, tv);
-				std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
-				std::vector<cv::Mat> ims;
-				ims.push_back(img);
-				
-				calibrator->setup(ims, showImages);
+				if ( ! img.empty() ) {
+					std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
+					std::vector<cv::Mat> ims;
+					ims.push_back(img);
+					calibrator->setup(ims, showImages);
+				}
 			}
 		}
 		maybe_merger->switchIO(1); // sourceNodeA
