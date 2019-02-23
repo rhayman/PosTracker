@@ -71,7 +71,7 @@ void StereoPosEditor::buttonEvent(Button * button)
 	}
 	if ( button == showVideoCapture ) {
 		m_setShowCapture = showVideoCapture->getToggleState();
-		m_proc->showCapturedImages();
+		m_proc->showCapturedImages(m_setShowCapture);
 	}
 }
 
