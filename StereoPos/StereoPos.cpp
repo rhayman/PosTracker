@@ -44,7 +44,7 @@ StereoPos::StereoPos() : GenericProcessor("Stereo Pos")
 {
 	setProcessorType (PROCESSOR_TYPE_FILTER);
 	sendSampleCount = false;
-	calibrator = std::make_unique<CalibrateCamera>();
+	// calibrator = std::make_unique<CalibrateCamera>();
 }
 
 StereoPos::~StereoPos() {
@@ -96,7 +96,7 @@ void StereoPos::testFcn() {
 					std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
 					std::vector<cv::Mat> ims;
 					ims.push_back(img);
-					calibrator = CalibrateCamera(board_width, board_height, board_size);
+					calibrator = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
 					calibrator->setup(ims, showImages);
 				}
 			}
