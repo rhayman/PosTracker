@@ -15,7 +15,7 @@ class CalibrateCamera {
 public:
 	CalibrateCamera() {};
 	~CalibrateCamera() {};
-	void setup(std::vector<cv::Mat> imgs) {
+	void setup(std::vector<cv::Mat> imgs, bool showImages=false) {
 		cv::Size board_size = cv::Size(board_width, board_height);
 		std::vector<cv::Point2f> corners;
 		for (int i = 0; i < imgs.size(); ++i)
@@ -23,8 +23,12 @@ public:
 			cv::Mat grey;
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
 			std::cout << "greyimgs[i].size() " << imgs[i].size() << std::endl;
-			cv::imshow("grey", grey);
-			cv::waitKey(1);
+			if ( showImages ) {
+				cv::imshow("grey", grey);
+				cv::waitKey(1);
+			}
+			else
+				cv::destroyWindow("grey");
 			bool found = false;
 			found = cv::findChessboardCorners(imgs[i], board_size, corners, CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
 			if ( found ) {
@@ -66,11 +70,14 @@ AudioProcessorEditor * StereoPos::createEditor() {
 void StereoPos::testFcn() {
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
+		auto ed = static_cast<StereoPosEditor*>(getEditor());
+		bool showImages = ed->showCapturedImages();
 		maybe_merger->switchIO(0); // sourceNodeA
 		PosTracker* video_A = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_A ) {
 			std::shared_ptr<Camera> thiscam = video_A->getCurrentCamera();
 			video_A->openCamera();
+			sleep(1);
 			if ( video_A->isCamReady() ) {
 				video_A->getEditor()->updateSettings();
 				cv::Mat img;
@@ -79,7 +86,8 @@ void StereoPos::testFcn() {
 				std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
 				std::vector<cv::Mat> ims;
 				ims.push_back(img);
-				calibrator->setup(ims);
+				
+				calibrator->setup(ims, showImages);
 			}
 		}
 		maybe_merger->switchIO(1); // sourceNodeA

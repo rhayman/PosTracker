@@ -17,12 +17,17 @@ public:
 	void updateSettings() {};
 	void update() {};
 
+	bool showCapturedImages() { return m_setShowCapture; }
+
 private:
 	StereoPos * m_proc;
 
 	ScopedPointer<TextEditor> intervalText;
 	ScopedPointer<Label> intervalLabel;
 	ScopedPointer<UtilityButton> captureButton;
+	ScopedPointer<ToggleButton> showVideoCapture;
+
+	bool m_setShowCapture = false;
 
 	const unsigned int nCalibrationImagesToCaputure = 1;
 

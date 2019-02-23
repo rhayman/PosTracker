@@ -31,6 +31,11 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	captureButton->setTooltip("testing various things");
 	captureButton->addListener(this);
 
+	addAndMakeVisible(showVideoCapture = new ToggleButton("Show capture"));
+	showVideoCapture->setBounds(5, 105, 100, 20);
+	showVideoCapture->setTooltip("Show the captured images");
+	showVideoCapture->addListener(this);
+	showVideoCapture->setEnabled(true);
 
 }
 
@@ -50,4 +55,6 @@ void StereoPosEditor::buttonEvent(Button * button)
 		}
 		m_proc->testFcn();
 	}
+	if ( button == showVideoCapture )
+		m_setShowCapture = showVideoCapture->getToggleState();
 }
