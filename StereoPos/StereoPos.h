@@ -5,8 +5,9 @@
 #include <ProcessorHeaders.h>
 
 class CalibrateCamera;
+class PosTracker;
 
-class StereoPos : public GenericProcessor
+class StereoPos : public GenericProcessor, public Thread
 {
 public:
 	StereoPos();
@@ -20,6 +21,11 @@ public:
 	void process(AudioSampleBuffer& buffer) override;
 
 	bool isReady() override { return true; }
+	void run();
+	void startStreaming();
+	void stopStreaming();
+	// void process(AudioSampleBuffer& buffer) override;
+
 
 	void testFcn();
 	void showCapturedImages(bool);
@@ -32,8 +38,12 @@ public:
 	void loadCustomParametersFromXml() override;
 
 private:
-	std::unique_ptr<CalibrateCamera> calibrator;
+	std::unique_ptr<CalibrateCamera> calibrator_A;
+	std::unique_ptr<CalibrateCamera> calibrator_B;
+	PosTracker * video_A = nullptr;
+	PosTracker * video_B = nullptr;
 
+	bool m_threadRunning = false;
 	CriticalSection lock;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StereoPos);
 };

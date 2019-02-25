@@ -78,7 +78,20 @@ void StereoPos::showCapturedImages(bool show) {
 
 }
 
-void StereoPos::testFcn() {
+void run() {
+
+}
+
+void startStreaming() {
+	// get some information abou the chessboard
+	auto ed = static_cast<StereoPosEditor*>(getEditor());
+	bool showImages = ed->showCapturedImages();
+	double board_width = ed->getBoardDims(BOARDPROP::kWidth);
+	double board_height = ed->getBoardDims(BOARDPROP::kHeight);
+	double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
+	calibrator_A = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
+	calibrator_B = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
+
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
 		auto ed = static_cast<StereoPosEditor*>(getEditor());
@@ -87,31 +100,63 @@ void StereoPos::testFcn() {
 		double board_height = ed->getBoardDims(BOARDPROP::kHeight);
 		double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
 		maybe_merger->switchIO(0); // sourceNodeA
-		PosTracker* video_A = (PosTracker*)maybe_merger->getSourceNode();
+		video_A = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_A ) {
-			std::shared_ptr<Camera> thiscam = video_A->getCurrentCamera();
+			std::shared_ptr<Camera> camera_A = video_A->getCurrentCamera();
 			video_A->openCamera();
 			video_A->getEditor()->updateSettings();
-			sleep(1);
+		}
+		maybe_merger->switchIO(1); // sourceNodeA
+		video_B = (PosTracker*)maybe_merger->getSourceNode();
+		if ( video_B ) {
+			std::shared_ptr<Camera> camera_B = video_B->getCurrentCamera();
+			video_B->openCamera();
+			video_B->getEditor()->updateSettings();
+		}
+	}
+	startThread(); // calls run
+}
+
+void stopStreaming() {
+	if ( m_threadRunning ) {
+		m_threadRunning = false;
+		stopThread(10000);
+		if ( video_A )
+			video_A->stopCamera();
+		if ( video_B )
+			video_B->stopCamera();
+	}
+}
+
+void StereoPos::run() {
+	cv::Mat frame_A, frame_B;
+	struct timeval tv;
+	while ( m_threadRunning ) {
+		if ( video_A ) {
 			if ( video_A->isCamReady() ) {
 				lock.enter();
-				cv::Mat img;
-				struct timeval tv;
-				thiscam->read_frame(img, tv);
-				if ( ! img.empty() ) {
+				thiscam->read_frame(frame_A, tv);
+				if ( ! frame_A.empty() ) {
 					std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
-					std::vector<cv::Mat> ims;
-					ims.push_back(img);
-					calibrator = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
-					calibrator->setup(ims, showImages);
+					std::vector<cv::Mat> ims_A;
+					ims_A.push_back(frame_A);
+					calibrator_A->setup(ims_A, showImages);
 				}
 				lock.exit();
 			}
 		}
-		maybe_merger->switchIO(1); // sourceNodeA
-		PosTracker* video_B = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_B ) {
-			std::cout << "video_B->getDeviceName() " << video_B->getDeviceName() << std::endl;
+			if ( video_B->isCamReady() ) {
+				lock.enter();
+				thiscam->read_frame(frame_B, tv);
+				if ( ! frame_B.empty() ) {
+					std::cout << "Calibrating " << video_B->getDeviceName() << "..." << std::endl;
+					std::vector<cv::Mat> ims_B;
+					ims_B.push_back(frame_B);
+					calibrator_B->setup(ims_B, showImages);
+				}
+				lock.exit();
+			}
 		}
 	}
 }
