@@ -126,36 +126,34 @@ void StereoPos::run() {
 	cv::Mat frame_A, frame_B;
 	struct timeval tv;
 	unsigned int count = 0;
-	while ( m_threadRunning ) {
-		while ( count <= nImagesToCapture ) {
-			if ( video_A ) {
-				if ( video_A->isCamReady() ) {
-					lock.enter();
-					camera_A->read_frame(frame_A, tv);
-					if ( ! frame_A.empty() ) {
-						std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
-						std::vector<cv::Mat> ims_A;
-						ims_A.push_back(frame_A);
-						calibrator_A->setup(ims_A, showImages);
-					}
-					lock.exit();
+	while ( (count <= nImagesToCapture) && m_threadRunning ) {
+		if ( video_A ) {
+			if ( video_A->isCamReady() ) {
+				lock.enter();
+				camera_A->read_frame(frame_A, tv);
+				if ( ! frame_A.empty() ) {
+					std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
+					std::vector<cv::Mat> ims_A;
+					ims_A.push_back(frame_A);
+					calibrator_A->setup(ims_A, showImages);
 				}
+				lock.exit();
 			}
-			if ( video_B ) {
-				if ( video_B->isCamReady() ) {
-					lock.enter();
-					camera_B->read_frame(frame_B, tv);
-					if ( ! frame_B.empty() ) {
-						std::cout << "Calibrating " << video_B->getDeviceName() << "..." << std::endl;
-						std::vector<cv::Mat> ims_B;
-						ims_B.push_back(frame_B);
-						calibrator_B->setup(ims_B, showImages);
-					}
-					lock.exit();
-				}
-			}
-			++count;
 		}
+		if ( video_B ) {
+			if ( video_B->isCamReady() ) {
+				lock.enter();
+				camera_B->read_frame(frame_B, tv);
+				if ( ! frame_B.empty() ) {
+					std::cout << "Calibrating " << video_B->getDeviceName() << "..." << std::endl;
+					std::vector<cv::Mat> ims_B;
+					ims_B.push_back(frame_B);
+					calibrator_B->setup(ims_B, showImages);
+				}
+				lock.exit();
+			}
+		}
+		++count;
 	}
 	stopStreaming();
 }
