@@ -141,6 +141,7 @@ void StereoPos::run() {
 					ims_A.push_back(frame_A);
 					if ( showImages ) {
 						cv::imshow("Camera A", frame_A);
+						cv::waitKey(1);
 					}
 
 				}
@@ -154,6 +155,7 @@ void StereoPos::run() {
 					ims_B.push_back(frame_B);
 					if ( showImages ) {
 						cv::imshow("Camera B", frame_B);
+						cv::waitKey(1);
 					}
 				}
 			}
