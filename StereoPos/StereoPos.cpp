@@ -20,7 +20,6 @@ public:
 		{
 			cv::Mat grey;
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
-			std::cout << "greyimgs[i].size() " << imgs[i].size() << std::endl;
 			if ( showImages ) {
 				cv::imshow("grey", grey);
 				cv::waitKey(1);
@@ -51,7 +50,6 @@ StereoPos::StereoPos() : GenericProcessor("Stereo Pos")
 {
 	setProcessorType (PROCESSOR_TYPE_FILTER);
 	sendSampleCount = false;
-	// calibrator = std::make_unique<CalibrateCamera>();
 }
 
 StereoPos::~StereoPos() {
@@ -96,6 +94,7 @@ void StereoPos::testFcn() {
 			sleep(1);
 			if ( video_A->isCamReady() ) {
 				video_A->getEditor()->updateSettings();
+				lock.enter();
 				cv::Mat img;
 				struct timeval tv;
 				thiscam->read_frame(img, tv);
@@ -106,6 +105,7 @@ void StereoPos::testFcn() {
 					calibrator = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
 					calibrator->setup(ims, showImages);
 				}
+				lock.exit();
 			}
 		}
 		maybe_merger->switchIO(1); // sourceNodeA
