@@ -34,7 +34,9 @@ public:
 				cv::cvtColor(col, col, cv::COLOR_GRAY2BGR);
 				cv::drawChessboardCorners(col, board_size, corners, found);
 				if ( showImages ) {
+					cv::namedWindow("Chessboard detection");
 					cv::imshow("Chessboard detection", col);
+					cv::waitKey(1);
 				}
 			}
 		}
@@ -137,8 +139,11 @@ void StereoPos::run() {
 				camera_A->read_frame(frame_A, tv);
 				if ( ! frame_A.empty() ) {
 					ims_A.push_back(frame_A);
-					if ( showImages )
+					if ( showImages ) {
 						cv::imshow("Camera A", frame_A);
+						cv::waitKey(1);
+					}
+
 				}
 			}
 		}
@@ -148,8 +153,10 @@ void StereoPos::run() {
 				camera_B->read_frame(frame_B, tv);
 				if ( ! frame_B.empty() ) {
 					ims_B.push_back(frame_B);
-					if ( showImages )
+					if ( showImages ) {
 						cv::imshow("Camera B", frame_B);
+						cv::waitKey(1);
+					}
 				}
 			}
 		}
