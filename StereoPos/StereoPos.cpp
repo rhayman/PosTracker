@@ -13,7 +13,7 @@ public:
 	CalibrateCamera() {};
 	CalibrateCamera(double width, double height, double size) : m_width(width), m_height(height), m_size(size) {};
 	~CalibrateCamera() {
-		if ( m_showImages )
+		if ( m_showImages && m_found )
 			cv::destroyWindow("Chessboard detection");
 	};
 	void setup(std::vector<cv::Mat> imgs, bool showImages=false) {
@@ -24,9 +24,8 @@ public:
 		{
 			cv::Mat grey;
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
-			bool found = false;
-			found = cv::findChessboardCorners(grey, board_size, corners, 1 | 4);
-			if ( found ) {
+			m_found = cv::findChessboardCorners(grey, board_size, corners, 1 | 4);
+			if ( m_found ) {
 				std::cout << "Got a chess board" << std::endl;
 				cv::cornerSubPix(grey, corners, cv::Size(5,5), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 30, 0.1));
 				cv::Mat col;
@@ -42,6 +41,7 @@ public:
 		}
 	};
 private:
+	bool m_found = false;
 	bool m_showImages = false;
 	double m_width = 11;
 	double m_height = 12;
@@ -141,7 +141,6 @@ void StereoPos::run() {
 					ims_A.push_back(frame_A);
 					if ( showImages ) {
 						cv::imshow("Camera A", frame_A);
-						cv::waitKey(pauseBetweenCapsSecs);
 					}
 
 				}
@@ -155,7 +154,6 @@ void StereoPos::run() {
 					ims_B.push_back(frame_B);
 					if ( showImages ) {
 						cv::imshow("Camera B", frame_B);
-						cv::waitKey(pauseBetweenCapsSecs);
 					}
 				}
 			}
