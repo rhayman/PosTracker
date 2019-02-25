@@ -93,19 +93,24 @@ void StereoPos::startStreaming() {
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
 		maybe_merger->switchIO(0); // sourceNodeA
-		if ( maybe_merger->stillHasSource() ) {
+		video_A = (PosTracker*)maybe_merger->getSourceNode();
+		if ( video_A->isEnabled ) {
 			video_A = (PosTracker*)maybe_merger->getSourceNode();
 			video_A->openCamera();
 			video_A->getEditor()->updateSettings();
 			camera_A = video_A->getCurrentCamera();
 		}
+		else
+			video_A = nullptr;
 		maybe_merger->switchIO(1); // sourceNodeA
-		if ( maybe_merger->stillHasSource() ) {
-			video_B = (PosTracker*)maybe_merger->getSourceNode();
+		video_B = (PosTracker*)maybe_merger->getSourceNode();
+		if ( video_B->isEnabled ) {
 			video_B->openCamera();
 			video_B->getEditor()->updateSettings();
 			camera_B = video_B->getCurrentCamera();
 		}
+		else
+			video_B = nullptr;
 	}
 
 	m_threadRunning = true;
