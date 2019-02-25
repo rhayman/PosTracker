@@ -43,8 +43,12 @@ private:
 	PosTracker * video_B = nullptr;
 	std::shared_ptr<Camera> camera_A;
 	std::shared_ptr<Camera> camera_B;
+	// containers for various parts of the opencv calibration algos
+	std::vector<cv::Mat> ims_A;
+	std::vector<cv::Mat> ims_B;
 
 	unsigned int nImagesToCapture = 0;
+	unsigned int nSecondsBetweenCaptures = 1;
 
 	bool m_threadRunning = false;
 	CriticalSection lock;

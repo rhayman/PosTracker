@@ -25,6 +25,7 @@ public:
 
 	double getBoardDims(BOARDPROP);
 	unsigned int getNImagesToCapture() { return nCalibrationImagesToCapture; }
+	int getNSecondsBetweenCaptures();
 
 	bool showCapturedImages() { return m_setShowCapture; }
 

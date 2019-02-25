@@ -53,6 +53,10 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	boardSquareSizeText->setText(square_size);
 }
 
+int StereoPosEditor::getNSecondsBetweenCaptures() {
+	return intervalText->getText().getIntValue();
+}
+
 void StereoPosEditor::buttonEvent(Button * button)
 {
 	if ( button == captureButton ) {

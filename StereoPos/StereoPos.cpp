@@ -83,7 +83,9 @@ void StereoPos::startStreaming() {
 	double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
 	calibrator_A = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
 	calibrator_B = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
-
+	// clear some buffers
+	ims_A.clear();
+	ims_B.clear();
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
 		auto ed = static_cast<StereoPosEditor*>(getEditor());
@@ -105,6 +107,7 @@ void StereoPos::startStreaming() {
 			camera_B = video_B->getCurrentCamera();
 		}
 	}
+
 	m_threadRunning = true;
 	startThread(); // calls run
 }
@@ -121,8 +124,9 @@ void StereoPos::stopStreaming() {
 }
 
 void StereoPos::run() {
-	sleep(1000);
+	sleep(1);
 	auto ed = static_cast<StereoPosEditor*>(getEditor());
+	int pauseBetweenCapsSecs = ed->getNSecondsBetweenCaptures();
 	bool showImages = ed->showCapturedImages();
 	cv::Mat frame_A, frame_B;
 	struct timeval tv;
@@ -134,9 +138,7 @@ void StereoPos::run() {
 				camera_A->read_frame(frame_A, tv);
 				if ( ! frame_A.empty() ) {
 					std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
-					std::vector<cv::Mat> ims_A;
 					ims_A.push_back(frame_A);
-					calibrator_A->setup(ims_A, showImages);
 				}
 				lock.exit();
 			}
@@ -147,15 +149,19 @@ void StereoPos::run() {
 				camera_B->read_frame(frame_B, tv);
 				if ( ! frame_B.empty() ) {
 					std::cout << "Calibrating " << video_B->getDeviceName() << "..." << std::endl;
-					std::vector<cv::Mat> ims_B;
 					ims_B.push_back(frame_B);
-					calibrator_B->setup(ims_B, showImages);
 				}
 				lock.exit();
 			}
 		}
+		sleep(pauseBetweenCapsSecs);
 		++count;
 	}
+	if ( video_A )
+		calibrator_A->setup(ims_A, showImages);
+	if ( video_B )
+		calibrator_B->setup(ims_B, showImages);
+
 }
 
 void StereoPos::saveCustomParametersToXml(XmlElement * xml)
