@@ -60,14 +60,12 @@ void StereoPosEditor::buttonEvent(Button * button)
 		int interval = time.getIntValue();
 		if ( interval <= 0 )
 			interval = 1;
-		std::cout << "interval " << interval << std::endl;
 		unsigned int count = 0;
 		while (count < nCalibrationImagesToCaputure) {
-			std::cout << count << std::endl;
 			sleep(interval);
+			m_proc->testFcn();
 			++count;
 		}
-		m_proc->testFcn();
 	}
 	if ( button == showVideoCapture ) {
 		m_setShowCapture = showVideoCapture->getToggleState();
