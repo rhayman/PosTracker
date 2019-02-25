@@ -2,6 +2,7 @@
 #define STEREOPOS_H_
 
 #include <memory>
+#include <vector>
 #include <ProcessorHeaders.h>
 
 class CalibrateCamera;
@@ -37,12 +38,8 @@ public:
 	void loadCustomParametersFromXml() override;
 
 private:
-	std::unique_ptr<CalibrateCamera> calibrator_A;
-	std::unique_ptr<CalibrateCamera> calibrator_B;
-	PosTracker * video_A = nullptr;
-	PosTracker * video_B = nullptr;
-	std::shared_ptr<Camera> camera_A;
-	std::shared_ptr<Camera> camera_B;
+	std::vector<std::unique_ptr<CalibrateCamera>> calibrators;
+	std::vector<PosTracker*> m_trackers;
 
 	unsigned int nImagesToCapture = 0;
 	unsigned int nSecondsBetweenCaptures = 1;

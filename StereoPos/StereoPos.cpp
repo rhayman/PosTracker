@@ -55,8 +55,10 @@ StereoPos::StereoPos() : GenericProcessor("Stereo Pos"), Thread("StereoPosThread
 }
 
 StereoPos::~StereoPos() {
-	 calibrator_A.reset();
-	 calibrator_B.reset();
+	 for (int i = 0; i < calibrators.size(); ++i)
+	 {
+	 	calibrators[i].reset();
+	 }
 	 cv::destroyAllWindows();
 }
 
@@ -70,14 +72,14 @@ AudioProcessorEditor * StereoPos::createEditor() {
 }
 
 void StereoPos::showCapturedImages(bool show) {
-	if ( show ) {
-		cv::namedWindow("Camera A", cv::WINDOW_NORMAL);
-		cv::namedWindow("Camera B", cv::WINDOW_NORMAL);
-	}
-	else {
-		cv::destroyWindow("Camera A");
-		cv::destroyWindow("Camera B");
-	}
+	// if ( show ) {
+	// 	cv::namedWindow("Camera A", cv::WINDOW_NORMAL);
+	// 	cv::namedWindow("Camera B", cv::WINDOW_NORMAL);
+	// }
+	// else {
+	// 	cv::destroyWindow("Camera A");
+	// 	cv::destroyWindow("Camera B");
+	// }
 
 }
 
@@ -88,30 +90,28 @@ void StereoPos::startStreaming() {
 	double board_width = ed->getBoardDims(BOARDPROP::kWidth);
 	double board_height = ed->getBoardDims(BOARDPROP::kHeight);
 	double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
-	calibrator_A = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
-	calibrator_B = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
 		std::cout << "maybe_merger->getNumInputs() " << maybe_merger->getNumInputs() << std::endl;
+		std::cout << "maybe_merger->getNumOutputs() " << maybe_merger->getNumOutputs() << std::endl;
 		maybe_merger->switchIO(0); // sourceNodeA
-		video_A = (PosTracker*)maybe_merger->getSourceNode();
-		if ( ! video_A->getName().isEmpty() ) {
-			video_A = (PosTracker*)maybe_merger->getSourceNode();
-			video_A->openCamera();
-			video_A->getEditor()->updateSettings();
-			camera_A = video_A->getCurrentCamera();
+		PosTracker * tracker = (PosTracker*)maybe_merger->getSourceNode();
+		if ( ! tracker->getDevName().empty() ) {
+			tracker = (PosTracker*)maybe_merger->getSourceNode();
+			tracker->openCamera();
+			tracker->getEditor()->updateSettings();
+			m_trackers.push_back(tracker);
+			calibrators.push_back(std::make_unique<CalibrateCamera>(board_width, board_height, board_size));
 		}
-		// else
-		// 	video_A = nullptr;
 		maybe_merger->switchIO(1); // sourceNodeA
-		video_B = (PosTracker*)maybe_merger->getSourceNode();
-		if ( ! video_B->getName().isEmpty() ) {
-			video_B->openCamera();
-			video_B->getEditor()->updateSettings();
-			camera_B = video_B->getCurrentCamera();
+		tracker = (PosTracker*)maybe_merger->getSourceNode();
+		if ( ! tracker->getDevName().empty() ) {
+			tracker = (PosTracker*)maybe_merger->getSourceNode();
+			tracker->openCamera();
+			tracker->getEditor()->updateSettings();
+			m_trackers.push_back(tracker);
+			calibrators.push_back(std::make_unique<CalibrateCamera>(board_width, board_height, board_size));
 		}
-		// else
-		// 	video_B = nullptr;
 	}
 
 	m_threadRunning = true;
@@ -122,10 +122,9 @@ void StereoPos::stopStreaming() {
 	if ( m_threadRunning ) {
 		m_threadRunning = false;
 		stopThread(1000);
-		if ( video_A )
-			video_A->stopCamera();
-		if ( video_B )
-			video_B->stopCamera();
+		for (int i = 0; i < m_trackers.size(); ++i) {
+			m_trackers[i]->stopCamera();
+		}
 	}
 }
 
@@ -133,52 +132,32 @@ void StereoPos::run() {
 	auto ed = static_cast<StereoPosEditor*>(getEditor());
 	int pauseBetweenCapsSecs = ed->getNSecondsBetweenCaptures();
 	bool showImages = ed->showCapturedImages();
-	cv::Mat frame_A, frame_B;
+	cv::Mat frame;
 	struct timeval tv;
 	unsigned int count = 0;
 	// containers for various parts of the opencv calibration algos
-	std::vector<cv::Mat> ims_A;
-	std::vector<cv::Mat> ims_B;
+	std::vector<std::vector<cv::Mat>> images{m_trackers.size(),0};
 	while ( (count <= nImagesToCapture) && m_threadRunning ) {
-		if ( video_A ) {
-			if ( video_A->isCamReady() ) {
-				std::cout << "capturing on A\n";
-				camera_A->read_frame(frame_A, tv);
-				if ( ! frame_A.empty() ) {
-					ims_A.push_back(frame_A);
-					if ( showImages ) {
-						cv::imshow("Camera A", frame_A);
-						cv::waitKey(1);
-					}
-
-				}
-			}
-		}
-		if ( video_B ) {
-			if ( video_B->isCamReady() ) {
-				std::cout << "capturing on A\n";
-				camera_B->read_frame(frame_B, tv);
-				if ( ! frame_B.empty() ) {
-					ims_B.push_back(frame_B);
-					if ( showImages ) {
-						cv::imshow("Camera B", frame_B);
-						cv::waitKey(1);
-					}
+		for (int i = 0; i < m_trackers.size(); ++i)
+		{
+			PosTracker * tracker = m_trackers[i];
+			if ( tracker->isCamReady() ) {
+				std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
+				camera->read_frame(frame, tv);
+				images[i].push_back(frame);
+				if ( showImages ) {
+					cv::imshow(tracker->getDevName(), frame);
+					cv::waitKey(1);
 				}
 			}
 		}
 		sleep(pauseBetweenCapsSecs*1000);
 		++count;
 	}
-	if ( video_A ) {
-		std::cout << "Calibrating camera A with " << ims_A.size() << " images" << std::endl;
-		calibrator_A->setup(ims_A, showImages);
+	for (int i = 0; i < m_trackers.size(); ++i) {
+		std::cout << "Calibrating camera  " << i << std::endl;
+		calibrators[i]->setup(images[i], showImages);
 	}
-	if ( video_B ) {
-		std::cout << "Calibrating camera B with " << ims_B.size() << " images" << std::endl;
-		calibrator_B->setup(ims_B, showImages);
-	}
-
 }
 
 void StereoPos::saveCustomParametersToXml(XmlElement * xml)
