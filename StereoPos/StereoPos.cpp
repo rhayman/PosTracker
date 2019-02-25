@@ -97,7 +97,7 @@ void StereoPos::startStreaming() {
 		maybe_merger->switchIO(0); // sourceNodeA
 		PosTracker * tracker = (PosTracker*)maybe_merger->getSourceNode();
 		std::cout << "tracker name " << tracker->getDevName() << std::endl;
-		if ( ! tracker->getDevName().empty() ) {
+		if ( tracker != nullptr ) {
 			tracker = (PosTracker*)maybe_merger->getSourceNode();
 			tracker->openCamera();
 			tracker->getEditor()->updateSettings();
@@ -106,8 +106,7 @@ void StereoPos::startStreaming() {
 		}
 		maybe_merger->switchIO(1); // sourceNodeA
 		tracker = (PosTracker*)maybe_merger->getSourceNode();
-		std::cout << "tracker name " << tracker->getDevName() << std::endl;
-		if ( ! tracker->getDevName().empty() ) {
+		if ( tracker != nullptr ) {
 			tracker = (PosTracker*)maybe_merger->getSourceNode();
 			tracker->openCamera();
 			tracker->getEditor()->updateSettings();
