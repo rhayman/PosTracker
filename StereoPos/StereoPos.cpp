@@ -78,7 +78,6 @@ void StereoPos::startStreaming() {
 	// get some information abou the chessboard
 	auto ed = static_cast<StereoPosEditor*>(getEditor());
 	nImagesToCapture = ed->getNImagesToCapture();
-	
 	double board_width = ed->getBoardDims(BOARDPROP::kWidth);
 	double board_height = ed->getBoardDims(BOARDPROP::kHeight);
 	double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
@@ -127,7 +126,6 @@ void StereoPos::run() {
 	cv::Mat frame_A, frame_B;
 	struct timeval tv;
 	unsigned int count = 0;
-	unsigned int 
 	while ( m_threadRunning ) {
 		while ( count <= nImagesToCapture ) {
 			if ( video_A ) {
@@ -156,6 +154,7 @@ void StereoPos::run() {
 					lock.exit();
 				}
 			}
+			++count;
 		}
 	}
 	stopStreaming();
