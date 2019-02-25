@@ -63,7 +63,7 @@ void StereoPosEditor::buttonEvent(Button * button)
 		unsigned int count = 0;
 		while (count < nCalibrationImagesToCaputure) {
 			sleep(interval);
-			m_proc->testFcn();
+			m_proc->startStreaming();
 			++count;
 		}
 	}

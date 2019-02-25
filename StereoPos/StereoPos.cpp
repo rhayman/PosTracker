@@ -79,11 +79,7 @@ void StereoPos::showCapturedImages(bool show) {
 
 }
 
-void run() {
-
-}
-
-void startStreaming() {
+void StereoPos::startStreaming() {
 	// get some information abou the chessboard
 	auto ed = static_cast<StereoPosEditor*>(getEditor());
 	bool showImages = ed->showCapturedImages();
@@ -118,7 +114,7 @@ void startStreaming() {
 	startThread(); // calls run
 }
 
-void stopStreaming() {
+void StereoPos::stopStreaming() {
 	if ( m_threadRunning ) {
 		m_threadRunning = false;
 		stopThread(10000);
