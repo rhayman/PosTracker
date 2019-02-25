@@ -12,18 +12,18 @@ class CalibrateCamera {
 public:
 	CalibrateCamera() {};
 	CalibrateCamera(double width, double height, double size) : m_width(width), m_height(height), m_size(size) {};
-	~CalibrateCamera() {};
+	~CalibrateCamera() {
+		if ( m_showImages )
+			cv::destroyWindow("Chessboard detection");
+	};
 	void setup(std::vector<cv::Mat> imgs, bool showImages=false) {
+		m_showImages = showImages;
 		cv::Size board_size = cv::Size(m_width, m_height);
 		std::vector<cv::Point2f> corners;
 		for (int i = 0; i < imgs.size(); ++i)
 		{
 			cv::Mat grey;
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
-			if ( showImages ) {
-				cv::imshow("grey", grey);
-				cv::waitKey(1);
-			}
 			bool found = false;
 			found = cv::findChessboardCorners(grey, board_size, corners, 1 | 4);
 			if ( found ) {
@@ -34,13 +34,13 @@ public:
 				cv::cvtColor(col, col, cv::COLOR_GRAY2BGR);
 				cv::drawChessboardCorners(col, board_size, corners, found);
 				if ( showImages ) {
-					cv::imshow("grey", col);
-					cv::waitKey(1);
+					cv::imshow("Chessboard detection", col);
 				}
 			}
 		}
 	};
 private:
+	bool m_showImages = false;
 	double m_width = 11;
 	double m_height = 12;
 	double m_size = 11;
@@ -67,10 +67,14 @@ AudioProcessorEditor * StereoPos::createEditor() {
 }
 
 void StereoPos::showCapturedImages(bool show) {
-	if ( show )
-		cv::namedWindow("grey", cv::WINDOW_NORMAL);
-	else
-		cv::destroyWindow("grey");
+	if ( show ) {
+		cv::namedWindow("Camera A", cv::WINDOW_NORMAL);
+		cv::namedWindow("Camera B", cv::WINDOW_NORMAL);
+	}
+	else {
+		cv::destroyWindow("Camera A");
+		cv::destroyWindow("Camera B");
+	}
 
 }
 
@@ -133,6 +137,8 @@ void StereoPos::run() {
 				camera_A->read_frame(frame_A, tv);
 				if ( ! frame_A.empty() ) {
 					ims_A.push_back(frame_A);
+					if ( showImages )
+						cv::imshow("Camera A", frame_A);
 				}
 			}
 		}
@@ -142,6 +148,8 @@ void StereoPos::run() {
 				camera_B->read_frame(frame_B, tv);
 				if ( ! frame_B.empty() ) {
 					ims_B.push_back(frame_B);
+					if ( showImages )
+						cv::imshow("Camera B", frame_B);
 				}
 			}
 		}
