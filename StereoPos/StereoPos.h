@@ -19,8 +19,6 @@ public:
 	bool isFilter() const override { return true; }
 	bool hasEditor() const override { return true; }
 
-	void process(AudioSampleBuffer& buffer) override;
-
 	bool isReady() override { return true; }
 	void run();
 	void startStreaming();
