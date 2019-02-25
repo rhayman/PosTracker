@@ -121,6 +121,7 @@ void StereoPos::stopStreaming() {
 }
 
 void StereoPos::run() {
+	sleep(1000);
 	auto ed = static_cast<StereoPosEditor*>(getEditor());
 	bool showImages = ed->showCapturedImages();
 	cv::Mat frame_A, frame_B;
