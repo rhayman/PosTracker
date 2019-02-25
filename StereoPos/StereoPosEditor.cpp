@@ -60,10 +60,6 @@ int StereoPosEditor::getNSecondsBetweenCaptures() {
 void StereoPosEditor::buttonEvent(Button * button)
 {
 	if ( button == captureButton ) {
-		String time = intervalText->getText();
-		int interval = time.getIntValue();
-		if ( interval <= 0 )
-			interval = 1;
 		m_proc->startStreaming();
 	}
 	if ( button == showVideoCapture ) {

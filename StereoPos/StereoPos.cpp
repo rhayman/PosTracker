@@ -85,10 +85,6 @@ void StereoPos::startStreaming() {
 	calibrator_B = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
-		auto ed = static_cast<StereoPosEditor*>(getEditor());
-		double board_width = ed->getBoardDims(BOARDPROP::kWidth);
-		double board_height = ed->getBoardDims(BOARDPROP::kHeight);
-		double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
 		maybe_merger->switchIO(0); // sourceNodeA
 		video_A = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_A ) {
@@ -112,7 +108,7 @@ void StereoPos::startStreaming() {
 void StereoPos::stopStreaming() {
 	if ( m_threadRunning ) {
 		m_threadRunning = false;
-		stopThread(10000);
+		stopThread(1000);
 		if ( video_A )
 			video_A->stopCamera();
 		if ( video_B )
@@ -155,7 +151,7 @@ void StereoPos::run() {
 		++count;
 	}
 	if ( video_A ) {
-		std::cout << "Calibrating camera B with " << ims_A.size() << " images" << std::endl;
+		std::cout << "Calibrating camera A with " << ims_A.size() << " images" << std::endl;
 		calibrator_A->setup(ims_A, showImages);
 	}
 	if ( video_B ) {
