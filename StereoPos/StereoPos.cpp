@@ -46,14 +46,15 @@ private:
 	double m_size = 11;
 };
 
-StereoPos::StereoPos() : GenericProcessor("Stereo Pos")
+StereoPos::StereoPos() : GenericProcessor("Stereo Pos"), Thread("StereoPosThread")
 {
 	setProcessorType (PROCESSOR_TYPE_FILTER);
 	sendSampleCount = false;
 }
 
 StereoPos::~StereoPos() {
-	 calibrator.reset();
+	 calibrator_A.reset();
+	 calibrator_B.reset();
 }
 
 void StereoPos::process(AudioSampleBuffer& buffer)
