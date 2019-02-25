@@ -44,7 +44,7 @@ private:
 	String board_height = String("12");
 	String square_size = String("11");
 
-	const unsigned int nCalibrationImagesToCaputure = 1;
+	const unsigned int nCalibrationImagesToCaputure = 5;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StereoPosEditor);
 };
