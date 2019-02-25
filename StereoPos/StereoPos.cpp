@@ -104,6 +104,7 @@ void StereoPos::startStreaming() {
 			video_B->getEditor()->updateSettings();
 		}
 	}
+	m_threadRunning = true;
 	startThread(); // calls run
 }
 
