@@ -136,7 +136,7 @@ void StereoPos::run() {
 	struct timeval tv;
 	unsigned int count = 0;
 	// containers for various parts of the opencv calibration algos
-	std::vector<std::vector<cv::Mat>> images{m_trackers.size(),0};
+	std::vector<std::vector<cv::Mat>> images{m_trackers.size()};
 	while ( (count <= nImagesToCapture) && m_threadRunning ) {
 		for (int i = 0; i < m_trackers.size(); ++i)
 		{
