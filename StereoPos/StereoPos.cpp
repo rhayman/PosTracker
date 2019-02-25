@@ -121,7 +121,6 @@ void StereoPos::stopStreaming() {
 }
 
 void StereoPos::run() {
-	sleep(1);
 	auto ed = static_cast<StereoPosEditor*>(getEditor());
 	int pauseBetweenCapsSecs = ed->getNSecondsBetweenCaptures();
 	bool showImages = ed->showCapturedImages();
@@ -137,7 +136,6 @@ void StereoPos::run() {
 				lock.enter();
 				camera_A->read_frame(frame_A, tv);
 				if ( ! frame_A.empty() ) {
-					std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
 					ims_A.push_back(frame_A);
 				}
 				lock.exit();
@@ -148,19 +146,22 @@ void StereoPos::run() {
 				lock.enter();
 				camera_B->read_frame(frame_B, tv);
 				if ( ! frame_B.empty() ) {
-					std::cout << "Calibrating " << video_B->getDeviceName() << "..." << std::endl;
 					ims_B.push_back(frame_B);
 				}
 				lock.exit();
 			}
 		}
-		sleep(pauseBetweenCapsSecs);
+		sleep(pauseBetweenCapsSecs*1000);
 		++count;
 	}
-	if ( video_A )
+	if ( video_A ) {
+		std::cout << "Calibrating camera B with " << ims_A.size() << " images" << std::endl;
 		calibrator_A->setup(ims_A, showImages);
-	if ( video_B )
+	}
+	if ( video_B ) {
+		std::cout << "Calibrating camera B with " << ims_B.size() << " images" << std::endl;
 		calibrator_B->setup(ims_B, showImages);
+	}
 
 }
 
