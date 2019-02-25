@@ -129,22 +129,20 @@ void StereoPos::run() {
 	while ( (count <= nImagesToCapture) && m_threadRunning ) {
 		if ( video_A ) {
 			if ( video_A->isCamReady() ) {
-				lock.enter();
+				std::cout << "capturing on A\n";
 				camera_A->read_frame(frame_A, tv);
 				if ( ! frame_A.empty() ) {
 					ims_A.push_back(frame_A);
 				}
-				lock.exit();
 			}
 		}
 		if ( video_B ) {
 			if ( video_B->isCamReady() ) {
-				lock.enter();
+				std::cout << "capturing on A\n";
 				camera_B->read_frame(frame_B, tv);
 				if ( ! frame_B.empty() ) {
 					ims_B.push_back(frame_B);
 				}
-				lock.exit();
 			}
 		}
 		sleep(pauseBetweenCapsSecs*1000);
