@@ -25,7 +25,7 @@ public:
 	void run();
 	void startStreaming();
 	void stopStreaming();
-	// void process(AudioSampleBuffer& buffer) override;
+	void process(AudioSampleBuffer& buffer) override {};
 
 
 	void testFcn();

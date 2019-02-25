@@ -57,13 +57,8 @@ StereoPos::~StereoPos() {
 	 calibrator_B.reset();
 }
 
-// void StereoPos::process(AudioSampleBuffer& buffer)
-// {}
-
 void StereoPos::updateSettings()
-{
-
-}
+{}
 
 AudioProcessorEditor * StereoPos::createEditor() {
 	editor = new StereoPosEditor(this, true);
