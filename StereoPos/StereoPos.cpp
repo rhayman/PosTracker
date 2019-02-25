@@ -93,16 +93,16 @@ void StereoPos::startStreaming() {
 		maybe_merger->switchIO(0); // sourceNodeA
 		video_A = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_A ) {
-			camera_A = video_A->getCurrentCamera();
 			video_A->openCamera();
 			video_A->getEditor()->updateSettings();
+			camera_A = video_A->getCurrentCamera();
 		}
 		maybe_merger->switchIO(1); // sourceNodeA
 		video_B = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_B ) {
-			camera_B = video_B->getCurrentCamera();
 			video_B->openCamera();
 			video_B->getEditor()->updateSettings();
+			camera_B = video_B->getCurrentCamera();
 		}
 	}
 	m_threadRunning = true;
@@ -155,7 +155,6 @@ void StereoPos::run() {
 		}
 		++count;
 	}
-	stopStreaming();
 }
 
 void StereoPos::saveCustomParametersToXml(XmlElement * xml)

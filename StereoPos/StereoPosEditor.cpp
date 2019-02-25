@@ -60,12 +60,7 @@ void StereoPosEditor::buttonEvent(Button * button)
 		int interval = time.getIntValue();
 		if ( interval <= 0 )
 			interval = 1;
-		unsigned int count = 0;
-		while (count < nCalibrationImagesToCapture) {
-			sleep(interval);
-			m_proc->startStreaming();
-			++count;
-		}
+		m_proc->startStreaming();
 	}
 	if ( button == showVideoCapture ) {
 		m_setShowCapture = showVideoCapture->getToggleState();
