@@ -99,14 +99,14 @@ void StereoPos::startStreaming() {
 		maybe_merger->switchIO(0); // sourceNodeA
 		video_A = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_A ) {
-			std::shared_ptr<Camera> camera_A = video_A->getCurrentCamera();
+			camera_A = video_A->getCurrentCamera();
 			video_A->openCamera();
 			video_A->getEditor()->updateSettings();
 		}
 		maybe_merger->switchIO(1); // sourceNodeA
 		video_B = (PosTracker*)maybe_merger->getSourceNode();
 		if ( video_B ) {
-			std::shared_ptr<Camera> camera_B = video_B->getCurrentCamera();
+			camera_B = video_B->getCurrentCamera();
 			video_B->openCamera();
 			video_B->getEditor()->updateSettings();
 		}

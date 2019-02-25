@@ -42,6 +42,8 @@ private:
 	std::unique_ptr<CalibrateCamera> calibrator_B;
 	PosTracker * video_A = nullptr;
 	PosTracker * video_B = nullptr;
+	std::shared_ptr<Camera> camera_A;
+	std::shared_ptr<Camera> camera_B;
 
 	bool m_threadRunning = false;
 	CriticalSection lock;
