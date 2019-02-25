@@ -156,6 +156,7 @@ void StereoPos::run() {
 			}
 		}
 	}
+	stopStreaming();
 }
 
 void StereoPos::saveCustomParametersToXml(XmlElement * xml)
