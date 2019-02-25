@@ -44,6 +44,8 @@ private:
 	std::shared_ptr<Camera> camera_A;
 	std::shared_ptr<Camera> camera_B;
 
+	unsigned int nImagesToCapture = 0;
+
 	bool m_threadRunning = false;
 	CriticalSection lock;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StereoPos);
