@@ -83,9 +83,6 @@ void StereoPos::startStreaming() {
 	double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
 	calibrator_A = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
 	calibrator_B = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
-	// clear some buffers
-	ims_A.clear();
-	ims_B.clear();
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
 		auto ed = static_cast<StereoPosEditor*>(getEditor());
@@ -131,6 +128,9 @@ void StereoPos::run() {
 	cv::Mat frame_A, frame_B;
 	struct timeval tv;
 	unsigned int count = 0;
+	// containers for various parts of the opencv calibration algos
+	std::vector<cv::Mat> ims_A;
+	std::vector<cv::Mat> ims_B;
 	while ( (count <= nImagesToCapture) && m_threadRunning ) {
 		if ( video_A ) {
 			if ( video_A->isCamReady() ) {
