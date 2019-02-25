@@ -24,6 +24,7 @@ public:
 	void update() {};
 
 	double getBoardDims(BOARDPROP);
+	unsigned int getNImagesToCapture() { return nCalibrationImagesToCapture; }
 
 	bool showCapturedImages() { return m_setShowCapture; }
 
@@ -44,7 +45,7 @@ private:
 	String board_height = String("12");
 	String square_size = String("11");
 
-	const unsigned int nCalibrationImagesToCaputure = 5;
+	unsigned int nCalibrationImagesToCapture = 5;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StereoPosEditor);
 };

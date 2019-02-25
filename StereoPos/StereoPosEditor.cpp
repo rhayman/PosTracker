@@ -61,7 +61,7 @@ void StereoPosEditor::buttonEvent(Button * button)
 		if ( interval <= 0 )
 			interval = 1;
 		unsigned int count = 0;
-		while (count < nCalibrationImagesToCaputure) {
+		while (count < nCalibrationImagesToCapture) {
 			sleep(interval);
 			m_proc->startStreaming();
 			++count;
