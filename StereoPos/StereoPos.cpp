@@ -92,6 +92,7 @@ void StereoPos::startStreaming() {
 	calibrator_B = std::make_unique<CalibrateCamera>(board_width, board_height, board_size);
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
+		std::cout << "maybe_merger->getNumInputs() " << maybe_merger->getNumInputs() << std::endl;
 		maybe_merger->switchIO(0); // sourceNodeA
 		video_A = (PosTracker*)maybe_merger->getSourceNode();
 		if ( ! video_A->getName().isEmpty() ) {
