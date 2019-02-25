@@ -91,9 +91,9 @@ void StereoPos::testFcn() {
 		if ( video_A ) {
 			std::shared_ptr<Camera> thiscam = video_A->getCurrentCamera();
 			video_A->openCamera();
+			video_A->getEditor()->updateSettings();
 			sleep(1);
 			if ( video_A->isCamReady() ) {
-				video_A->getEditor()->updateSettings();
 				lock.enter();
 				cv::Mat img;
 				struct timeval tv;
