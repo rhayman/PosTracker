@@ -31,7 +31,7 @@ public:
 				cv::Mat col;
 				grey.copyTo(col);
 				cv::cvtColor(col, col, cv::COLOR_GRAY2BGR);
-				cv::drawChessboardCorners(col, board_size, corners, found);
+				cv::drawChessboardCorners(col, board_size, corners, m_found);
 				if ( showImages ) {
 					cv::namedWindow("Chessboard detection");
 					cv::imshow("Chessboard detection", col);
