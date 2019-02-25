@@ -82,7 +82,6 @@ void StereoPos::showCapturedImages(bool show) {
 void StereoPos::startStreaming() {
 	// get some information abou the chessboard
 	auto ed = static_cast<StereoPosEditor*>(getEditor());
-	bool showImages = ed->showCapturedImages();
 	double board_width = ed->getBoardDims(BOARDPROP::kWidth);
 	double board_height = ed->getBoardDims(BOARDPROP::kHeight);
 	double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
@@ -92,7 +91,6 @@ void StereoPos::startStreaming() {
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
 		auto ed = static_cast<StereoPosEditor*>(getEditor());
-		bool showImages = ed->showCapturedImages();
 		double board_width = ed->getBoardDims(BOARDPROP::kWidth);
 		double board_height = ed->getBoardDims(BOARDPROP::kHeight);
 		double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
@@ -126,6 +124,8 @@ void StereoPos::stopStreaming() {
 }
 
 void StereoPos::run() {
+	auto ed = static_cast<StereoPosEditor*>(getEditor());
+	bool showImages = ed->showCapturedImages();
 	cv::Mat frame_A, frame_B;
 	struct timeval tv;
 	while ( m_threadRunning ) {
