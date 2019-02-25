@@ -392,7 +392,7 @@ void PosTracker::run()
 					ed->setInfoValue(InfoLabelType::XPOS, (double)xy[0]);
 					ed->setInfoValue(InfoLabelType::YPOS, (double)xy[1]);
 					cv::bitwise_and(frame, displayMask_mask, frame, displayMask->getSingleChannelMask());
-					if ( pts[1].x => getVideoMask(BORDER::LEFT) && pts[1].y => getVideoMask(BORDER::TOP) && path_overlay == true )
+					if ( pts[1].x >= getVideoMask(BORDER::LEFT) && pts[1].y >= getVideoMask(BORDER::TOP) && path_overlay == true )
 					{
 						cv::Mat pathFrame = displayMask->getPathFrame();
 						cv::line(pathFrame, pts[0], pts[1], cv::Scalar(0,255,0), 2, cv::LINE_8);
