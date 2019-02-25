@@ -132,7 +132,7 @@ void StereoPos::run() {
 		if ( video_A ) {
 			if ( video_A->isCamReady() ) {
 				lock.enter();
-				thiscam->read_frame(frame_A, tv);
+				camera_A->read_frame(frame_A, tv);
 				if ( ! frame_A.empty() ) {
 					std::cout << "Calibrating " << video_A->getDeviceName() << "..." << std::endl;
 					std::vector<cv::Mat> ims_A;
@@ -145,7 +145,7 @@ void StereoPos::run() {
 		if ( video_B ) {
 			if ( video_B->isCamReady() ) {
 				lock.enter();
-				thiscam->read_frame(frame_B, tv);
+				camera_B->read_frame(frame_B, tv);
 				if ( ! frame_B.empty() ) {
 					std::cout << "Calibrating " << video_B->getDeviceName() << "..." << std::endl;
 					std::vector<cv::Mat> ims_B;
