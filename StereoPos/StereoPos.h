@@ -6,6 +6,7 @@
 
 class CalibrateCamera;
 class PosTracker;
+class Camera;
 
 class StereoPos : public GenericProcessor, public Thread
 {
