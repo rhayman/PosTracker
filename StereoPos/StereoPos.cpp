@@ -3,6 +3,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <unistd.h>
+#include <ctime>
 #include "StereoPos.h"
 #include "StereoPosEditor.h"
 #include "../PosTracker/PosTracker.h"
@@ -134,26 +135,57 @@ void StereoPos::run() {
 	cv::Mat frame;
 	struct timeval tv;
 	unsigned int count = 0;
+	bool doCapture = false;
 	// containers for various parts of the opencv calibration algos
 	std::vector<std::vector<cv::Mat>> images{m_trackers.size()};
-	while ( (count < nImagesToCapture) && m_threadRunning ) {
-		for (int i = 0; i < m_trackers.size(); ++i)
-		{
-			PosTracker * tracker = m_trackers[i];
-			if ( tracker->isCamReady() ) {
-				std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
-				std::cout << "Capturing frame " << count << " on " << tracker->getDevName() << std::endl;
-				camera->read_frame(frame, tv);
-				images[i].push_back(frame);
-				if ( showImages ) {
-					cv::imshow(tracker->getDevName(), frame);
-					cv::waitKey(1);
+	std::time starttime = std::time(nullptr);
+	while ( m_threadRunning ) {
+		std::time nowtime = std::time(nullptr);
+		if ( std::difftime(nowtime, starttime) > 1) {
+			std::cout << "Capturing on cameras after " << std::difftime(nowtime, starttime) << " seconds" << std::endl;
+			for (int i = 0; i < m_trackers.size(); ++i)
+			{
+				PosTracker * tracker = m_trackers[i];
+				if ( tracker->isCamReady() ) {
+					std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
+					camera->read_frame(frame, tv);
+					images[i].push_back(frame);
 				}
 			}
 		}
+		else {
+			for (int i = 0; i < m_trackers.size(); ++i)
+			{
+				PosTracker * tracker = m_trackers[i];
+				if ( tracker->isCamReady() ) {
+					std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
+					camera->read_frame(frame, tv);
+				}
+			}
+		}
+		std::time starttime = std::time(nullptr);
 		sleep(pauseBetweenCapsSecs*1000);
-		++count;
 	}
+
+
+	// while ( (count < nImagesToCapture) && m_threadRunning ) {
+	// 	for (int i = 0; i < m_trackers.size(); ++i)
+	// 	{
+	// 		PosTracker * tracker = m_trackers[i];
+	// 		if ( tracker->isCamReady() ) {
+	// 			std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
+	// 			std::cout << "Capturing frame " << count << " on " << tracker->getDevName() << std::endl;
+	// 			camera->read_frame(frame, tv);
+	// 			images[i].push_back(frame);
+	// 			if ( showImages ) {
+	// 				cv::imshow(tracker->getDevName(), frame);
+	// 				cv::waitKey(1);
+	// 			}
+	// 		}
+	// 	}
+	// 	sleep(pauseBetweenCapsSecs*1000);
+	// 	++count;
+	// }
 	for (int i = 0; i < m_trackers.size(); ++i) {
 		std::cout << "Calibrating camera  " << i << std::endl;
 		calibrators[i]->setup(images[i], showImages);
