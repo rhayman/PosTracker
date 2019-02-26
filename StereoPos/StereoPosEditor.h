@@ -39,9 +39,9 @@ private:
 	ScopedPointer<TextEditor> boardSquareSizeText;
 	ScopedPointer<Label> intervalLabel;
 	ScopedPointer<Label> nImagesLabel;
-	ScopedPointer<TextEditor> boardWidthLabel;
-	ScopedPointer<TextEditor> boardHeightLabel;
-	ScopedPointer<TextEditor> boardSquareSizeLabel;
+	ScopedPointer<Label> boardWidthLabel;
+	ScopedPointer<Label> boardHeightLabel;
+	ScopedPointer<Label> boardSquareSizeLabel;
 	ScopedPointer<UtilityButton> captureButton;
 	ScopedPointer<ToggleButton> showVideoCapture;
 
