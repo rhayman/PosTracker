@@ -16,7 +16,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 
 	// add controls etc
 	addAndMakeVisible(intervalText = new TextEditor(String("Interval")));
-	intervalText->setBounds(5, 25, 80, 20);
+	intervalText->setBounds(5, 25, 30, 20);
 	intervalText->setText("1");
 	intervalText->setTooltip("Interval between frame captures");
 
@@ -29,7 +29,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	addAndMakeVisible(intervalLabel);
 
 	addAndMakeVisible(nImagesText = new TextEditor(String("NumImages")));
-	nImagesText->setBounds(5, 55, 80, 20);
+	nImagesText->setBounds(5, 55, 30, 20);
 	nImagesText->setText("5");
 	nImagesText->setTooltip("The number of images to capture from each camera");
 
@@ -53,7 +53,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	showVideoCapture->setEnabled(true);
 
 	addAndMakeVisible(boardWidthText = new TextEditor(String("Board width")));
-	boardWidthText->setBounds(165, 25, 80, 20);
+	boardWidthText->setBounds(165, 25, 30, 20);
 	boardWidthText->setTooltip("Width of the board");
 	boardWidthText->setText(board_width);
 
@@ -66,7 +66,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	addAndMakeVisible(boardWidthLabel);
 
 	addAndMakeVisible(boardHeightText = new TextEditor(String("Board height")));
-	boardHeightText->setBounds(165, 55, 80, 20);
+	boardHeightText->setBounds(165, 55, 30, 20);
 	boardHeightText->setTooltip("Height of the board");
 	boardHeightText->setText(board_height);
 
@@ -79,11 +79,11 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	addAndMakeVisible(boardHeightLabel);
 
 	addAndMakeVisible(boardSquareSizeText = new TextEditor(String("Square size")));
-	boardSquareSizeText->setBounds(165, 85, 80, 20);
+	boardSquareSizeText->setBounds(165, 85, 30, 20);
 	boardSquareSizeText->setTooltip("The size of each square");
 	boardSquareSizeText->setText(square_size);
 
-	boardSquareSizeLabel = new Label("boardSquareSizeLabel", "Sqaure size (cm)");
+	boardSquareSizeLabel = new Label("boardSquareSizeLabel", "Square size (cm)");
 	boardSquareSizeLabel->setBounds(200, 85, 80, 20);
 	boardSquareSizeLabel->setFont(font);
 	boardSquareSizeLabel->setEditable (false, false, false);
