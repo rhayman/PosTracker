@@ -151,7 +151,7 @@ void StereoPos::run() {
 				}
 			}
 		}
-		sleep(pauseBetweenCapsSecs*100000);
+		sleep(pauseBetweenCapsSecs*1000);
 		++count;
 	}
 	for (int i = 0; i < m_trackers.size(); ++i) {

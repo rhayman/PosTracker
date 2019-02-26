@@ -16,6 +16,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	// add controls etc
 	addAndMakeVisible(intervalText = new TextEditor(String("Interval")));
 	intervalText->setBounds(5, 25, 80, 20);
+	intervalText->setText("1");
 	intervalText->setTooltip("Interval between frame captures");
 
 	intervalLabel = new Label("IntervalTime", "Interval(s)");
