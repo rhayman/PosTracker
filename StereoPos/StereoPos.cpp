@@ -141,7 +141,7 @@ void StereoPos::run() {
 	std::time_t starttime = std::time(nullptr);
 	while ( (count < nImagesToCapture) && m_threadRunning ) {
 		std::time_t nowtime = std::time(nullptr);
-		if ( std::difftime(nowtime, starttime) > 1) {
+		if ( std::difftime(nowtime, starttime) > pauseBetweenCapsSecs) {
 			std::cout << "Capturing on cameras after " << std::difftime(nowtime, starttime) << " seconds" << std::endl;
 			for (int i = 0; i < m_trackers.size(); ++i)
 			{
