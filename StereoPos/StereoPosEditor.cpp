@@ -53,12 +53,12 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	showVideoCapture->setEnabled(true);
 
 	addAndMakeVisible(boardWidthText = new TextEditor(String("Board width")));
-	boardWidthText->setBounds(165, 25, 30, 20);
+	boardWidthText->setBounds(115, 25, 30, 20);
 	boardWidthText->setTooltip("Width of the board");
 	boardWidthText->setText(board_width);
 
 	boardWidthLabel = new Label("boardWidthLabel", "Board corner rows");
-	boardWidthLabel->setBounds(200, 25, 80, 20);
+	boardWidthLabel->setBounds(155, 25, 80, 20);
 	boardWidthLabel->setFont(font);
 	boardWidthLabel->setEditable (false, false, false);
 	boardWidthLabel->setJustificationType(Justification::centredLeft);
@@ -66,12 +66,12 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	addAndMakeVisible(boardWidthLabel);
 
 	addAndMakeVisible(boardHeightText = new TextEditor(String("Board height")));
-	boardHeightText->setBounds(165, 55, 30, 20);
+	boardHeightText->setBounds(115, 55, 30, 20);
 	boardHeightText->setTooltip("Height of the board");
 	boardHeightText->setText(board_height);
 
 	boardHeightLabel = new Label("boardHeightLabel", "Board corner cols");
-	boardHeightLabel->setBounds(200, 55, 80, 20);
+	boardHeightLabel->setBounds(155, 55, 80, 20);
 	boardHeightLabel->setFont(font);
 	boardHeightLabel->setEditable (false, false, false);
 	boardHeightLabel->setJustificationType(Justification::centredLeft);
@@ -79,12 +79,12 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	addAndMakeVisible(boardHeightLabel);
 
 	addAndMakeVisible(boardSquareSizeText = new TextEditor(String("Square size")));
-	boardSquareSizeText->setBounds(165, 85, 30, 20);
+	boardSquareSizeText->setBounds(115, 85, 30, 20);
 	boardSquareSizeText->setTooltip("The size of each square");
 	boardSquareSizeText->setText(square_size);
 
 	boardSquareSizeLabel = new Label("boardSquareSizeLabel", "Square size (cm)");
-	boardSquareSizeLabel->setBounds(200, 85, 80, 20);
+	boardSquareSizeLabel->setBounds(155, 85, 80, 20);
 	boardSquareSizeLabel->setFont(font);
 	boardSquareSizeLabel->setEditable (false, false, false);
 	boardSquareSizeLabel->setJustificationType(Justification::centredLeft);
