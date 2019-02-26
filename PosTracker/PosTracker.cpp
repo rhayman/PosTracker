@@ -366,6 +366,9 @@ void PosTracker::run()
 	if ( ! displayMask->getPathFrame().empty() ) {
 		displayMask->setPathFrame(cv::Scalar(0));
 	}
+	std::vector<int> compression_params;
+	compression_params.push_back(cv::IMWRITE_PNG_COMPRESSION);
+	compression_params.push_back(9);
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
 
@@ -401,7 +404,7 @@ void PosTracker::run()
 					}
 					cv::rectangle(frame, cv::Point(double(xy[0])-3, double(xy[1])-3), cv::Point(double(xy[0])+3, double(xy[1])+3), cv::Scalar(0,255,0), -1,1);
 					cv::imshow(currentCam->get_dev_name(), frame);
-					cv::imwrite(std::string("/home/robin/tmp/imgs/")+std::string("frame_")+std::to_string(count), frame);
+					cv::imwrite(std::string("/home/robin/tmp/imgs/")+std::string("frame_")+std::to_string(count), frame, );
 					cv::waitKey(1);
 
 					double fps = cv::getTickFrequency() / (cv::getTickCount() - st);
