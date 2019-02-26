@@ -74,10 +74,11 @@ AudioProcessorEditor * StereoPos::createEditor() {
 
 void StereoPos::showCapturedImages(bool show) {
 	if ( show ) {
-		if ( ! m_trackers.epmty() ) {
+		if ( ! m_trackers.empty() ) {
 			for (int i = 0; i < m_trackers.size(); ++i) {
 				cv::namedWindow("capture_" + std::to_string(i));
 			}
+		}
 	}
 	else
 		cv::destroyAllWindows();
