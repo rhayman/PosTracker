@@ -401,7 +401,7 @@ void PosTracker::run()
 					}
 					cv::rectangle(frame, cv::Point(double(xy[0])-3, double(xy[1])-3), cv::Point(double(xy[0])+3, double(xy[1])+3), cv::Scalar(0,255,0), -1,1);
 					cv::imshow(currentCam->get_dev_name(), frame);
-					cv::imwrite("/home/robin/tmp/imgs/"+"frame_"+std::to_string(count), frame);
+					cv::imwrite(std::string("/home/robin/tmp/imgs/")+std::string("frame_")+std::to_string(count), frame);
 					cv::waitKey(1);
 
 					double fps = cv::getTickFrequency() / (cv::getTickCount() - st);
