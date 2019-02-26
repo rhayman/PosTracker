@@ -151,6 +151,7 @@ void StereoPos::run() {
 					camera->read_frame(frame, tv);
 					images[i].push_back(frame);
 					cv::imwrite(std::string("/home/robin/tmp/imgs/frame_") + std::to_string(count) + std::string(".png"), frame);
+					++count;
 				}
 			}
 		}
@@ -166,7 +167,6 @@ void StereoPos::run() {
 		}
 		std::time_t starttime = std::time(nullptr);
 		sleep(pauseBetweenCapsSecs*1000);
-		++count;
 	}
 
 
