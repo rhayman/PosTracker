@@ -92,6 +92,9 @@ void StereoPos::startStreaming() {
 	double board_height = ed->getBoardDims(BOARDPROP::kHeight);
 	double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
 	GenericProcessor * maybe_merger = getSourceNode();
+	m_trackers.clear();
+	bool showims = ed->showCapturedImages();
+	showCapturedImages(showims);
 	if ( maybe_merger->isMerger() ) {
 		maybe_merger->switchIO(0); // sourceNodeA
 		PosTracker * tracker = (PosTracker*)maybe_merger->getSourceNode();
