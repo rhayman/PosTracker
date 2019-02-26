@@ -80,6 +80,7 @@ void StereoPos::showCapturedImages(bool show) {
 	// 	cv::destroyWindow("Camera A");
 	// 	cv::destroyWindow("Camera B");
 	// }
+	cv::destroyAllWindows();
 
 }
 
@@ -92,11 +93,8 @@ void StereoPos::startStreaming() {
 	double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
 	GenericProcessor * maybe_merger = getSourceNode();
 	if ( maybe_merger->isMerger() ) {
-		std::cout << "maybe_merger->getNumInputs() " << maybe_merger->getNumInputs() << std::endl;
-		std::cout << "maybe_merger->getNumOutputs() " << maybe_merger->getNumOutputs() << std::endl;
 		maybe_merger->switchIO(0); // sourceNodeA
 		PosTracker * tracker = (PosTracker*)maybe_merger->getSourceNode();
-		std::cout << "tracker name " << tracker->getDevName() << std::endl;
 		if ( tracker != nullptr ) {
 			tracker = (PosTracker*)maybe_merger->getSourceNode();
 			tracker->openCamera();
@@ -138,17 +136,18 @@ void StereoPos::run() {
 	unsigned int count = 0;
 	// containers for various parts of the opencv calibration algos
 	std::vector<std::vector<cv::Mat>> images{m_trackers.size()};
-	while ( (count <= nImagesToCapture) && m_threadRunning ) {
+	while ( (count < nImagesToCapture) && m_threadRunning ) {
 		for (int i = 0; i < m_trackers.size(); ++i)
 		{
 			PosTracker * tracker = m_trackers[i];
 			if ( tracker->isCamReady() ) {
 				std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
+				std::cout << "Capturing frame " << count << " on " << tracker->getDevName() << std::endl;
 				camera->read_frame(frame, tv);
 				images[i].push_back(frame);
 				if ( showImages ) {
-					cv::imshow(tracker->getDevName(), frame);
-					cv::waitKey(1);
+					// cv::imshow(tracker->getDevName(), frame);
+					// cv::waitKey(1);
 				}
 			}
 		}
