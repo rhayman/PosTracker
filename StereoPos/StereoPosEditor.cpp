@@ -21,7 +21,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	intervalText->setTooltip("Interval between frame captures");
 
 	intervalLabel = new Label("IntervalTime", "Interval(s)");
-	intervalLabel->setBounds(90, 25, 90, 20);
+	intervalLabel->setBounds(40, 25, 90, 20);
 	intervalLabel->setFont(font);
 	intervalLabel->setEditable (false, false, false);
 	intervalLabel->setJustificationType(Justification::centredLeft);
@@ -34,7 +34,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	nImagesText->setTooltip("The number of images to capture from each camera");
 
 	nImagesLabel = new Label("nImagesLabel", "# images");
-	nImagesLabel->setBounds(90, 55, 80, 20);
+	nImagesLabel->setBounds(40, 55, 80, 20);
 	nImagesLabel->setFont(font);
 	nImagesLabel->setEditable (false, false, false);
 	nImagesLabel->setJustificationType(Justification::centredLeft);
