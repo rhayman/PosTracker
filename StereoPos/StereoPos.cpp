@@ -139,37 +139,24 @@ void StereoPos::run() {
 	// containers for various parts of the opencv calibration algos
 	std::vector<std::vector<cv::Mat>> images{m_trackers.size()};
 	std::time_t starttime = std::time(nullptr);
-	while ( (count < nImagesToCapture) && m_threadRunning ) {
+	while ( ( count < (nImagesToCapture * m_trackers.size()) ) && m_threadRunning ) {
 		std::time_t nowtime = std::time(nullptr);
-		if ( std::difftime(nowtime, starttime) > pauseBetweenCapsSecs) {
-			std::cout << "Capturing on cameras after " << std::difftime(nowtime, starttime) << " seconds" << std::endl;
-			for (int i = 0; i < m_trackers.size(); ++i)
-			{
-				PosTracker * tracker = m_trackers[i];
-				if ( tracker->isCamReady() ) {
-					std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
-					camera->read_frame(frame, tv);
+		for (int i = 0; i < m_trackers.size(); ++i) {
+			PosTracker * tracker = m_trackers[i];
+			if ( tracker->isCamReady() ) {
+				std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
+				camera->read_frame(frame, tv);
+				if ( std::difftime(nowtime, starttime) > pauseBetweenCapsSecs) {
+					std::cout << "Saving images after " << std::difftime(nowtime, starttime) << " seconds" << std::endl;
 					images[i].push_back(frame);
 					cv::imwrite(std::string("/home/robin/tmp/imgs/frame_") + std::to_string(count) + std::string(".png"), frame);
 					++count;
 				}
 			}
 		}
-		else {
-			for (int i = 0; i < m_trackers.size(); ++i)
-			{
-				PosTracker * tracker = m_trackers[i];
-				if ( tracker->isCamReady() ) {
-					std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
-					camera->read_frame(frame, tv);
-				}
-			}
-		}
 		std::time_t starttime = std::time(nullptr);
 		sleep(pauseBetweenCapsSecs*1000);
 	}
-
-
 	// while ( (count < nImagesToCapture) && m_threadRunning ) {
 	// 	for (int i = 0; i < m_trackers.size(); ++i)
 	// 	{
