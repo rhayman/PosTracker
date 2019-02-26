@@ -73,16 +73,14 @@ AudioProcessorEditor * StereoPos::createEditor() {
 }
 
 void StereoPos::showCapturedImages(bool show) {
-	// if ( show ) {
-	// 	cv::namedWindow("Camera A", cv::WINDOW_NORMAL);
-	// 	cv::namedWindow("Camera B", cv::WINDOW_NORMAL);
-	// }
-	// else {
-	// 	cv::destroyWindow("Camera A");
-	// 	cv::destroyWindow("Camera B");
-	// }
-	cv::destroyAllWindows();
-
+	if ( show ) {
+		if ( ! m_trackers.epmty() ) {
+			for (int i = 0; i < m_trackers.size(); ++i) {
+				cv::namedWindow("capture_" + std::to_string(i));
+			}
+	}
+	else
+		cv::destroyAllWindows();
 }
 
 void StereoPos::startStreaming() {
@@ -149,7 +147,8 @@ void StereoPos::run() {
 				if ( std::difftime(nowtime, starttime) > pauseBetweenCapsSecs) {
 					std::cout << "Saving images after " << std::difftime(nowtime, starttime) << " seconds" << std::endl;
 					images[i].push_back(frame);
-					cv::imwrite(std::string("/home/robin/tmp/imgs/frame_") + std::to_string(count) + std::string(".png"), frame);
+					cv::imshow("capture_" + std::to_string(i), frame);
+					cv::waitKey(1);
 					++count;
 				}
 			}
@@ -157,24 +156,6 @@ void StereoPos::run() {
 		std::time_t starttime = std::time(nullptr);
 		sleep(pauseBetweenCapsSecs*1000);
 	}
-	// while ( (count < nImagesToCapture) && m_threadRunning ) {
-	// 	for (int i = 0; i < m_trackers.size(); ++i)
-	// 	{
-	// 		PosTracker * tracker = m_trackers[i];
-	// 		if ( tracker->isCamReady() ) {
-	// 			std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
-	// 			std::cout << "Capturing frame " << count << " on " << tracker->getDevName() << std::endl;
-	// 			camera->read_frame(frame, tv);
-	// 			images[i].push_back(frame);
-	// 			if ( showImages ) {
-	// 				cv::imshow(tracker->getDevName(), frame);
-	// 				cv::waitKey(1);
-	// 			}
-	// 		}
-	// 	}
-	// 	sleep(pauseBetweenCapsSecs*1000);
-	// 	++count;
-	// }
 	for (int i = 0; i < m_trackers.size(); ++i) {
 		std::cout << "Calibrating camera  " << i << std::endl;
 		calibrators[i]->setup(images[i], showImages);
