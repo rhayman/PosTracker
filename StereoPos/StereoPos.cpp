@@ -139,7 +139,7 @@ void StereoPos::run() {
 	// containers for various parts of the opencv calibration algos
 	std::vector<std::vector<cv::Mat>> images{m_trackers.size()};
 	std::time_t starttime = std::time(nullptr);
-	while ( m_threadRunning ) {
+	while ( (count < nImagesToCapture) && m_threadRunning ) {
 		std::time_t nowtime = std::time(nullptr);
 		if ( std::difftime(nowtime, starttime) > 1) {
 			std::cout << "Capturing on cameras after " << std::difftime(nowtime, starttime) << " seconds" << std::endl;
@@ -150,6 +150,7 @@ void StereoPos::run() {
 					std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
 					camera->read_frame(frame, tv);
 					images[i].push_back(frame);
+					cv::imwrite(std::string("/home/robin/tmp/imgs/frame_") + std::to_string(count) + std::string(".png"), frame);
 				}
 			}
 		}
@@ -165,6 +166,7 @@ void StereoPos::run() {
 		}
 		std::time_t starttime = std::time(nullptr);
 		sleep(pauseBetweenCapsSecs*1000);
+		++count;
 	}
 
 
