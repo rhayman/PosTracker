@@ -146,8 +146,8 @@ void StereoPos::run() {
 				camera->read_frame(frame, tv);
 				images[i].push_back(frame);
 				if ( showImages ) {
-					// cv::imshow(tracker->getDevName(), frame);
-					// cv::waitKey(1);
+					cv::imshow(tracker->getDevName(), frame);
+					cv::waitKey(1);
 				}
 			}
 		}
