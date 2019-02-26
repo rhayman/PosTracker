@@ -24,7 +24,7 @@ public:
 	void update() {};
 
 	double getBoardDims(BOARDPROP);
-	unsigned int getNImagesToCapture() { return nCalibrationImagesToCapture; }
+	int getNImagesToCapture();
 	int getNSecondsBetweenCaptures();
 
 	bool showCapturedImages() { return m_setShowCapture; }
@@ -33,10 +33,15 @@ private:
 	StereoPos * m_proc;
 
 	ScopedPointer<TextEditor> intervalText;
+	ScopedPointer<TextEditor> nImagesText;
 	ScopedPointer<TextEditor> boardWidthText;
 	ScopedPointer<TextEditor> boardHeightText;
 	ScopedPointer<TextEditor> boardSquareSizeText;
 	ScopedPointer<Label> intervalLabel;
+	ScopedPointer<Label> nImagesLabel;
+	ScopedPointer<TextEditor> boardWidthLabel;
+	ScopedPointer<TextEditor> boardHeightLabel;
+	ScopedPointer<TextEditor> boardSquareSizeLabel;
 	ScopedPointer<UtilityButton> captureButton;
 	ScopedPointer<ToggleButton> showVideoCapture;
 
@@ -45,8 +50,6 @@ private:
 	String board_width = String("11");
 	String board_height = String("12");
 	String square_size = String("11");
-
-	unsigned int nCalibrationImagesToCapture = 5;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(StereoPosEditor);
 };

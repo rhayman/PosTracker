@@ -9,6 +9,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	MemoryInputStream mis(silk, silksize, false);
 	Typeface::Ptr typeface = new CustomTypeface(mis);
 	Font font = Font(typeface);
+	font.setHeight(8);
 
 	desiredWidth = 425;
 	m_proc = (StereoPos*)getProcessor();
@@ -27,8 +28,21 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	intervalLabel->setColour (TextEditor::textColourId, Colours::grey);
 	addAndMakeVisible(intervalLabel);
 
+	addAndMakeVisible(nImagesText = new TextEditor(String("NumImages")));
+	nImagesText->setBounds(5, 55, 80, 20);
+	nImagesText->setText("5");
+	nImagesText->setTooltip("The number of images to capture from each camera");
+
+	nImagesLabel = new Label("nImagesLabel", "# images");
+	nImagesLabel->setBounds(90, 55, 80, 20);
+	nImagesLabel->setFont(font);
+	nImagesLabel->setEditable (false, false, false);
+	nImagesLabel->setJustificationType(Justification::centredLeft);
+	nImagesLabel->setColour (TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(nImagesLabel);
+
 	addAndMakeVisible(captureButton = new UtilityButton("Capture", Font ("Small Text", 10, Font::plain)));
-	captureButton->setBounds(5, 55, 80, 20);
+	captureButton->setBounds(5, 85, 80, 20);
 	captureButton->setTooltip("testing various things");
 	captureButton->addListener(this);
 
@@ -43,19 +57,47 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	boardWidthText->setTooltip("Width of the board");
 	boardWidthText->setText(board_width);
 
+	boardWidthLabel = new Label("boardWidthLabel", "Board corner rows");
+	boardWidthLabel->setBounds(200, 25, 80, 20);
+	boardWidthLabel->setFont(font);
+	boardWidthLabel->setEditable (false, false, false);
+	boardWidthLabel->setJustificationType(Justification::centredLeft);
+	boardWidthLabel->setColour (TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(boardWidthLabel);
+
 	addAndMakeVisible(boardHeightText = new TextEditor(String("Board height")));
 	boardHeightText->setBounds(165, 55, 80, 20);
 	boardHeightText->setTooltip("Height of the board");
 	boardHeightText->setText(board_height);
 
+	boardHeightLabel = new Label("boardHeightLabel", "Board corner cols");
+	boardHeightLabel->setBounds(200, 55, 80, 20);
+	boardHeightLabel->setFont(font);
+	boardHeightLabel->setEditable (false, false, false);
+	boardHeightLabel->setJustificationType(Justification::centredLeft);
+	boardHeightLabel->setColour (TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(boardHeightLabel);
+
 	addAndMakeVisible(boardSquareSizeText = new TextEditor(String("Square size")));
 	boardSquareSizeText->setBounds(165, 85, 80, 20);
 	boardSquareSizeText->setTooltip("The size of each square");
 	boardSquareSizeText->setText(square_size);
+
+	boardSquareSizeLabel = new Label("boardSquareSizeLabel", "Sqaure size (cm)");
+	boardSquareSizeLabel->setBounds(200, 85, 80, 20);
+	boardSquareSizeLabel->setFont(font);
+	boardSquareSizeLabel->setEditable (false, false, false);
+	boardSquareSizeLabel->setJustificationType(Justification::centredLeft);
+	boardSquareSizeLabel->setColour (TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(boardSquareSizeLabel);
 }
 
 int StereoPosEditor::getNSecondsBetweenCaptures() {
 	return intervalText->getText().getIntValue();
+}
+
+int StereoPosEditor::getNImagesToCapture() {
+	return nImagesText->getText().getIntValue();
 }
 
 void StereoPosEditor::buttonEvent(Button * button)
