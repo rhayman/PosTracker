@@ -9,7 +9,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	MemoryInputStream mis(silk, silksize, false);
 	Typeface::Ptr typeface = new CustomTypeface(mis);
 	Font font = Font(typeface);
-	font.setHeight(8);
+	font.setHeight(9);
 
 	desiredWidth = 425;
 	m_proc = (StereoPos*)getProcessor();
