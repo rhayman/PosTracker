@@ -399,7 +399,7 @@ void PosTracker::run()
 						cv::line(pathFrame, pts[0], pts[1], cv::Scalar(0,255,0), 2, cv::LINE_8);
 						cv::addWeighted(frame, 1.0, pathFrame, 0.5, 0.0, frame);
 					}
-					cv::rectangle(frame, cv::Point(double(xy[0])-3, double(xy[1])-3), cv::Point(double(xy[0])+3, double(xy[1])+3), cv::Scalar(0,255,0), -1,1);
+					cv::rectangle(frame, cv::Point(double(xy[0])-3, double(xy[1])-3), cv::Point(double(xy[0])+3, double(xy[1])+3), cv::Scalar(0,0,255), -1,1);
 					cv::imshow(currentCam->get_dev_name(), frame);
 					cv::waitKey(1);
 
