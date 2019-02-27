@@ -58,7 +58,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	boardWidthText->setText(board_width);
 
 	boardWidthLabel = new Label("boardWidthLabel", "Board corner rows");
-	boardWidthLabel->setBounds(155, 25, 80, 20);
+	boardWidthLabel->setBounds(145, 25, 80, 20);
 	boardWidthLabel->setFont(font);
 	boardWidthLabel->setEditable (false, false, false);
 	boardWidthLabel->setJustificationType(Justification::centredLeft);
@@ -71,7 +71,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	boardHeightText->setText(board_height);
 
 	boardHeightLabel = new Label("boardHeightLabel", "Board corner cols");
-	boardHeightLabel->setBounds(155, 55, 80, 20);
+	boardHeightLabel->setBounds(145, 55, 80, 20);
 	boardHeightLabel->setFont(font);
 	boardHeightLabel->setEditable (false, false, false);
 	boardHeightLabel->setJustificationType(Justification::centredLeft);
@@ -84,7 +84,7 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	boardSquareSizeText->setText(square_size);
 
 	boardSquareSizeLabel = new Label("boardSquareSizeLabel", "Square size (cm)");
-	boardSquareSizeLabel->setBounds(155, 85, 80, 20);
+	boardSquareSizeLabel->setBounds(145, 85, 80, 20);
 	boardSquareSizeLabel->setFont(font);
 	boardSquareSizeLabel->setEditable (false, false, false);
 	boardSquareSizeLabel->setJustificationType(Justification::centredLeft);
@@ -99,6 +99,7 @@ int StereoPosEditor::getNSecondsBetweenCaptures() {
 int StereoPosEditor::getNImagesToCapture() {
 	return nImagesText->getText().getIntValue();
 }
+
 
 void StereoPosEditor::buttonEvent(Button * button)
 {
