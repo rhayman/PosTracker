@@ -26,7 +26,7 @@ public:
 		{
 			cv::Mat grey;
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
-			m_found = cv::findCirclesGrid(grey, board_size, corners, cv::CALIB_CB_ASYMMETRIC_GRID);
+			m_found = cv::findCirclesGrid(grey, board_size, corners, cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
 			if ( m_found ) {
 				std::cout << "Got a chess board" << std::endl;
 				cv::cornerSubPix(grey, corners, cv::Size(5,5), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 30, 0.1));
