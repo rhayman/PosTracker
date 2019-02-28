@@ -25,6 +25,7 @@ public:
 		std::vector<cv::Point2f> corners;
 		cv::SimpleBlobDetector::Params params;
 		params.minArea = 10;
+		params.maxArea = 10e5;
 		params.minDistBetweenBlobs = 5;
 		cv::Ptr<cv::SimpleBlobDetector> blobDetector = cv::SimpleBlobDetector::create(params);
 		for (int i = 0; i < imgs.size(); ++i)
