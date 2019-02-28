@@ -376,8 +376,7 @@ void PosTracker::run()
 		{
 			juce::int64 st = cv::getTickCount();
 			currentCam->read_frame(frame, tv);
-			m_frame_ptr = static_cast<void*>(frame.data);
-
+			
 			if ( !frame.empty() )
 			{
 				lock.enter();
@@ -394,6 +393,7 @@ void PosTracker::run()
 					ed->setInfoValue(InfoLabelType::XPOS, (double)xy[0]);
 					ed->setInfoValue(InfoLabelType::YPOS, (double)xy[1]);
 					cv::bitwise_and(frame, displayMask_mask, frame, displayMask->getSingleChannelMask());
+					m_frame_ptr = static_cast<void*>(frame.data);
 					if ( pts[0].x > getVideoMask(BORDER::LEFT) && pts[0].y > getVideoMask(BORDER::TOP) &&
 						pts[1].x > getVideoMask(BORDER::LEFT) && pts[1].y > getVideoMask(BORDER::TOP) && path_overlay == true )
 					{
