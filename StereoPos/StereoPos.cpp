@@ -147,7 +147,7 @@ void StereoPos::run() {
 				if ( std::difftime(nowtime, starttime) > pauseBetweenCapsSecs) {
 					std::cout << "Saving images after " << std::difftime(nowtime, starttime) << " seconds" << std::endl;
 					if ( tracker->isStreaming() ) {
-						void * frame_ptr = tracker->get_frame_ptr();
+						uchar * frame_ptr = tracker->get_frame_ptr();
 						Formats * currentFmt = tracker->getCurrentFormat();
 						if (currentFmt->pixelformat == V4L2_PIX_FMT_YUYV)
 							frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8UC2, frame_ptr);

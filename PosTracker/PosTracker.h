@@ -86,7 +86,7 @@ public:
 	int getCurrentFormatIdx() { return currentFormatIdx; }
 	Formats * getCurrentFormat();
 
-	void * get_frame_ptr() { return m_frame_ptr; }
+	uchar * get_frame_ptr() { return m_frame_ptr; }
 
 	void saveCustomParametersToXml(XmlElement* xml) override;
 	void loadCustomParametersFromXml() override;
@@ -104,7 +104,7 @@ private:
 	std::shared_ptr<PosTS> pos_tracker;
 	std::unique_ptr<DisplayMask> displayMask;
 
-	void * m_frame_ptr;
+	uchar * m_frame_ptr;
 
 	CriticalSection lock;
 	CriticalSection displayMutex;
