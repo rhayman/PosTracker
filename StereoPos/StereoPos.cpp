@@ -2,6 +2,7 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <opencv2/features2d.hpp>
 #include <unistd.h>
 #include <cuchar>
 #include <ctime>
@@ -22,11 +23,15 @@ public:
 		m_showImages = showImages;
 		cv::Size board_size = cv::Size(m_width, m_height);
 		std::vector<cv::Point2f> corners;
+		cv::SimpleBlobDetector::Params params;
+		params.minArea = 10;
+		params.minDistBetweenBlobs = 5;
+		cv::Ptr<cv::FeatureDetector> blobDetector = new cv::SimpleBlobDetector(params);
 		for (int i = 0; i < imgs.size(); ++i)
 		{
 			cv::Mat grey;
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
-			m_found = cv::findCirclesGrid(grey, board_size, corners, cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING);
+			m_found = cv::findCirclesGrid(grey, board_size, corners, cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING, blobDetector);
 			if ( m_found ) {
 				std::cout << "Got a chess board" << std::endl;
 				cv::cornerSubPix(grey, corners, cv::Size(5,5), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 30, 0.1));
