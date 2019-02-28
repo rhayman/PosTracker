@@ -26,7 +26,7 @@ public:
 		cv::SimpleBlobDetector::Params params;
 		params.minArea = 10;
 		params.minDistBetweenBlobs = 5;
-		cv::Ptr<cv::FeatureDetector> blobDetector = new cv::SimpleBlobDetector(params);
+		cv::Ptr<cv::SimpleBlobDetector> blobDetector = cv::SimpleBlobDetector::create(params);
 		for (int i = 0; i < imgs.size(); ++i)
 		{
 			cv::Mat grey;
