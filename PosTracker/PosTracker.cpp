@@ -376,11 +376,11 @@ void PosTracker::run()
 		{
 			juce::int64 st = cv::getTickCount();
 			currentCam->read_frame(frame, tv);
-			m_frame_ptr = static_cast<void*>(frame.data);
 			
 			if ( !frame.empty() )
 			{
 				lock.enter();
+				m_frame_ptr = static_cast<void*>(frame.data);
 				pos_tracker = std::make_shared<PosTS>(tv, frame);
 				cv::Mat displayMask_mask = displayMask->getMask();
 				pos_tracker->setMask(displayMask_mask);
