@@ -151,11 +151,12 @@ void StereoPos::run() {
 						void * frame_ptr = tracker->get_frame_ptr();
 						Formats * currentFmt = tracker->getCurrentFormat();
 						if (currentFmt->pixelformat == V4L2_PIX_FMT_YUYV)
-							frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8UC2, frame_ptr);
+							frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8UC2, (uchar*)frame_ptr);
 						else if (currentFmt->pixelformat == V4L2_PIX_FMT_MJPEG)
-							frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8U, frame_ptr);
-						images[i].push_back(frame);
-						cv::imshow("capture_" + std::to_string(i), frame);
+							frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8U, (uchar*)frame_ptr);
+						cv::Mat frame_clone = frame.clone();
+						images[i].push_back(frame_clone);
+						cv::imshow("capture_" + std::to_string(i), frame_clone);
 						cv::waitKey(1);
 						++count;
 					}
