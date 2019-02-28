@@ -91,6 +91,7 @@ void StereoPos::startStreaming() {
 	double board_width = ed->getBoardDims(BOARDPROP::kWidth);
 	double board_height = ed->getBoardDims(BOARDPROP::kHeight);
 	double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
+	std::cout << "Looking for a chessboard with " << board_width << " corners wide, " << board_height << " corners high\n";
 	GenericProcessor * maybe_merger = getSourceNode();
 	m_trackers.clear();
 	bool showims = ed->showCapturedImages();
