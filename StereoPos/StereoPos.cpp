@@ -154,16 +154,10 @@ void StereoPos::run() {
 					if ( tracker->isStreaming() ) {
 						void * frame_ptr = tracker->get_frame_ptr();
 						Formats * currentFmt = tracker->getCurrentFormat();
-						if (currentFmt->pixelformat == V4L2_PIX_FMT_YUYV) {
-							frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8UC2, (unsigned char*)frame_ptr);
-							cv::cvtColor(frame, frame, cv::COLOR_YUV2BGR_YUY2);
-						}
-						else if (currentFmt->pixelformat == V4L2_PIX_FMT_MJPEG)
-							frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8U, (unsigned char*)frame_ptr);
+						frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8UC3, (unsigned char*)frame_ptr);
 						cv::Mat frame_clone = frame.clone();
 						images[i].push_back(frame_clone);
-						cv::imshow("capture_" + std::to_string(i), frame_clone);
-						cv::waitKey(1);
+						cv::imwrite("/home/robin/tmp/imgs/capture_" + std::to_string(count) + ".png", frame_clone);
 						++count;
 					}
 				}
