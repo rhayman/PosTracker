@@ -80,7 +80,11 @@ void StereoPos::showCapturedImages(bool show) {
 		}
 	}
 	else
-		cv::destroyAllWindows();
+		if ( ! m_trackers.empty() ) {
+			for (int i = 0; i < m_trackers.size(); ++i) {
+				cv::destroyWindow("capture_" + std::to_string(i));
+			}
+		}
 }
 
 void StereoPos::startStreaming() {
@@ -90,7 +94,7 @@ void StereoPos::startStreaming() {
 	double board_width = ed->getBoardDims(BOARDPROP::kWidth);
 	double board_height = ed->getBoardDims(BOARDPROP::kHeight);
 	double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
-	std::cout << "Looking for a chessboard with " << board_width << " corners wide, " << board_height << " corners high\n";
+	std::cout << "Looking for a chessboard " << board_width << " corners wide, " << board_height << " corners high\n";
 	GenericProcessor * maybe_merger = getSourceNode();
 	m_trackers.clear();
 	bool showims = ed->showCapturedImages();
@@ -150,10 +154,12 @@ void StereoPos::run() {
 					if ( tracker->isStreaming() ) {
 						void * frame_ptr = tracker->get_frame_ptr();
 						Formats * currentFmt = tracker->getCurrentFormat();
-						if (currentFmt->pixelformat == V4L2_PIX_FMT_YUYV)
-							frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8UC2, (uchar*)frame_ptr);
+						if (currentFmt->pixelformat == V4L2_PIX_FMT_YUYV) {
+							frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8UC2, (unsigned char*)frame_ptr);
+							cv::cvtColor(frame, frame, cv::COLOR_YUV2BGR_YUY2);
+						}
 						else if (currentFmt->pixelformat == V4L2_PIX_FMT_MJPEG)
-							frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8U, (uchar*)frame_ptr);
+							frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8U, (unsigned char*)frame_ptr);
 						cv::Mat frame_clone = frame.clone();
 						images[i].push_back(frame_clone);
 						cv::imshow("capture_" + std::to_string(i), frame_clone);
