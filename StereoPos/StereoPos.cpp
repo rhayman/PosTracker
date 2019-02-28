@@ -25,7 +25,7 @@ public:
 		{
 			cv::Mat grey;
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
-			m_found = cv::findChessboardCorners(grey, board_size, corners, 1 | 4);
+			m_found = cv::findChessboardCorners(grey, board_size, corners);
 			if ( m_found ) {
 				std::cout << "Got a chess board" << std::endl;
 				cv::cornerSubPix(grey, corners, cv::Size(5,5), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 30, 0.1));
@@ -136,7 +136,6 @@ void StereoPos::run() {
 	int pauseBetweenCapsSecs = ed->getNSecondsBetweenCaptures();
 	bool showImages = ed->showCapturedImages();
 	cv::Mat frame;
-	struct timeval tv;
 	unsigned int count = 0;
 	bool doCapture = false;
 	// containers for various parts of the opencv calibration algos
@@ -148,6 +147,7 @@ void StereoPos::run() {
 			PosTracker * tracker = m_trackers[i];
 			if ( tracker->isCamReady() ) {
 				std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
+				struct timeval tv;
 				camera->read_frame(frame, tv);
 				if ( std::difftime(nowtime, starttime) > pauseBetweenCapsSecs) {
 					std::cout << "Saving images after " << std::difftime(nowtime, starttime) << " seconds" << std::endl;
