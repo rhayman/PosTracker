@@ -376,7 +376,7 @@ void PosTracker::run()
 		{
 			juce::int64 st = cv::getTickCount();
 			currentCam->read_frame(frame, tv);
-			m_frame_ptr = frame.data;
+			m_frame_ptr = static_cast<void*>(frame.data);
 
 			if ( !frame.empty() )
 			{
