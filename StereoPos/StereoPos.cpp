@@ -144,6 +144,7 @@ void StereoPos::run() {
 		for (int i = 0; i < m_trackers.size(); ++i) {
 			PosTracker * tracker = m_trackers[i];
 			if ( tracker->isCamReady() ) {
+				tracker->updateSettings();
 				std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
 				struct timeval tv;
 				camera->read_frame(frame, tv);
