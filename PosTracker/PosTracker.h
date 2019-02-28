@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
-#include <cuchar>
+#include <uchar.h>
 
 #include <queue>
 #include "common.h"
