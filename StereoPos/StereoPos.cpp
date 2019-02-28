@@ -34,7 +34,7 @@ public:
 				cv::cvtColor(col, col, cv::COLOR_GRAY2BGR);
 				cv::drawChessboardCorners(col, board_size, corners, m_found);
 				if ( showImages ) {
-					cv::imwrite("/home/robin/tmp/imgs/chessboard_" + std::to_string(i) + ".png");
+					cv::imwrite("/home/robin/tmp/imgs/chessboard_" + std::to_string(i) + ".png", col);
 				}
 			}
 		}
