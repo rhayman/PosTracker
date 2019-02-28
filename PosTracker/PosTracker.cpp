@@ -340,6 +340,7 @@ void PosTracker::stopStreaming()
 {
 	if ( threadRunning )
 	{
+		liveStream = false;
 		threadRunning = false;
 		posBuffer = std::queue<std::shared_ptr<PosTS>>{};
 		stopThread(10000);
@@ -375,6 +376,7 @@ void PosTracker::run()
 		{
 			juce::int64 st = cv::getTickCount();
 			currentCam->read_frame(frame, tv);
+			m_frame_ptr = static_cast<void *>(frame);
 
 			if ( !frame.empty() )
 			{

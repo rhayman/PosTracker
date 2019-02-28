@@ -144,12 +144,11 @@ void StereoPos::run() {
 		for (int i = 0; i < m_trackers.size(); ++i) {
 			PosTracker * tracker = m_trackers[i];
 			if ( tracker->isCamReady() ) {
-				tracker->updateSettings();
-				std::shared_ptr<Camera> camera = tracker->getCurrentCamera();
-				struct timeval tv;
-				camera->read_frame(frame, tv);
 				if ( std::difftime(nowtime, starttime) > pauseBetweenCapsSecs) {
 					std::cout << "Saving images after " << std::difftime(nowtime, starttime) << " seconds" << std::endl;
+					if ( tracker->isStreaming() ) {
+						frame = static_cast<cv::Mat>(tracker->get_frame_ptr());
+					}
 					images[i].push_back(frame);
 					cv::imshow("capture_" + std::to_string(i), frame);
 					cv::waitKey(1);
