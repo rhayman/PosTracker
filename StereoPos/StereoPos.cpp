@@ -191,9 +191,19 @@ void StereoPos::saveCustomParametersToXml(XmlElement * xml)
 
 void StereoPos::loadCustomParametersFromXml()
 {
+	auto ed = static_cast<StereoPosEditor*>(getEditor());
 	forEachXmlChildElementWithTagName(*parametersAsXml, paramXml, "Parameters")
 	{
-
+		if ( paramXml->hasAttribute("numImages") )
+			ed->setNImagesToCapture(paramXml->getIntAttribute("numImages"));
+		if ( paramXml->hasAttribute("timeDelay") )
+			ed->setNSecondsBetweenCaptures(paramXml->getIntAttribute("timeDelay"));
+		if ( paramXml->hasAttribute("numColumns") )
+			ed->setBoardDims(BOARDPROP::kWidth, paramXml->getIntAttribute("numColumns"));
+		if ( paramXml->hasAttribute("numRows") )
+			ed->setBoardDims(BOARDPROP::kHeight, paramXml->getIntAttribute("numRows"));
+		if ( paramXml->hasAttribute("squareSize") )
+			ed->setBoardDims(BOARDPROP::kSquareSize, paramXml->getIntAttribute("squareSize"));
 	}
 	updateSettings();
 }
