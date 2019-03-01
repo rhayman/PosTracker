@@ -78,19 +78,19 @@ AudioProcessorEditor * StereoPos::createEditor() {
 }
 
 void StereoPos::showCapturedImages(bool show) {
-	if ( show ) {
-		if ( ! m_trackers.empty() ) {
-			for (int i = 0; i < m_trackers.size(); ++i) {
-				cv::namedWindow("capture_" + std::to_string(i));
-			}
-		}
-	}
-	else
-		if ( ! m_trackers.empty() ) {
-			for (int i = 0; i < m_trackers.size(); ++i) {
-				cv::destroyWindow("capture_" + std::to_string(i));
-			}
-		}
+	// if ( show ) {
+	// 	if ( ! m_trackers.empty() ) {
+	// 		for (int i = 0; i < m_trackers.size(); ++i) {
+	// 			cv::namedWindow("capture_" + std::to_string(i));
+	// 		}
+	// 	}
+	// }
+	// else
+	// 	if ( ! m_trackers.empty() ) {
+	// 		for (int i = 0; i < m_trackers.size(); ++i) {
+	// 			cv::destroyWindow("capture_" + std::to_string(i));
+	// 		}
+	// 	}
 }
 
 void StereoPos::startStreaming() {
