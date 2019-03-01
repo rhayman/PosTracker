@@ -27,8 +27,6 @@ public:
 	void stopStreaming();
 	void process(AudioSampleBuffer& buffer) override {};
 
-
-	void testFcn();
 	void showCapturedImages(bool);
 
 	void updateSettings();

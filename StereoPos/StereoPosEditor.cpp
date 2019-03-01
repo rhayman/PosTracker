@@ -96,10 +96,17 @@ int StereoPosEditor::getNSecondsBetweenCaptures() {
 	return intervalText->getText().getIntValue();
 }
 
+void StereoPosEditor::setNSecondsBetweenCaptures(int secs) {
+	intervalText->setText(String(secs));
+}
+
 int StereoPosEditor::getNImagesToCapture() {
 	return nImagesText->getText().getIntValue();
 }
 
+void StereoPosEditor::setNImagesToCapture(int nIms) {
+	nImagesText->setText(String(nIms));
+}
 
 void StereoPosEditor::buttonEvent(Button * button)
 {
@@ -122,6 +129,23 @@ double StereoPosEditor::getBoardDims(BOARDPROP prop) {
 		}
 		case BOARDPROP::kSquareSize: {
 			return boardSquareSizeText->getText().getDoubleValue();
+		}
+	}
+}
+
+void StereoPosEditor::setBoardDims(BOARDPROP prop, int val) {
+	switch (prop) {
+		case BOARDPROP::kWidth: {
+			boardWidthText->setText(String(val));
+			break;
+		}
+		case BOARDPROP::kHeight: {
+			boardHeightText->setText(String(val));
+			break;
+		}
+		case BOARDPROP::kSquareSize: {
+			return boardSquareSizeText->setText(String(val));
+			break;
 		}
 	}
 }

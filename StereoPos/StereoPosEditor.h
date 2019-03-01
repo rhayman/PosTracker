@@ -24,8 +24,11 @@ public:
 	void update() {};
 
 	double getBoardDims(BOARDPROP);
+	void setBoardDims(BOARDPROP, int);
 	int getNImagesToCapture();
+	void setNImagesToCapture(int);
 	int getNSecondsBetweenCaptures();
+	void setNSecondsBetweenCaptures(int);
 
 	bool showCapturedImages() { return m_setShowCapture; }
 

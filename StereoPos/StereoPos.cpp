@@ -66,7 +66,10 @@ StereoPos::~StereoPos() {
 }
 
 void StereoPos::updateSettings()
-{}
+{
+	if ( editor != NULL )
+		editor->updateSettings();
+}
 
 AudioProcessorEditor * StereoPos::createEditor() {
 	editor = new StereoPosEditor(this, true);
@@ -178,6 +181,12 @@ void StereoPos::saveCustomParametersToXml(XmlElement * xml)
 {
 	xml->setAttribute("Type", "StereoPos");
 	XmlElement * paramXml = xml->createNewChildElement("Parameters");
+	auto ed = static_cast<StereoPosEditor*>(getEditor());
+	paramXml->setAttribute("numImages", ed->getNImagesToCapture());
+	paramXml->setAttribute("timeDelay", ed->getNSecondsBetweenCaptures());
+	paramXml->setAttribute("numColumns", ed->getBoardDims(BOARDPROP::kWidth));
+	paramXml->setAttribute("numRows", ed->getBoardDims(BOARDPROP::kHeight));
+	paramXml->setAttribute("squareSize", ed->getBoardDims(BOARDPROP::kSquareSize));
 }
 
 void StereoPos::loadCustomParametersFromXml()
