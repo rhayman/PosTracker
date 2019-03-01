@@ -15,10 +15,7 @@ class CalibrateCamera {
 public:
 	CalibrateCamera() {};
 	CalibrateCamera(double width, double height, double size) : m_width(width), m_height(height), m_size(size) {};
-	~CalibrateCamera() {
-		if ( m_showImages && m_found )
-			cv::destroyWindow("Chessboard detection");
-	};
+	~CalibrateCamera() {};
 	void setup(std::vector<cv::Mat> imgs, bool showImages=false) {
 		m_showImages = showImages;
 		cv::Size board_size = cv::Size(m_width, m_height);
