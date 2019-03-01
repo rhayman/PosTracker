@@ -200,13 +200,13 @@ void PosTrackerEditor::sliderValueChanged(Slider * sliderChanged)
 	{
 		auto val = sliderChanged->getValue();
 		if ( m_proc->isCamReady() )
-			m_proc->adjustBrightness(val);
+			m_proc->adjustContrast(val);
 	}
 	if ( sliderChanged == brightnessSldr )
 	{
 		auto val = sliderChanged->getValue();
 		if ( m_proc->isCamReady() )
-			m_proc->adjustContrast(val);
+			m_proc->adjustBrightness(val);
 	}
 	if ( sliderChanged == exposureSldr )
 	{
@@ -370,11 +370,11 @@ void PosTrackerEditor::updateSettings()
 	    int control_ok;
 		// ------------- BRIGHTNESS ------------------
 	    control_ok = m_proc->getControlValues(V4L2_CID_BRIGHTNESS, min, max, step);
-	    Array<double>v{double(min), double(max)};
+	    Array<double>brightness_range{double(min), double(max)};
 	    if ( control_ok == 0 ) { // all good
 	    	int new_val = m_proc->getBrightness();
 		    brightnessSldr->setValue(new_val);
-		    brightnessSldr->setValues(v);
+		    brightnessSldr->setValues(brightness_range);
 		    brightnessSldr->setRange(min, max, step);
 		    m_proc->adjustBrightness(new_val);
 		    brightnessSldr->setActive(true);
@@ -383,11 +383,11 @@ void PosTrackerEditor::updateSettings()
 		    brightnessSldr->setActive(false);
 	    // CONTRAST
 	    control_ok = m_proc->getControlValues(V4L2_CID_CONTRAST, min, max, step);
+	    Array<double>contrast_range{double(min), double(max)};
 	    if ( control_ok == 0 ) {
 	    	int new_val = m_proc->getContrast();
 		    contrastSldr->setValue(new_val);
-		    v = {double(min), double(max)};
-		    contrastSldr->setValues(v);
+		    contrastSldr->setValues(contrast_range);
 		    contrastSldr->setRange(min, max, step);
 		    m_proc->adjustContrast(new_val);
 		    contrastSldr->setActive(true);
@@ -397,13 +397,13 @@ void PosTrackerEditor::updateSettings()
 
 	    // EXPOSURE
 	    control_ok = m_proc->getControlValues(V4L2_CID_EXPOSURE_ABSOLUTE, min, max, step);
+	    Array<double>exposure_range{double(min), double(max)};
 	    bool use_auto_exposure = m_proc->autoExposure();
 	    if ( (control_ok == 0) && ( ! use_auto_exposure ) ) {
 	    	int new_val = m_proc->getExposure();
 	    	autoExposure->setToggleState(false, sendNotification);
 		    exposureSldr->setValue(new_val);
-		    v = {double(min), double(max)};
-		    exposureSldr->setValues(v);
+		    exposureSldr->setValues(exposure_range);
 		    exposureSldr->setRange(min, max, step);
 		    m_proc->adjustExposure(new_val);
 		    exposureSldr->setActive(true);
