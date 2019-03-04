@@ -46,9 +46,9 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	captureButton->setTooltip("testing various things");
 	captureButton->addListener(this);
 
-	addAndMakeVisible(showVideoCapture = new ToggleButton("Show capture"));
+	addAndMakeVisible(showVideoCapture = new ToggleButton("Save captured images"));
 	showVideoCapture->setBounds(5, 105, 100, 20);
-	showVideoCapture->setTooltip("Show the captured images");
+	showVideoCapture->setTooltip("Save the captured images");
 	showVideoCapture->addListener(this);
 	showVideoCapture->setEnabled(true);
 
@@ -90,6 +90,17 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	boardSquareSizeLabel->setJustificationType(Justification::centredLeft);
 	boardSquareSizeLabel->setColour (TextEditor::textColourId, Colours::grey);
 	addAndMakeVisible(boardSquareSizeLabel);
+
+	addAndMakeVisible(calibrationPatternCombo = new ComboBox("calibrationPattern"));
+	calibrationPatternCombo->setBounds(230, 25, 80, 20);
+	calibrationPatternCombo->setTooltip("The calibration pattern");
+	calibrationPatternCombo->setEditableText(false);
+	calibrationPatternCombo->setJustificationType(Justification::centredLeft);
+	calibrationPatternCombo->addItem("Chessboard", 1);
+	calibrationPatternCombo->addItem("Circular (symmetric)", 2);
+	calibrationPatternCombo->addItem("Circular (asymmetric)", 3);
+	calibrationPatternCombo->setSelectedId(1, dontSendNotification);
+
 }
 
 int StereoPosEditor::getNSecondsBetweenCaptures() {
@@ -114,8 +125,8 @@ void StereoPosEditor::buttonEvent(Button * button)
 		m_proc->startStreaming();
 	}
 	if ( button == showVideoCapture ) {
-		m_setShowCapture = showVideoCapture->getToggleState();
-		m_proc->showCapturedImages(m_setShowCapture);
+		m_saveCapture = showVideoCapture->getToggleState();
+		m_proc->showCapturedImages(m_saveCapture);
 	}
 }
 
@@ -147,5 +158,17 @@ void StereoPosEditor::setBoardDims(BOARDPROP prop, int val) {
 			return boardSquareSizeText->setText(String(val));
 			break;
 		}
+	}
+}
+
+BOARDPROP StereoPosEditor::getBoardType() {
+	int board_type = calibrationPatternCombo->getSelectedId();
+	switch (board_type) {
+		case 1:
+			return BOARDPROP::kChessBoard;
+		case 2:
+			return BOARDPROP::kCircularSymmetric;
+		case 3:
+			return BOARDPROP::kCircularAsymmetric;
 	}
 }

@@ -95,7 +95,6 @@ private:
 	std::string m_dev_name;
 	std::ofstream ofs;
 	bool camReady = false;
-	bool threadRunning = false;
 	bool liveStream = false;
 	int currentCameraIdx = -1;
 	int currentFormatIdx = -1;

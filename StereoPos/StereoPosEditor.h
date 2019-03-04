@@ -7,7 +7,10 @@
 enum class BOARDPROP {
 	kWidth,
 	kHeight,
-	kSquareSize
+	kSquareSize,
+	kChessBoard,
+	kCircularSymmetric,
+	kCircularAsymmetric
 };
 
 class StereoPosEditor : public GenericEditor
@@ -29,8 +32,10 @@ public:
 	void setNImagesToCapture(int);
 	int getNSecondsBetweenCaptures();
 	void setNSecondsBetweenCaptures(int);
+	BOARDPROP getBoardType();
 
-	bool showCapturedImages() { return m_setShowCapture; }
+	void saveCapturedImages(bool val) { m_saveCapture = val; }
+	bool saveCapturedImages() { return m_saveCapture; }
 
 private:
 	StereoPos * m_proc;
@@ -40,15 +45,17 @@ private:
 	ScopedPointer<TextEditor> boardWidthText;
 	ScopedPointer<TextEditor> boardHeightText;
 	ScopedPointer<TextEditor> boardSquareSizeText;
+	ScopedPointer<ComboBox> calibrationPatternCombo;
 	ScopedPointer<Label> intervalLabel;
 	ScopedPointer<Label> nImagesLabel;
 	ScopedPointer<Label> boardWidthLabel;
 	ScopedPointer<Label> boardHeightLabel;
 	ScopedPointer<Label> boardSquareSizeLabel;
+	ScopedPointer<Label> calibrationPatternLabel;
 	ScopedPointer<UtilityButton> captureButton;
 	ScopedPointer<ToggleButton> showVideoCapture;
 
-	bool m_setShowCapture = false;
+	bool m_saveCapture = false;
 
 	String board_width = String("11");
 	String board_height = String("12");

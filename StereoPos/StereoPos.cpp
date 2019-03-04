@@ -11,11 +11,14 @@
 #include "../PosTracker/PosTracker.h"
 #include "../PosTracker/Camera.h"
 
+using inputArray = std::vector<std::vector<T>>;
+
 class CalibrateCamera {
 public:
 	CalibrateCamera() {};
-	CalibrateCamera(double width, double height, double size) : m_width(width), m_height(height), m_size(size) {};
+	CalibrateCamera(double width, double height, double size, BOARDPROP bType) : m_width(width), m_height(height), m_size(size), m_board_type(bType) {};
 	~CalibrateCamera() {};
+	void setCameraName(std::string name) { m_camera_name = name; }
 	void setup(std::vector<cv::Mat> imgs, bool showImages=false) {
 		m_showImages = showImages;
 		cv::Size board_size = cv::Size(m_width, m_height);
@@ -25,30 +28,98 @@ public:
 		params.maxArea = 10e5;
 		params.minDistBetweenBlobs = 5;
 		cv::Ptr<cv::SimpleBlobDetector> blobDetector = cv::SimpleBlobDetector::create(params);
+		m_object_points.clear();
+		m_image_points.clear();
+		m_image_ids.clear();
+		// what goes into m_object_points
+		std::vector<cv::Point3f> obj;
+		for (int i = 0; i < m_height; ++i) {
+			for (int j = 0; j < m_width; ++j)
+				obj.push_back(cv::Point3f((float)j * m_size, (float)i * m_size, 0));
+		}
 		for (int i = 0; i < imgs.size(); ++i)
 		{
 			cv::Mat grey;
 			cv::cvtColor(imgs[i], grey, cv::COLOR_BGR2GRAY);
-			m_found = cv::findCirclesGrid(grey, board_size, corners, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING, blobDetector);
+			switch ( m_board_type ) {
+				case BOARDPROP::kChessBoard: {
+					m_found = cv::findChessboardCorners(grey, board_size, corners, cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FILTER_QUADS);
+					break;
+				}
+				case BOARDPROP::kCircularSymmetric: {
+					m_found = cv::findCirclesGrid(grey, board_size, corners, cv::CALIB_CB_SYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING, blobDetector);
+					break;
+				}
+				case BOARDPROP::kCircularAsymmetric: {
+					m_found = cv::findCirclesGrid(grey, board_size, corners, cv::CALIB_CB_ASYMMETRIC_GRID | cv::CALIB_CB_CLUSTERING, blobDetector);
+					break;
+				}
+			}
 			if ( m_found ) {
-				std::cout << "Got a chess board" << std::endl;
+				m_image_points.push_back(corners);
+				m_object_points.push(obj);
+				m_image_ids.push_back(i);
 				cv::cornerSubPix(grey, corners, cv::Size(5,5), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 30, 0.1));
-				cv::Mat col;
-				grey.copyTo(col);
-				cv::cvtColor(col, col, cv::COLOR_GRAY2BGR);
-				cv::drawChessboardCorners(col, board_size, corners, m_found);
 				if ( showImages ) {
-					cv::imwrite("/home/robin/tmp/imgs/chessboard_" + std::to_string(i) + ".png", col);
+					cv::Mat col;
+					grey.copyTo(col);
+					cv::cvtColor(col, col, cv::COLOR_GRAY2BGR);
+					cv::drawChessboardCorners(col, board_size, corners, m_found);
+					cv::imshow("Camera " + m_camera_name + ", pattern " + std::to_string(i), grey);
+					char c = (char)cv::waitKey(0);
+					if ( c == 27 || c == 'q') { // ESC or 'q' pressed
+						cv::destroyWindow("Camera " + m_camera_name + ", pattern " + std::to_string(i));
+					}
 				}
 			}
 		}
 	};
+
+	void calibrate(cv::Size sz) {
+		int flag = 0;
+		flag |= cv::CV_CALIB_FIX_K4;
+		flag |= cv::CV_CALIB_FIX_K5;
+		if ( ! m_object_points.empty() )
+			cv::calibrateCamera(m_object_points, m_image_points, sz, m_cameraMatrix, m_distCoeffs, m_rvecs, m_tvecs, flag);
+		else {
+			std::cout << "No calibration patterns were found, try again..." << std::endl;
+			return;
+		}
+	};
+
+	std::vector<int> getIDs() { return m_image_ids; }
+	std::vector<std::vector<cv::Point3f>> getObjectPoints() { return m_object_points; }
+	 getImagePoints() { return m_image_points; }
+	cv::Mat getCameraMatrix() { return m_cameraMatrix; }
+	cv::Mat getDistCoeffs() { return m_distCoeffs; }
 private:
 	bool m_found = false;
 	bool m_showImages = false;
 	double m_width = 11;
 	double m_height = 12;
 	double m_size = 11;
+	BOARDPROP m_board_type = BOARDPROP::kChessBoard;
+	// vectors for holding the object and image points (openCV parlance)
+	inputArray<cv::Point3f> m_object_points; // holds the x / y corners of the chessboard (determined from m_size)
+	inputArray<cv::Point2f> m_image_points; // holds the detected corners (from findChessboardCorners/ findCirclesGrid)
+	std::vector<int> m_image_ids; // used to match corresponding images between two cameras
+	/*
+	 The actual calibration matrices:
+	cameraMatrix - the intrinsic camera matrix (3x3)
+	distCoeffs - the distortion coefficients for this camera of 4, 5, 8, 12 or 14 elements
+	rvecs, tvecs - rotation and translation vectors estimated for each pattern view
+	*/
+	cv::Mat m_cameraMatrix, m_distCoeffs;
+	std::vector<cv::Mat> m_rvecs, m_tvecs;
+	std::string m_camera_name = "";
+};
+
+class SteroCalibrate
+{
+public:
+	SteroCalibrate() {};
+	~SteroCalibrate() {};
+	void calibrate(std::vector<std::vector<cv::Point3f>> object_points, std::vector<std::vector<cv::Point2f>> image_points_1, std::vector<std::vector<cv::Point2f>> image_points_2,)
 };
 
 StereoPos::StereoPos() : GenericProcessor("Stereo Pos"), Thread("StereoPosThread")
@@ -59,9 +130,7 @@ StereoPos::StereoPos() : GenericProcessor("Stereo Pos"), Thread("StereoPosThread
 
 StereoPos::~StereoPos() {
 	 for (int i = 0; i < calibrators.size(); ++i)
-	 {
 	 	calibrators[i].reset();
-	 }
 	 cv::destroyAllWindows();
 }
 
@@ -100,50 +169,36 @@ void StereoPos::startStreaming() {
 	double board_width = ed->getBoardDims(BOARDPROP::kWidth);
 	double board_height = ed->getBoardDims(BOARDPROP::kHeight);
 	double board_size = ed->getBoardDims(BOARDPROP::kSquareSize);
-	std::cout << "Looking for a chessboard " << board_width << " corners wide, " << board_height << " corners high\n";
+	auto board_type = ed->getBoardType();
+	std::cout << "Looking for a calibration pattern " << board_width << " corners wide, " << board_height << " corners high\n";
 	GenericProcessor * maybe_merger = getSourceNode();
 	m_trackers.clear();
-	bool showims = ed->showCapturedImages();
+	bool showims = ed->saveCapturedImages();
 	showCapturedImages(showims);
 	if ( maybe_merger->isMerger() ) {
-		maybe_merger->switchIO(0); // sourceNodeA
-		PosTracker * tracker = (PosTracker*)maybe_merger->getSourceNode();
-		if ( tracker != nullptr ) {
-			tracker = (PosTracker*)maybe_merger->getSourceNode();
-			tracker->openCamera();
-			tracker->getEditor()->updateSettings();
-			m_trackers.push_back(tracker);
-			calibrators.push_back(std::make_unique<CalibrateCamera>(board_width, board_height, board_size));
-		}
-		maybe_merger->switchIO(1); // sourceNodeA
-		tracker = (PosTracker*)maybe_merger->getSourceNode();
-		if ( tracker != nullptr ) {
-			tracker = (PosTracker*)maybe_merger->getSourceNode();
-			tracker->openCamera();
-			tracker->getEditor()->updateSettings();
-			m_trackers.push_back(tracker);
-			calibrators.push_back(std::make_unique<CalibrateCamera>(board_width, board_height, board_size));
+		for (int i = 0; i < 2; ++i) {
+			maybe_merger->switchIO(i);
+			PosTracker * tracker = (PosTracker*)maybe_merger->getSourceNode();
+			if ( tracker != nullptr ) {
+				tracker = (PosTracker*)maybe_merger->getSourceNode();
+				tracker->openCamera();
+				tracker->getEditor()->updateSettings();
+				m_trackers.push_back(tracker);
+				auto cal = std::make_unique<CalibrateCamera>(board_width, board_height, board_size, board_type);
+				cal->setCameraName(tracker->getDevName());
+				calibrators.push_back(std::move(cal));
+
+			}
 		}
 	}
-
 	m_threadRunning = true;
 	startThread(); // calls run
-}
-
-void StereoPos::stopStreaming() {
-	if ( m_threadRunning ) {
-		m_threadRunning = false;
-		stopThread(1000);
-		for (int i = 0; i < m_trackers.size(); ++i) {
-			m_trackers[i]->stopCamera();
-		}
-	}
 }
 
 void StereoPos::run() {
 	auto ed = static_cast<StereoPosEditor*>(getEditor());
 	int pauseBetweenCapsSecs = ed->getNSecondsBetweenCaptures();
-	bool showImages = ed->showCapturedImages();
+	bool showImages = ed->saveCapturedImages();
 	cv::Mat frame;
 	unsigned int count = 0;
 	bool doCapture = false;
@@ -157,12 +212,11 @@ void StereoPos::run() {
 			if ( tracker->isCamReady() ) {
 				if ( std::difftime(nowtime, starttime) > pauseBetweenCapsSecs) {
 					if ( tracker->isStreaming() ) {
-						std::cout << "Saving images after " << std::difftime(nowtime, starttime) << " seconds" << std::endl;
+						std::cout << "Capturing image on " << tracker->getDevName() << std::endl;
 						Formats * currentFmt = tracker->getCurrentFormat();
 						frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8UC3, (unsigned char*)tracker->get_frame_ptr());
 						cv::Mat frame_clone = frame.clone();
 						images[i].push_back(frame_clone);
-						cv::imwrite("/home/robin/tmp/imgs/capture_" + std::to_string(count) + ".png", frame_clone);
 						++count;
 					}
 				}
@@ -172,8 +226,18 @@ void StereoPos::run() {
 		sleep(pauseBetweenCapsSecs*1000);
 	}
 	for (int i = 0; i < m_trackers.size(); ++i) {
-		std::cout << "Calibrating camera  " << i << std::endl;
+		std::cout << "Calibrating camera " << i << " with " << std::to_string(images[i].size()) << " images" << std::endl;
 		calibrators[i]->setup(images[i], showImages);
+	}
+}
+
+void StereoPos::stopStreaming() {
+	if ( m_threadRunning ) {
+		m_threadRunning = false;
+		stopThread(1000);
+		for (int i = 0; i < m_trackers.size(); ++i) {
+			m_trackers[i]->stopCamera();
+		}
 	}
 }
 

@@ -216,18 +216,15 @@ public:
 PosTracker::PosTracker() : GenericProcessor("Pos Tracker"), Thread("PosTrackerThread")
 {
 	setProcessorType (PROCESSOR_TYPE_SOURCE);
-	sendSampleCount = true; // only sending events
+	sendSampleCount = false; // only sending events
 	displayMask = std::make_unique<DisplayMask>();
 }
 
 PosTracker::~PosTracker()
 {
 	if ( currentCam->ready() )
-	{
-		currentCam->stop_device();
-		currentCam->uninit_device();
-		currentCam->close_device();
-	}
+		stopCamera();
+	stopThread(1000);
 	displayMask.reset();
 }
 
@@ -248,15 +245,15 @@ void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
 
 void PosTracker::process(AudioSampleBuffer& buffer)
 {
-		setTimestampAndSamples(CoreServices::getGlobalTimestamp(), 1);
-		lock.enter();
-		while ( ! posBuffer.empty() )
-		{
-			std::shared_ptr<PosTS> p = std::move(posBuffer.front());
-			sendTimeStampedPosToMidiBuffer(std::move(p));
-			posBuffer.pop();
-		}
-		lock.exit();
+	setTimestampAndSamples(CoreServices::getGlobalTimestamp(), 1);
+	lock.enter();
+	while ( ! posBuffer.empty() )
+	{
+		std::shared_ptr<PosTS> p = std::move(posBuffer.front());
+		sendTimeStampedPosToMidiBuffer(std::move(p));
+		posBuffer.pop();
+	}
+	lock.exit();
 }
 
 void PosTracker::createEventChannels()
@@ -330,7 +327,6 @@ void PosTracker::startStreaming()
 		{
 			cv::namedWindow(currentCam->get_dev_name(), cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO & cv::WINDOW_GUI_NORMAL);
 		}
-		threadRunning = true;
 		posBuffer = std::queue<std::shared_ptr<PosTS>>{}; // clear the buffer
 		startThread(); // calls run()
 	}
@@ -338,14 +334,10 @@ void PosTracker::startStreaming()
 
 void PosTracker::stopStreaming()
 {
-	if ( threadRunning )
-	{
-		liveStream = false;
-		threadRunning = false;
-		posBuffer = std::queue<std::shared_ptr<PosTS>>{};
-		stopThread(10000);
-		stopCamera();
-	}
+	stopThread(1000);
+	stopCamera();
+	liveStream = false;
+	posBuffer = std::queue<std::shared_ptr<PosTS>>{};
 }
 
 void PosTracker::showLiveStream(bool val)
@@ -370,13 +362,15 @@ void PosTracker::run()
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
 
-	while ( threadRunning )
+	while ( isThreadRunning() )
 	{
+		if ( threadShouldExit() )
+			return;
 		if ( camReady )
 		{
 			juce::int64 st = cv::getTickCount();
 			currentCam->read_frame(frame, tv);
-			
+
 			if ( !frame.empty() )
 			{
 				lock.enter();
@@ -394,7 +388,7 @@ void PosTracker::run()
 					ed->setInfoValue(InfoLabelType::XPOS, (double)xy[0]);
 					ed->setInfoValue(InfoLabelType::YPOS, (double)xy[1]);
 					cv::bitwise_and(frame, displayMask_mask, frame, displayMask->getSingleChannelMask());
-					
+
 					if ( pts[0].x > getVideoMask(BORDER::LEFT) && pts[0].y > getVideoMask(BORDER::TOP) &&
 						pts[1].x > getVideoMask(BORDER::LEFT) && pts[1].y > getVideoMask(BORDER::TOP) && path_overlay == true )
 					{
@@ -417,7 +411,6 @@ void PosTracker::run()
 			}
 		}
 	}
-	threadRunning = false;
 	std::cout << std::endl;
 }
 
