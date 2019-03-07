@@ -225,6 +225,7 @@ void StereoPos::startStreaming() {
 	m_trackers.clear();
 	bool showims = ed->saveCapturedImages();
 	showCapturedImages(showims);
+	calibrators.clear();
 	if ( maybe_merger->isMerger() ) {
 		for (int i = 0; i < 2; ++i) {
 			maybe_merger->switchIO(i);
