@@ -25,7 +25,10 @@ public:
 	void run();
 	void startStreaming();
 	void stopStreaming();
-	void process(AudioSampleBuffer& buffer) override {};
+	void process(AudioSampleBuffer& buffer) override { checkForEvents(); }
+
+	void calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2);
+	void handleEvent(const EventChannel *, const MidiMessage &, int) override;
 
 	void showCapturedImages(bool);
 
