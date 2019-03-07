@@ -102,9 +102,9 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	calibrationPatternCombo->setSelectedId(1, dontSendNotification);
 
 	addAndMakeVisible(calibrateButton = new UtilityButton("Calibrate", Font ("Small Text", 10, Font::plain)));
-	captureButton->setBounds(230, 85, 80, 20);
-	captureButton->setTooltip("Calibrate the two cameras");
-	captureButton->addListener(this);
+	calibrateButton->setBounds(230, 85, 80, 20);
+	calibrateButton->setTooltip("Calibrate the two cameras");
+	calibrateButton->addListener(this);
 
 }
 
