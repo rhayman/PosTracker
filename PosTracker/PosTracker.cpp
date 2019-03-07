@@ -334,8 +334,8 @@ void PosTracker::startStreaming()
 
 void PosTracker::stopStreaming()
 {
-	stopThread(1000);
 	stopCamera();
+	stopThread(1000);
 	liveStream = false;
 	posBuffer = std::queue<std::shared_ptr<PosTS>>{};
 }
