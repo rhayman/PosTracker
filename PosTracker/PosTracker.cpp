@@ -222,9 +222,10 @@ PosTracker::PosTracker() : GenericProcessor("Pos Tracker"), Thread("PosTrackerTh
 
 PosTracker::~PosTracker()
 {
-	if ( currentCam->ready() )
+	if ( camReady )
 		stopCamera();
-	stopThread(1000);
+	if ( isThreadRunning () )
+		stopThread(1000);
 	displayMask.reset();
 }
 
