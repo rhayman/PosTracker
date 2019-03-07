@@ -83,8 +83,8 @@ public:
 
 	bool calibrate() {
 		int flag = 0;
-		flag |= CV_CALIB_FIX_K4;
-		flag |= CV_CALIB_FIX_K5;
+		flag |= cv::CV_CALIB_FIX_K4;
+		flag |= cv::CV_CALIB_FIX_K5;
 		if ( ! m_object_points.empty() ) {
 			cv::calibrateCamera(m_object_points, m_image_points, m_img_size, m_cameraMatrix, m_distCoeffs, m_rvecs, m_tvecs, flag);
 			std::cout << "Successfully calibrated camera" << std::endl;
@@ -249,7 +249,6 @@ void StereoPos::run() {
 						frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8UC3, (unsigned char*)tracker->get_frame_ptr());
 						cv::Mat frame_clone = frame.clone();
 						images[i].push_back(frame_clone);
-						tracker->stereoPosCapture(false);
 						++count;
 					}
 				}
