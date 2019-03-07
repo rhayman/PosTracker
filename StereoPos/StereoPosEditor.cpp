@@ -101,6 +101,11 @@ StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultP
 	calibrationPatternCombo->addItem("Circular (asymmetric)", 3);
 	calibrationPatternCombo->setSelectedId(1, dontSendNotification);
 
+	addAndMakeVisible(calibrateButton = new UtilityButton("Calibrate", Font ("Small Text", 10, Font::plain)));
+	captureButton->setBounds(230, 85, 80, 20);
+	captureButton->setTooltip("Calibrate the two cameras");
+	captureButton->addListener(this);
+
 }
 
 int StereoPosEditor::getNSecondsBetweenCaptures() {
@@ -127,6 +132,9 @@ void StereoPosEditor::buttonEvent(Button * button)
 	if ( button == showVideoCapture ) {
 		m_saveCapture = showVideoCapture->getToggleState();
 		m_proc->showCapturedImages(m_saveCapture);
+	}
+	if ( button == calibrateButton ) {
+		m_proc->doStereoCalibration();
 	}
 }
 

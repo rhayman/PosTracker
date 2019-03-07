@@ -53,6 +53,7 @@ private:
 	ScopedPointer<Label> boardSquareSizeLabel;
 	ScopedPointer<Label> calibrationPatternLabel;
 	ScopedPointer<UtilityButton> captureButton;
+	ScopedPointer<UtilityButton> calibrateButton;
 	ScopedPointer<ToggleButton> showVideoCapture;
 
 	bool m_saveCapture = false;

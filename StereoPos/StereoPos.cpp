@@ -103,6 +103,7 @@ public:
 	cv::Mat getCameraMatrix() { return m_cameraMatrix; }
 	cv::Mat getDistCoeffs() { return m_distCoeffs; }
 	bool setup_success() { return m_setup_success; }
+	cv::Size getImageSize() { return m_img_size; }
 private:
 	bool m_setup_success = false;
 	bool m_found = false;
@@ -158,6 +159,12 @@ void StereoPos::handleEvent(const EventChannel * eventInfo, const MidiMessage & 
 
 void StereoPos::showCapturedImages(bool show) {}
 
+void StereoPos::doStereoCalibration() {
+	if ( calibrators.size() == 2 ) {
+		calibrate(calibrators[0].get(), calibrators[1].get());
+	}
+}
+
 void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2) {
 	// check for calibration patterns from both cameras at the same pattern position
 	auto ids_1 = camera_1->getIDs();
@@ -171,24 +178,32 @@ void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2
 		std::cout << "Captured calibration patterns at positions:\n";
 		for (int n: id_intersection)
 			std::cout << n << "\t" << std::endl;
-		ioArray<cv::Point3f> obj_pts_1;
+		ioArray<cv::Point3f> obj_pts;
 		ioArray<cv::Point2f> img_pts_1;
-		ioArray<cv::Point3f> obj_pts_2;
 		ioArray<cv::Point2f> img_pts_2;
+		auto im_size = camera_1->getImageSize();
 		auto cam1_obj_pts = camera_1->getObjectPoints();
 		auto cam1_img_pts = camera_1->getImagePoints();
-		auto cam2_obj_pts = camera_2->getObjectPoints();
+		auto cam1_mat = camera_1->getCameraMatrix();
+		auto cam1_dist_coeffs = camera_1->getDistCoeffs();
+
 		auto cam2_img_pts = camera_2->getImagePoints();
+		auto cam2_mat = camera_2->getCameraMatrix();
+		auto cam2_dist_coeffs = camera_2->getDistCoeffs();
 		for (int n : id_intersection ) {
 			std::vector<int> item{n};
 			auto result = std::find_first_of(ids_1.begin(), ids_1.end(), item.begin(), item.end());
 			auto idx = std::distance(ids_1.begin(), result);
-			obj_pts_1.push_back(cam1_obj_pts[idx]);
+			obj_pts.push_back(cam1_obj_pts[idx]);
 			img_pts_1.push_back(cam1_img_pts[idx]);
 			idx = std::distance(ids_2.begin(), result);
-			obj_pts_2.push_back(cam2_obj_pts[idx]);
 			img_pts_2.push_back(cam2_img_pts[idx]);
 		}
+		cv::Mat R, E, F;
+		cv::Vec3d T;
+		int flag = 0;
+		flag |= cv::CALIB_FIX_INTRINSIC;
+		cv::stereoCalibrate(obj_pts, cam1_img_pts, cam2_img_pts, cam1_mat, cam1_dist_coeffs, cam2_mat, cam2_dist_coeffs, im_size, R, T, E, F, flag);
 	}
 	else {
 		std::cout << "No matching calibration patterns were captured on both cameras" << std::endl;
@@ -221,7 +236,6 @@ void StereoPos::startStreaming() {
 				auto cal = std::make_unique<CalibrateCamera>(board_width, board_height, board_size, board_type);
 				cal->setCameraName(tracker->getDevName());
 				calibrators.push_back(std::move(cal));
-
 			}
 		}
 	}
