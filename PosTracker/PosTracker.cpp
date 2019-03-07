@@ -315,9 +315,12 @@ void PosTracker::openCamera()
 
 void PosTracker::stopCamera()
 {
-	currentCam->stop_device();
-	currentCam->uninit_device();
-	currentCam->close_device();
+	if ( currentCam->started() )
+		currentCam->stop_device();
+	if ( currentCam->initialized() )
+		currentCam->uninit_device();
+	if ( currentCam->ready() )
+		currentCam->close_device();
 }
 
 void PosTracker::startStreaming()
