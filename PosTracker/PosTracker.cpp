@@ -334,8 +334,8 @@ void PosTracker::startStreaming()
 
 void PosTracker::stopStreaming()
 {
-	stopCamera();
 	stopThread(1000);
+	stopCamera();
 	liveStream = false;
 	posBuffer = std::queue<std::shared_ptr<PosTS>>{};
 }
@@ -347,8 +347,6 @@ void PosTracker::showLiveStream(bool val)
 		cv::destroyWindow(currentCam->get_dev_name());
 	}
 }
-
-
 
 void PosTracker::run()
 {
