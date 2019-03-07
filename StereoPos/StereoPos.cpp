@@ -179,8 +179,11 @@ void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2
 		std::cout << "Captured calibration patterns at positions:\n";
 		for (int n: id_intersection)
 			std::cout << n << "\t" << std::endl;
+		std::cout << "here\n";
 		ioArray<cv::Point3f> obj_pts;
+		std::cout << "here2\n";
 		ioArray<cv::Point2f> img_pts_1;
+		std::cout << "here3\n";
 		ioArray<cv::Point2f> img_pts_2;
 		auto im_size = camera_1->getImageSize();
 		auto cam1_obj_pts = camera_1->getObjectPoints();
