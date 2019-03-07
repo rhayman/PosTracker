@@ -160,6 +160,7 @@ void StereoPos::handleEvent(const EventChannel * eventInfo, const MidiMessage & 
 void StereoPos::showCapturedImages(bool show) {}
 
 void StereoPos::doStereoCalibration() {
+	std::cout << "calibrators size: " << calibrators.size() << std::endl;
 	if ( calibrators.size() == 2 ) {
 		calibrate(calibrators[0].get(), calibrators[1].get());
 	}
