@@ -196,7 +196,6 @@ void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2
 			std::vector<int> item{n};
 			auto result = std::find_first_of(ids_1.begin(), ids_1.end(), item.begin(), item.end());
 			auto idx = std::distance(ids_1.begin(), result);
-			std::cout << "idx = " << idx << std::endl;
 			obj_pts.push_back(cam1_obj_pts[idx]);
 			img_pts_1.push_back(cam1_img_pts[idx]);
 			idx = std::distance(ids_2.begin(), result);
@@ -214,7 +213,8 @@ void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2
 		cv::Vec3d T;
 		int flag = 0;
 		flag |= cv::CALIB_FIX_INTRINSIC;
-		cv::stereoCalibrate(obj_pts, img_pts1, img_pts2, cam1_mat, cam1_dist_coeffs, cam2_mat, cam2_dist_coeffs, im_size, R, T, E, F, flag);
+		cv::stereoCalibrate(obj_pts, img_pts_1, img_pts_2, cam1_mat, cam1_dist_coeffs, cam2_mat, cam2_dist_coeffs, im_size, R, T, E, F, flag);
+		std::cout << "Completed stereo calibration!" << std::endl;
 	}
 	else {
 		std::cout << "No matching calibration patterns were captured on both cameras" << std::endl;
