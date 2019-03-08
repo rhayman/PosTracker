@@ -191,11 +191,12 @@ void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2
 		auto cam2_img_pts = camera_2->getImagePoints();
 		auto cam2_mat = camera_2->getCameraMatrix();
 		auto cam2_dist_coeffs = camera_2->getDistCoeffs();
-		
+
 		for (int n : id_intersection ) {
 			std::vector<int> item{n};
 			auto result = std::find_first_of(ids_1.begin(), ids_1.end(), item.begin(), item.end());
 			auto idx = std::distance(ids_1.begin(), result);
+			std::cout << "idx = " << idx << std::endl;
 			obj_pts.push_back(cam1_obj_pts[idx]);
 			img_pts_1.push_back(cam1_img_pts[idx]);
 			idx = std::distance(ids_2.begin(), result);
