@@ -28,7 +28,7 @@ public:
 	void process(AudioSampleBuffer& buffer) override { checkForEvents(); }
 
 	void doStereoCalibration();
-	void calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2);
+	bool calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2);
 	void handleEvent(const EventChannel *, const MidiMessage &, int) override;
 
 	void showCapturedImages(bool);

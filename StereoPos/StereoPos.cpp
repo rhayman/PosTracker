@@ -166,7 +166,7 @@ void StereoPos::doStereoCalibration() {
 	}
 }
 
-void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2) {
+bool StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2) {
 	// check for calibration patterns from both cameras at the same pattern position
 	auto ids_1 = camera_1->getIDs();
 	auto ids_2 = camera_2->getIDs();
@@ -178,7 +178,9 @@ void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2
 	if ( ! id_intersection.empty() ) {
 		std::cout << "Captured calibration patterns at positions:\n";
 		for (int n: id_intersection)
-			std::cout << n << "\t" << std::endl;
+			std::cout << n << "\t";
+		std::cout << std::endl;
+
 		ioArray<cv::Point3f> obj_pts;
 		ioArray<cv::Point2f> img_pts_1;
 		ioArray<cv::Point2f> img_pts_2;
@@ -203,17 +205,20 @@ void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2
 		}
 		std::cout << "obj_pts.size() " << obj_pts.size() << std::endl;
 		std::cout << "img_pts_1.size() " << img_pts_1.size() << std::endl;
+		std::cout << "img_pts_1[0].size() " << img_pts_1[0].size() << std::endl;
 		std::cout << "img_pts_2.size() " << img_pts_2.size() << std::endl;
+		std::cout << "img_pts_2[0].size() " << img_pts_2[0].size() << std::endl;
 		cv::Mat R, E, F;
 		cv::Vec3d T;
 		int flag = 0;
 		flag |= cv::CALIB_FIX_INTRINSIC;
 		cv::stereoCalibrate(obj_pts, img_pts_1, img_pts_2, cam1_mat, cam1_dist_coeffs, cam2_mat, cam2_dist_coeffs, im_size, R, T, E, F, flag);
 		std::cout << "Completed stereo calibration!" << std::endl;
+		return true;
 	}
 	else {
 		std::cout << "No matching calibration patterns were captured on both cameras" << std::endl;
-		return;
+		return false;
 	}
 }
 
