@@ -202,13 +202,8 @@ void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2
 			img_pts_2.push_back(cam2_img_pts[idx]);
 		}
 		std::cout << "obj_pts.size() " << obj_pts.size() << std::endl;
-		std::cout << "cam1_img_pts.size() " << cam1_img_pts.size() << std::endl;
-		std::cout << "cam2_img_pts.size() " << cam2_img_pts.size() << std::endl;
-		std::cout << "cam1_mat.size() " << cam1_mat.size() << std::endl;
-		std::cout << "cam1_dist_coeffs.size() " << cam1_dist_coeffs.size() << std::endl;
-		std::cout << "cam2_mat.size() " << cam2_mat.size() << std::endl;
-		std::cout << "cam2_dist_coeffs.size() " << cam2_dist_coeffs.size() << std::endl;
-		std::cout << "im_size " << im_size << std::endl;
+		std::cout << "img_pts_1.size() " << img_pts_1.size() << std::endl;
+		std::cout << "img_pts_2.size() " << img_pts_2.size() << std::endl;
 		cv::Mat R, E, F;
 		cv::Vec3d T;
 		int flag = 0;
