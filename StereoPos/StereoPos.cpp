@@ -194,6 +194,7 @@ void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2
 		auto cam2_img_pts = camera_2->getImagePoints();
 		auto cam2_mat = camera_2->getCameraMatrix();
 		auto cam2_dist_coeffs = camera_2->getDistCoeffs();
+		
 		for (int n : id_intersection ) {
 			std::vector<int> item{n};
 			auto result = std::find_first_of(ids_1.begin(), ids_1.end(), item.begin(), item.end());
@@ -203,6 +204,14 @@ void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2
 			idx = std::distance(ids_2.begin(), result);
 			img_pts_2.push_back(cam2_img_pts[idx]);
 		}
+		std::cout << "obj_pts.size() " << obj_pts.size() << std::endl;
+		std::cout << "cam1_img_pts.size() " << cam1_img_pts.size() << std::endl;
+		std::cout << "cam2_img_pts.size() " << cam2_img_pts.size() << std::endl;
+		std::cout << "cam1_mat.size() " << cam1_mat.size() << std::endl;
+		std::cout << "cam1_dist_coeffs.size() " << cam1_dist_coeffs.size() << std::endl;
+		std::cout << "cam2_mat.size() " << cam2_mat.size() << std::endl;
+		std::cout << "cam2_dist_coeffs.size() " << cam2_dist_coeffs.size() << std::endl;
+		std::cout << "im_size " << im_size << std::endl;
 		cv::Mat R, E, F;
 		cv::Vec3d T;
 		int flag = 0;
@@ -225,9 +234,9 @@ void StereoPos::startStreaming() {
 	auto board_type = ed->getBoardType();
 	std::cout << "Looking for a calibration pattern " << board_width << " corners wide, " << board_height << " corners high\n";
 	GenericProcessor * maybe_merger = getSourceNode();
-	m_trackers.clear();
 	bool showims = ed->saveCapturedImages();
 	showCapturedImages(showims);
+	m_trackers.clear();
 	calibrators.clear();
 	if ( maybe_merger->isMerger() ) {
 		for (int i = 0; i < 2; ++i) {
