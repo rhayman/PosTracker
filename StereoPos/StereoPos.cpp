@@ -72,7 +72,7 @@ public:
 					grey.copyTo(col);
 					cv::cvtColor(col, col, cv::COLOR_GRAY2BGR);
 					cv::drawChessboardCorners(col, board_size, corners, m_found);
-					cv::imshow("Camera " + m_camera_name + ", pattern " + std::to_string(i), grey);
+					cv::imshow("Camera " + m_camera_name + ", pattern " + std::to_string(i), col);
 					char c = (char)cv::waitKey(0);
 					if ( c == 27 || c == 'q') { // ESC or 'q' pressed
 						cv::destroyWindow("Camera " + m_camera_name + ", pattern " + std::to_string(i));
