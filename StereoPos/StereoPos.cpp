@@ -214,7 +214,7 @@ void StereoPos::calibrate(CalibrateCamera * camera_1, CalibrateCamera * camera_2
 		cv::Vec3d T;
 		int flag = 0;
 		flag |= cv::CALIB_FIX_INTRINSIC;
-		cv::stereoCalibrate(obj_pts, cam1_img_pts, cam2_img_pts, cam1_mat, cam1_dist_coeffs, cam2_mat, cam2_dist_coeffs, im_size, R, T, E, F, flag);
+		cv::stereoCalibrate(obj_pts, img_pts1, img_pts2, cam1_mat, cam1_dist_coeffs, cam2_mat, cam2_dist_coeffs, im_size, R, T, E, F, flag);
 	}
 	else {
 		std::cout << "No matching calibration patterns were captured on both cameras" << std::endl;
