@@ -317,6 +317,7 @@ void StereoPos::saveCustomParametersToXml(XmlElement * xml)
 	paramXml->setAttribute("numColumns", ed->getBoardDims(BOARDPROP::kWidth));
 	paramXml->setAttribute("numRows", ed->getBoardDims(BOARDPROP::kHeight));
 	paramXml->setAttribute("squareSize", ed->getBoardDims(BOARDPROP::kSquareSize));
+	paramXml->setAttribute("boardType", static_cast<int>(ed->getBoardType()));
 }
 
 void StereoPos::loadCustomParametersFromXml()
@@ -334,6 +335,8 @@ void StereoPos::loadCustomParametersFromXml()
 			ed->setBoardDims(BOARDPROP::kHeight, paramXml->getIntAttribute("numRows"));
 		if ( paramXml->hasAttribute("squareSize") )
 			ed->setBoardDims(BOARDPROP::kSquareSize, paramXml->getIntAttribute("squareSize"));
+		if ( paramXml->hasAttribute("boardType") )
+			ed->setBoardType(paramXml->getIntAttribute("boardType"));
 	}
 	updateSettings();
 }
