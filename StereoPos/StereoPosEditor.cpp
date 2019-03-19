@@ -143,7 +143,10 @@ void StereoPosEditor::buttonEvent(Button * button)
 		m_proc->showCapturedImages(m_saveCapture);
 	}
 	if ( button == calibrateButton.get() ) {
-		m_proc->doStereoCalibration();
+		// test button removal
+		if ( intervalLabel )
+			intervalLabel.reset();
+		// m_proc->doStereoCalibration();
 	}
 }
 
@@ -172,7 +175,7 @@ void StereoPosEditor::setBoardDims(BOARDPROP prop, int val) {
 			break;
 		}
 		case BOARDPROP::kSquareSize: {
-			return boardSquareSizeText->setText(String(val));
+			boardSquareSizeText->setText(String(val));
 			break;
 		}
 	}

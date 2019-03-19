@@ -6,12 +6,13 @@
 #include <memory>
 
 #include <queue>
-#include "common.h"
+#include "../common.h"
 #include <ProcessorHeaders.h>
 
 class Camera;
 class PosTS;
 class DisplayMask;
+class TrackersEditor;
 
 class PosTracker : public GenericProcessor, public Thread
 {
@@ -55,6 +56,7 @@ public:
 	void stopStreaming();
 	void startRecording();
 	void stopRecording();
+	void playPauseLiveStream(bool val) { m_switchPausePlay = val; }
 
 	// returns 0 if control is ok, 1 if not
 	int getControlValues(__u32, __s32 &, __s32 &, __s32 &);
@@ -118,6 +120,7 @@ private:
 
 	bool auto_exposure = false;
 	bool path_overlay = false;
+	bool m_switchPausePlay = true;
 
 	std::queue<std::shared_ptr<PosTS>> posBuffer;
 

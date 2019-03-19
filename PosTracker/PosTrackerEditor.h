@@ -5,7 +5,7 @@
 #include <EditorHeaders.h>
 #include "PosTracker.h"
 
-#include "common.h"
+#include "../common.h"
 
 class CameraControlSlider;
 class FrameControlSlider;

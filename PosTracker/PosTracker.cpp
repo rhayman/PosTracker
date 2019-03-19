@@ -5,6 +5,7 @@
 #include "PosTracker.h"
 #include "PosTrackerEditor.h"
 #include "Camera.h"
+#include "../cvTracking/TrackersEditor.hpp"
 
 #include <array>
 #include <vector>
@@ -125,7 +126,30 @@ public:
 	~PosTS() {};
 	void setROIRect(cv::Rect roi) { roi_rect = roi; }
 	void setMask(cv::Mat m) { mask = m; }
-	cv::Mat simpleColorDetect(cv::Mat & frame)
+	void setTV(struct timeval t) { m_tv = t; }
+	void setTracker(cv::Ptr<cv::Tracker> t) { m_tracker = t; }
+	void doDetection(const TrackerType method, const cv::Mat & frame, cv::Rect2d & bounding_box) {
+		if ( ! frame.empty() ) {
+			if ( method == TrackerType::kLED )
+				singleLEDDetection(frame);
+			else {
+				m_tracker->update(frame, bounding_box);
+				// fill out the x,y data for saving open-ephys data stream
+				auto centre_x = bounding_box.x + (bounding_box.width/2.0);
+				auto centre_y = bounding_box.y + (bounding_box.height/2.0);
+				maxloc.x = centre_x;
+				maxloc.y = centre_y;
+				if ( bounding_box.empty() ) {
+					//DO FALL BACK METHOD
+					cv::extractChannel(frame, red_channel, 0);
+					cv::Mat roi = red_channel(roi_rect);
+					cv::threshold(roi, roi, 200, 1000, cv::THRESH_BINARY);
+					fallbackDetection(roi);
+				}
+			}
+		}
+	};
+	void singleLEDDetection(const cv::Mat & frame)
 	{
 		if ( ! frame.empty() ) {
 			cv::extractChannel(frame, red_channel, 0);
@@ -150,17 +174,18 @@ public:
 				maxloc.x = static_cast<int>(x_centroid) + roi_rect.x;
 				maxloc.y = static_cast<int>(y_centroid) + roi_rect.y;
 			}
-			else {
-				cv::minMaxLoc(roi, NULL, NULL, NULL, &maxloc, ~roi);
-				maxloc.x = maxloc.x + roi_rect.x;
-				maxloc.y = maxloc.y + roi_rect.y;
-			}
+			else
+				fallbackDetection(roi);
+
 			m_xy[0] = (juce::uint32)maxloc.x;
 			m_xy[1] = (juce::uint32)maxloc.y;
-
-			return roi;
 		}
-	}
+	};
+	void fallbackDetection(cv::Mat roi) {
+		cv::minMaxLoc(roi, NULL, NULL, NULL, &maxloc, ~roi);
+		maxloc.x = maxloc.x + roi_rect.x;
+		maxloc.y = maxloc.y + roi_rect.y;
+	};
 	cv::Mat processFrame(cv::Mat & frame)
 	{
 		cv::Mat cpy;
@@ -171,7 +196,7 @@ public:
 		cv::Mat kern = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
 		cv::erode(cpy, cpy, kern, cv::Point(-1,-1), 1);
 		return cpy;
-	}
+	};
 
 	void blobDetect(std::vector<cv::Point2f> & centre, std::vector<float> & radius)
 	{
@@ -191,18 +216,18 @@ public:
 			m_xy[0] = (juce::uint32)__centre.x;
 			m_xy[1] = (juce::uint32)__centre.y;
 		}
-	}
+	};
 
 	struct timeval getTimeVal() { return m_tv; }
 	juce::uint32 * getPos()
 	{
 		return m_xy;
-	}
+	};
 	friend std::ostream & operator<<(std::ostream & out, const PosTS & p)
 	{
 		out << "\t" << p.m_xy[0] << "\t" << p.m_xy[1] << std::endl;
 		return out;
-	}
+	};
 	cv::Mat kern = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
 	cv::Mat red_channel, m_src;
 	cv::Point maxloc;
@@ -211,6 +236,8 @@ public:
 	std::vector<cv::KeyPoint> kps;
 	cv::Rect roi_rect;
 	cv::Mat mask;
+	cv::Ptr<cv::Tracker> m_tracker;
+private:
 };
 
 PosTracker::PosTracker() : GenericProcessor("Pos Tracker"), Thread("PosTrackerThread")
@@ -366,6 +393,16 @@ void PosTracker::run()
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
 
+	// check if we have a destination node of Tracking API...
+	Trackers * tracker_proc = (Trackers*)getDestNode();
+	TrackerType kind_of_tracker = TrackerType::kLED;
+	if ( tracker_proc ) {
+		kind_of_tracker = tracker_proc->getTrackerID();
+	}
+
+	bool cv_tracker_init = false;
+	pos_tracker = std::make_shared<PosTS>(tv, frame);
+
 	while ( isThreadRunning() )
 	{
 		if ( threadShouldExit() )
@@ -374,16 +411,35 @@ void PosTracker::run()
 		{
 			juce::int64 st = cv::getTickCount();
 			currentCam->read_frame(frame, tv);
+			pos_tracker->setTV(tv);
 
 			if ( !frame.empty() )
 			{
 				lock.enter();
 				m_frame_ptr = static_cast<void*>(frame.data);
-				pos_tracker = std::make_shared<PosTS>(tv, frame);
+
+				// provide the PosTS instance with masks etc
 				cv::Mat displayMask_mask = displayMask->getMask();
 				pos_tracker->setMask(displayMask_mask);
 				pos_tracker->setROIRect(displayMask->getROIRect());
-				roi = pos_tracker->simpleColorDetect(frame);
+
+				// TESTING TRACKING WITH CV TRACKER API
+				if ( tracker_proc && ! cv_tracker_init) {
+					auto tracker_proc_ed = static_cast<TrackersEditor*>(tracker_proc->getEditor());
+					auto cv_tracker = tracker_proc_ed->getTracker();
+					auto bounding_box = tracker_proc_ed->getROI();
+
+					if ( cv_tracker && ! bounding_box.empty() ) {
+						kind_of_tracker = tracker_proc->getTrackerID();
+						pos_tracker->setTracker(cv_tracker);
+						cv_tracker_init = pos_tracker->m_tracker->init(frame, bounding_box);
+					}
+				}
+
+
+				// Do the actual detection using whatever method the user asked for
+				cv::Rect2d bb;
+				pos_tracker->doDetection(kind_of_tracker, frame, bb);
 
 				if ( liveStream == true )
 				{
@@ -401,8 +457,14 @@ void PosTracker::run()
 						cv::addWeighted(frame, 1.0, pathFrame, 0.5, 0.0, frame);
 					}
 					cv::rectangle(frame, cv::Point(double(xy[0])-3, double(xy[1])-3), cv::Point(double(xy[0])+3, double(xy[1])+3), cv::Scalar(0,0,255), -1,1);
-					cv::imshow(currentCam->get_dev_name(), frame);
-					cv::waitKey(1);
+					if ( ! bb.empty() ) {
+						cv::rectangle(frame, bb, cv::Scalar(255, 0, 0), 1, 1);
+					}
+					if ( cv::waitKey(1) == 32 ) {
+						m_switchPausePlay = !m_switchPausePlay;
+					}
+					if ( m_switchPausePlay )
+						cv::imshow(currentCam->get_dev_name(), frame);
 
 					double fps = cv::getTickFrequency() / (cv::getTickCount() - st);
 					ed->setInfoValue(InfoLabelType::FPS, fps);

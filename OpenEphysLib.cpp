@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <PluginInfo.h>
 #include "PosTracker/PosTracker.h"
 #include "StereoPos/StereoPos.h"
+#include "cvTracking/Trackers.hpp"
 #include <string>
 #ifdef WIN32
 #include <Windows.h>
@@ -34,7 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace Plugin;
 //Number of plugins defined on the library. Can be of different types (Processors, RecordEngines, etc...)
-#define NUM_PLUGINS 2
+#define NUM_PLUGINS 3
 
 extern "C" EXPORT void getLibInfo(Plugin::LibraryInfo* info)
 {
@@ -61,6 +62,12 @@ extern "C" EXPORT int getPluginInfo(int index, Plugin::PluginInfo* info)
 		info->processor.name = "Stereo Pos"; //Processor name shown in the GUI
 		info->processor.type = Plugin::FilterProcessor; //Type of processor. Can be FilterProcessor, SourceProcessor, SinkProcessor or UtilityProcessor. Specifies where on the processor list will appear
 		info->processor.creator = &(Plugin::createProcessor<StereoPos>); //Class factory pointer. Replace "ExampleProcessor" with the name of your class.
+		break;
+	case 2:
+		info->type = Plugin::PLUGIN_TYPE_PROCESSOR; //Type of plugin. See "Source/Processors/PluginManager/OpenEphysPlugin.h" for complete info about the different type structures
+		info->processor.name = "Tracking API"; //Processor name shown in the GUI
+		info->processor.type = Plugin::FilterProcessor; //Type of processor. Can be FilterProcessor, SourceProcessor, SinkProcessor or UtilityProcessor. Specifies where on the processor list will appear
+		info->processor.creator = &(Plugin::createProcessor<Trackers>); //Class factory pointer. Replace "ExampleProcessor" with the name of your class.
 		break;
 	default:
 		return -1;

@@ -7,7 +7,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "common.h"
+#include "../common.h"
 
 class Camera
 {
