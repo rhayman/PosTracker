@@ -428,19 +428,20 @@ void PosTracker::run()
 				pos_tracker->setROIRect(displayMask->getROIRect());
 
 				// TESTING TRACKING WITH CV TRACKER API
-				auto tracker_proc_ed = static_cast<TrackersEditor*>(tracker_proc->getEditor());
-				cv_tracker_init = tracker_proc_ed->is_tracker_init();
-				pos_tracker->trackerIsInit = cv_tracker_init;
-				if ( tracker_proc && ! cv_tracker_init) {
-					auto cv_tracker = tracker_proc_ed->getTracker();
-					auto bounding_box = tracker_proc_ed->getROI();
+				if ( tracker_proc ) {
+					auto tracker_proc_ed = static_cast<TrackersEditor*>(tracker_proc->getEditor());
+					cv_tracker_init = tracker_proc_ed->is_tracker_init();
+					pos_tracker->trackerIsInit = cv_tracker_init;
+					if ( tracker_proc && ! cv_tracker_init) {
+						auto cv_tracker = tracker_proc_ed->getTracker();
+						auto bounding_box = tracker_proc_ed->getROI();
 
-					if ( cv_tracker && ! bounding_box.empty() ) {
-						kind_of_tracker = tracker_proc->getTrackerID();
-						pos_tracker->setTracker(cv_tracker);
+						if ( cv_tracker && ! bounding_box.empty() ) {
+							kind_of_tracker = tracker_proc->getTrackerID();
+							pos_tracker->setTracker(cv_tracker);
+						}
 					}
 				}
-
 
 				// Do the actual detection using whatever method the user asked for
 				cv::Rect2d bb;
