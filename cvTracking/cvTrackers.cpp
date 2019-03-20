@@ -313,7 +313,7 @@ cv::Ptr<cv::Tracker> MedianFlow::makeTracker() {
 			params.maxMedianLengthOfDisplacementDifference = val;
 		}
 		if ( name == String("pointsInGrid") ) {
-			ComboBox * t = static_cast<ComboBox*>(element.get());
+			TextEditor * t = static_cast<TextEditor*>(element.get());
 			auto val = t->getText().getIntValue();
 			params.pointsInGrid = val;
 		}
