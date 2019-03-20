@@ -95,6 +95,11 @@ void TrackersEditor::comboBoxChanged(ComboBox * box) {
 			m_trackerUI = std::make_unique<MedianFlow>(this, "MedianFlow");
 			m_trackerUI->makeTrackerUI();
 		}
+		if ( trackerKind == "MIL") {
+			m_proc->setTrackerID(TrackerType::kMedianFlow);
+			m_trackerUI = std::make_unique<MIL>(this, "MIL");
+			m_trackerUI->makeTrackerUI();
+		}
 		// TODO: MAKE THE OTHER TRACKER TYPES HERE
 		updateSettings();
 	}

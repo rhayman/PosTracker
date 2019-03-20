@@ -346,3 +346,84 @@ cv::Ptr<cv::Tracker> MedianFlow::makeTracker() {
 	}
 	return cv::TrackerMedianFlow::create(params);
 }
+
+void MIL::makeTrackerUI() {
+	std::vector<int> label_bounds{90, 25, 50, 20};
+	addLabelToUIElements("Init radius", label_bounds);
+	std::vector<int> te_bounds{145, 25, 50, 20};
+	addTextEditorToUIElements("initRadius", te_bounds, "3", "Maximal pyramid level number for Lucas-Kanade optical flow");
+
+	std::vector<int> label1_bounds{90, 45, 50, 20};
+	addLabelToUIElements("Search window size", label1_bounds);
+	std::vector<int> te1_bounds{145, 45, 50, 20};
+	addTextEditorToUIElements("searchWindowSize", te1_bounds, "25", "Criterion for loosing the tracked object");
+
+	std::vector<int> label2_bounds{90, 65, 50, 20};
+	addLabelToUIElements("Initial max neg num", label2_bounds);
+	std::vector<int> te2_bounds{145, 65, 50, 20};
+	addTextEditorToUIElements("initMaxNegNumber", te2_bounds, "65", "Square root of number of keypoints used; increase it to trade accurateness for speed");
+
+	std::vector<int> label3_bounds{90, 85, 50, 20};
+	addLabelToUIElements("Track in radius", label3_bounds);
+	std::vector<int> te3_bounds{145, 85, 50, 20};
+	addTextEditorToUIElements("trackInRadius", te3_bounds, "4", "Termination criteria for Lucas-Kanade optical flow");
+
+	std::vector<int> label4_bounds{90, 105, 50, 20};
+	addLabelToUIElements("Track max pos num", label4_bounds);
+	std::vector<int> te4_bounds{145, 105, 50, 20};
+	addTextEditorToUIElements("trackMaxPositiveNum", te4_bounds, "100000", "Max count for Lucas-Kanade termination criteria");
+
+	std::vector<int> label5_bounds{200, 25, 50, 20};
+	addLabelToUIElements("Track max neg num", label5_bounds);
+	std::vector<int> te5_bounds{255, 25, 50, 20};
+	addTextEditorToUIElements("trackMaxNegativeNum", te5_bounds, "65", "EPS for Lucas-Kanade termination criteria");
+
+	std::vector<int> label6_bounds{200, 45, 50, 20};
+	addLabelToUIElements("Feature set num features", label6_bounds);
+	std::vector<int> te6_bounds{255, 45, 50, 20};
+	addTextEditorToUIElements("featureSetNumFeatures", te6_bounds, "250", "Window size parameter for Lucas-Kanade optical flow");
+
+}
+
+cv::Ptr<cv::Tracker> MIL::makeTracker() {
+	auto params = cv::TrackerMIL::Params();
+	for ( auto & element : m_UIElements ) {
+		auto name = element->getName();
+		if ( name == String("initRadius") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getFloatValue();
+			params.samplerInitInRadius = val;
+		}
+		if ( name == String("searchWindowSize") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getFloatValue();
+			params.samplerSearchWinSize = val;
+		}
+		if ( name == String("initMaxNegNumber") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getIntValue();
+			params.samplerInitMaxNegNum = val;
+		}
+		if ( name == String("trackInRadius") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getFloatValue();
+			params.samplerTrackInRadius = val;
+		}
+		if ( name == String("trackMaxPositiveNum") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getIntValue();
+			params.samplerTrackMaxPosNum = val;
+		}
+		if ( name == String("trackMaxNegativeNum") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getIntValue();
+			params.samplerTrackMaxNegNum = val;
+		}
+		if ( name == String("featureSetNumFeatures") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getIntValue();
+			params.featureSetNumFeatures = val;
+		}
+	}
+	return cv::TrackerMIL::create(params);
+}

@@ -50,4 +50,12 @@ public:
 	virtual cv::Ptr<cv::Tracker> makeTracker() override;
 };
 
+class MIL : public cvTracker {
+public:
+	MIL(GenericEditor * parent, std::string name) : cvTracker(parent, name) {};
+	~MIL() {};
+	virtual void makeTrackerUI() override;
+	virtual cv::Ptr<cv::Tracker> makeTracker() override;
+};
+
 #endif
