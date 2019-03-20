@@ -42,4 +42,12 @@ public:
 	virtual cv::Ptr<cv::Tracker> makeTracker() override;
 };
 
+class MedianFlow : public cvTracker {
+public:
+	MedianFlow(GenericEditor * parent, std::string name) : cvTracker(parent, name) {};
+	~MedianFlow() {};
+	virtual void makeTrackerUI() override;
+	virtual cv::Ptr<cv::Tracker> makeTracker() override;
+};
+
 #endif

@@ -252,3 +252,97 @@ cv::Ptr<cv::Tracker> KCFTracker::makeTracker() {
 	}
 	return cv::TrackerKCF::create(params);
 }
+
+void MedianFlow::makeTrackerUI() {
+	std::vector<int> label_bounds{90, 25, 50, 20};
+	addLabelToUIElements("Max level", label_bounds);
+	std::vector<int> te_bounds{145, 25, 50, 20};
+	addTextEditorToUIElements("maxLevel", te_bounds, "10", "Maximal pyramid level number for Lucas-Kanade optical flow");
+
+	std::vector<int> label1_bounds{90, 45, 50, 20};
+	addLabelToUIElements("Max displacement length", label1_bounds);
+	std::vector<int> te1_bounds{145, 45, 50, 20};
+	addTextEditorToUIElements("maxDispLength", te1_bounds, "10", "Criterion for loosing the tracked object");
+
+	std::vector<int> label2_bounds{90, 65, 50, 20};
+	addLabelToUIElements("Points in grid", label2_bounds);
+	std::vector<int> te2_bounds{145, 65, 50, 20};
+	addTextEditorToUIElements("pointsInGrid", te2_bounds, "10", "Square root of number of keypoints used; increase it to trade accurateness for speed");
+
+	std::vector<int> label3_bounds{90, 85, 50, 20};
+	addLabelToUIElements("Termination criteria", label3_bounds);
+	std::vector<int> te3_bounds{145, 85, 50, 20};
+	std::vector<std::string> term_crit{"COUNT", "EPS", "COUNT|EPS"};
+	addComboBoxToUIElements("termCrit", te3_bounds, term_crit, "Termination criteria for Lucas-Kanade optical flow");
+
+	std::vector<int> label4_bounds{90, 105, 50, 20};
+	addLabelToUIElements("Max count", label4_bounds);
+	std::vector<int> te4_bounds{145, 105, 50, 20};
+	addTextEditorToUIElements("termCrit_maxCount", te4_bounds, "20", "Max count for Lucas-Kanade termination criteria");
+
+	std::vector<int> label5_bounds{200, 25, 50, 20};
+	addLabelToUIElements("EPS", label5_bounds);
+	std::vector<int> te5_bounds{255, 25, 50, 20};
+	addTextEditorToUIElements("termCrit_EPS", te5_bounds, "0.3", "EPS for Lucas-Kanade termination criteria");
+
+	std::vector<int> label6_bounds{200, 45, 50, 20};
+	addLabelToUIElements("Window size", label6_bounds);
+	std::vector<int> te6_bounds{255, 45, 50, 20};
+	addTextEditorToUIElements("windowSize", te6_bounds, "3", "Window size parameter for Lucas-Kanade optical flow");
+
+	std::vector<int> label7_bounds{200, 65, 50, 20};
+	addLabelToUIElements("NCC window size", label7_bounds);
+	std::vector<int> te7_bounds{255, 65, 50, 20};
+	addTextEditorToUIElements("nccWindowSize", te7_bounds, "30", "Window size around a point for normalized cross-correlation check");
+
+}
+
+cv::Ptr<cv::Tracker> MedianFlow::makeTracker() {
+	auto params = cv::TrackerMedianFlow::Params();
+	auto t_crit = cv::TermCriteria();
+	for ( auto & element : m_UIElements ) {
+		auto name = element->getName();
+		if ( name == String("maxLevel") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getIntValue();
+			params.maxLevel = val;
+		}
+		if ( name == String("maxDispLength") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getDoubleValue();
+			params.maxMedianLengthOfDisplacementDifference = val;
+		}
+		if ( name == String("pointsInGrid") ) {
+			ComboBox * t = static_cast<ComboBox*>(element.get());
+			auto val = t->getText().getIntValue();
+			params.pointsInGrid = val;
+		}
+		if ( name == String("termCrit") ) {
+			ComboBox * t = static_cast<ComboBox*>(element.get());
+			auto val = t->getSelectedId()-1;
+			t_crit.type = val;
+		}
+		if ( name == String("termCrit_maxCount") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getIntValue();
+			t_crit.maxCount = val;
+		}
+		if ( name == String("termCrit_EPS") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getIntValue();
+			t_crit.epsilon = val;
+		}
+		if ( name == String("windowSize") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getFloatValue();
+			params.winSize = cv::Size(val,val);
+		}
+		if ( name == String("nccWindowSize") ) {
+			TextEditor * t = static_cast<TextEditor*>(element.get());
+			auto val = t->getText().getIntValue();
+			params.winSizeNCC = cv::Size(val,val);
+		}
+		params.termCriteria = t_crit;
+	}
+	return cv::TrackerMedianFlow::create(params);
+}

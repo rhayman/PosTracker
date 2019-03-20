@@ -1,6 +1,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/tracking.hpp>
 #include <opencv2/imgproc.hpp>
 #include "PosTracker.h"
 #include "PosTrackerEditor.h"
@@ -133,12 +134,14 @@ public:
 			if ( method == TrackerType::kLED )
 				singleLEDDetection(frame);
 			else {
-				m_tracker->update(frame, bounding_box);
-				// fill out the x,y data for saving open-ephys data stream
-				auto centre_x = bounding_box.x + (bounding_box.width/2.0);
-				auto centre_y = bounding_box.y + (bounding_box.height/2.0);
-				maxloc.x = centre_x;
-				maxloc.y = centre_y;
+				if ( trackerIsInit ) {
+					m_tracker->update(frame, bounding_box);
+					// fill out the x,y data for saving open-ephys data stream
+					auto centre_x = bounding_box.x + (bounding_box.width/2.0);
+					auto centre_y = bounding_box.y + (bounding_box.height/2.0);
+					maxloc.x = centre_x;
+					maxloc.y = centre_y;
+				}
 				if ( bounding_box.empty() ) {
 					//DO FALL BACK METHOD
 					cv::extractChannel(frame, red_channel, 0);
@@ -237,6 +240,7 @@ public:
 	cv::Rect roi_rect;
 	cv::Mat mask;
 	cv::Ptr<cv::Tracker> m_tracker;
+	bool trackerIsInit = false;
 private:
 };
 
@@ -424,15 +428,16 @@ void PosTracker::run()
 				pos_tracker->setROIRect(displayMask->getROIRect());
 
 				// TESTING TRACKING WITH CV TRACKER API
+				auto tracker_proc_ed = static_cast<TrackersEditor*>(tracker_proc->getEditor());
+				cv_tracker_init = tracker_proc_ed->is_tracker_init();
+				pos_tracker->trackerIsInit = cv_tracker_init;
 				if ( tracker_proc && ! cv_tracker_init) {
-					auto tracker_proc_ed = static_cast<TrackersEditor*>(tracker_proc->getEditor());
 					auto cv_tracker = tracker_proc_ed->getTracker();
 					auto bounding_box = tracker_proc_ed->getROI();
 
 					if ( cv_tracker && ! bounding_box.empty() ) {
 						kind_of_tracker = tracker_proc->getTrackerID();
 						pos_tracker->setTracker(cv_tracker);
-						cv_tracker_init = pos_tracker->m_tracker->init(frame, bounding_box);
 					}
 				}
 

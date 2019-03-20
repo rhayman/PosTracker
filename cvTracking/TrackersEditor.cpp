@@ -44,24 +44,29 @@ void TrackersEditor::buttonEvent(Button * button) {
 		cv::Mat frame_clone;
 		int idx = trackerCombo->getSelectedId() - 1;
 		auto trackerKind = kTrackers[idx];
-		if ( trackerKind == "Boosting" ) {
-			auto tracker = m_trackerUI->makeTracker();
-			setTracker(tracker);
-			PosTracker * pos_tracker = (PosTracker*)(m_proc->getSourceNode());
-			if ( pos_tracker->isCamReady() ) {
-				if ( pos_tracker->isStreaming() ) {
-					pos_tracker->playPauseLiveStream(false);
-					std::string devName = pos_tracker->getDeviceName();
-					Formats * currentFmt = pos_tracker->getCurrentFormat();
-					cv::Mat frame;
-					frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8UC3, (unsigned char*)pos_tracker->get_frame_ptr());
-					frame_clone = frame.clone();
+		if ( trackerKind != "LED" ) {
+			if ( m_trackerUI ) {
+				auto tracker = m_trackerUI->makeTracker();
+				setTracker(tracker);
+				PosTracker * pos_tracker = (PosTracker*)(m_proc->getSourceNode());
+				if ( pos_tracker->isCamReady() ) {
+					if ( pos_tracker->isStreaming() ) {
+						pos_tracker->playPauseLiveStream(false);
+						std::string devName = pos_tracker->getDeviceName();
+						Formats * currentFmt = pos_tracker->getCurrentFormat();
+						cv::Mat frame;
+						frame = cv::Mat(currentFmt->height, currentFmt->width, CV_8UC3, (unsigned char*)pos_tracker->get_frame_ptr());
+						frame_clone = frame.clone();
+						m_tracker_init = false;
 
-					cv::Rect roi = cv::selectROI("Select ROI", frame_clone);
-					if ( ! roi.empty() ) {
-						setROI(roi);
-						pos_tracker->playPauseLiveStream(true);
-						cv::destroyWindow("Select ROI");
+						cv::Rect roi = cv::selectROI("Select ROI", frame_clone);
+						if ( ! roi.empty() ) {
+							setROI(roi);
+							tracker->init(frame, roi);
+							m_tracker_init = true;
+							pos_tracker->playPauseLiveStream(true);
+							cv::destroyWindow("Select ROI");
+						}
 					}
 				}
 			}
@@ -83,6 +88,11 @@ void TrackersEditor::comboBoxChanged(ComboBox * box) {
 		if ( trackerKind == "KCF" ) {
 			m_proc->setTrackerID(TrackerType::kKCF);
 			m_trackerUI = std::make_unique<KCFTracker>(this, "KCF");
+			m_trackerUI->makeTrackerUI();
+		}
+		if ( trackerKind == "MedianFlow") {
+			m_proc->setTrackerID(TrackerType::kMedianFlow);
+			m_trackerUI = std::make_unique<MedianFlow>(this, "MedianFlow");
 			m_trackerUI->makeTrackerUI();
 		}
 		// TODO: MAKE THE OTHER TRACKER TYPES HERE
