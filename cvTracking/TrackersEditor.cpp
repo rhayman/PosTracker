@@ -46,9 +46,7 @@ void TrackersEditor::buttonEvent(Button * button) {
 		auto trackerKind = kTrackers[idx];
 		if ( trackerKind != "LED" ) {
 			if ( m_trackerUI ) {
-				std::cout << "here\n";
 				auto tracker = m_trackerUI->makeTracker();
-				std::cout << "here2\n";
 				setTracker(tracker);
 				PosTracker * pos_tracker = (PosTracker*)(m_proc->getSourceNode());
 				if ( pos_tracker->isCamReady() ) {

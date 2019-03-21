@@ -400,8 +400,9 @@ void PosTracker::run()
 	// check if we have a destination node of Tracking API...
 	Trackers * tracker_proc = (Trackers*)getDestNode();
 	TrackerType kind_of_tracker = TrackerType::kLED;
-	if ( tracker_proc ) {
+	if ( tracker_proc && (tracker_proc->getName() == String("Tracker API") ) ) {
 		kind_of_tracker = tracker_proc->getTrackerID();
+		std::cout << "kind_of_tracker = " << static_cast<int>(kind_of_tracker) << std::endl;
 	}
 
 	bool cv_tracker_init = false;
@@ -428,7 +429,7 @@ void PosTracker::run()
 				pos_tracker->setROIRect(displayMask->getROIRect());
 
 				// TESTING TRACKING WITH CV TRACKER API
-				if ( tracker_proc ) {
+				if ( tracker_proc && (tracker_proc->getName() == String("Tracker API") ) ) {
 					auto tracker_proc_ed = static_cast<TrackersEditor*>(tracker_proc->getEditor());
 					cv_tracker_init = tracker_proc_ed->is_tracker_init();
 					pos_tracker->trackerIsInit = cv_tracker_init;
