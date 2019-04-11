@@ -141,6 +141,8 @@ public:
 					auto centre_y = bounding_box.y + (bounding_box.height/2.0);
 					maxloc.x = centre_x;
 					maxloc.y = centre_y;
+					m_xy[0] = (juce::uint32)maxloc.x;
+					m_xy[1] = (juce::uint32)maxloc.y;
 				}
 				if ( bounding_box.empty() ) {
 					//DO FALL BACK METHOD
@@ -402,7 +404,6 @@ void PosTracker::run()
 	TrackerType kind_of_tracker = TrackerType::kLED;
 	if ( tracker_proc && (tracker_proc->getName() == String("Tracker API") ) ) {
 		kind_of_tracker = tracker_proc->getTrackerID();
-		std::cout << "kind_of_tracker = " << static_cast<int>(kind_of_tracker) << std::endl;
 	}
 
 	bool cv_tracker_init = false;
