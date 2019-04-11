@@ -1,7 +1,7 @@
 ## Synopsis
 
 A plugin for the openephys plugin-GUI electrophysiology software that tracks the largest
-bright spot captured from a webcam and saves the x,y and time of capture.
+bright spot captured from a webcam and saves the x,y and the difference in us of the time of capture of the frame and the time of insertion into the data file.
 
 ## Motivation
 
