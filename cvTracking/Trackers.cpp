@@ -17,7 +17,7 @@ void Trackers::updateSettings()
 }
 
 void Trackers::handleEvent(const EventChannel * eventInfo, const MidiMessage & event, int samplePosition) {
-	std::cout << "eventInfo->getName() " << eventInfo->getName() << std::endl;
+	// std::cout << "eventInfo->getName() " << eventInfo->getName() << std::endl;
 }
 
 AudioProcessorEditor * Trackers::createEditor() {

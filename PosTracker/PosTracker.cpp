@@ -129,10 +129,41 @@ public:
 	void setMask(cv::Mat m) { mask = m; }
 	void setTV(struct timeval t) { m_tv = t; }
 	void setTracker(cv::Ptr<cv::Tracker> t) { m_tracker = t; }
+	void setBackgroundSubtractor(cv::Ptr<cv::BackgroundSubtractor> bg) { m_background_sub = bg; }
 	void doDetection(const TrackerType method, const cv::Mat & frame, cv::Rect2d & bounding_box) {
 		if ( ! frame.empty() ) {
 			if ( method == TrackerType::kLED )
 				singleLEDDetection(frame);
+			else if ( method == TrackerType::kBACKGROUND || method == TrackerType::kBACKGROUNDKNN ) {
+				// specialised method not using opencv's Tracker API
+				if ( m_background_sub ) {
+					cv::Mat fg_mask;
+					m_background_sub->apply(frame, fg_mask);
+					cv::Mat labels, stats, centroids;
+					int nlabels = cv::connectedComponentsWithStats(fg_mask, labels, stats, centroids, 8, CV_32S, cv::CCL_WU);
+					cv::Size stats_size = stats.size();
+					if ( stats_size.height > 1 ) {
+						int maxpix = 0;
+						int biggestComponent = 0;
+						for (int i = 1; i < stats_size.height; ++i)
+						{
+							if ( stats.at<int>(i, cv::CC_STAT_AREA) > maxpix ) {
+								maxpix = stats.at<int>(i, cv::CC_STAT_AREA);
+								biggestComponent = i;
+							}
+						}
+						double x_centroid, y_centroid;
+						x_centroid = centroids.at<double>(biggestComponent, 0);
+						y_centroid = centroids.at<double>(biggestComponent, 1);
+						maxloc.x = static_cast<int>(x_centroid);
+						maxloc.y = static_cast<int>(y_centroid);
+						m_xy[0] = (juce::uint32)maxloc.x;
+						m_xy[1] = (juce::uint32)maxloc.y;
+					}
+					else
+						fallbackDetection(fg_mask);
+				}
+			}
 			else {
 				if ( trackerIsInit ) {
 					m_tracker->update(frame, bounding_box);
@@ -242,6 +273,7 @@ public:
 	cv::Rect roi_rect;
 	cv::Mat mask;
 	cv::Ptr<cv::Tracker> m_tracker;
+	cv::Ptr<cv::BackgroundSubtractor> m_background_sub;
 	bool trackerIsInit = false;
 private:
 };
@@ -255,10 +287,16 @@ PosTracker::PosTracker() : GenericProcessor("Pos Tracker"), Thread("PosTrackerTh
 
 PosTracker::~PosTracker()
 {
-	if ( camReady )
+	std::cout << "PosTracker dtor called\n";
+	if ( camReady ) {
+		std::cout << "Stopping camera...\n";
 		stopCamera();
-	if ( isThreadRunning () )
-		stopThread(1000);
+	}
+	if ( isThreadRunning () ) {
+		std::cout << "Stopping thread...\n";
+		signalThreadShouldExit();
+		stopThread(10000);
+	}
 	displayMask.reset();
 }
 
@@ -348,12 +386,18 @@ void PosTracker::openCamera()
 
 void PosTracker::stopCamera()
 {
-	if ( currentCam->started() )
+	if ( currentCam->started() ) {
+		std::cout << "Stopping device...\n";
 		currentCam->stop_device();
-	if ( currentCam->initialized() )
+	}
+	if ( currentCam->initialized() ) {
+		std::cout << "Uninit device...\n";
 		currentCam->uninit_device();
-	if ( currentCam->ready() )
+	}
+	if ( currentCam->ready() ) {
+		std::cout << "Closing device...\n";
 		currentCam->close_device();
+	}
 }
 
 void PosTracker::startStreaming()
@@ -399,6 +443,8 @@ void PosTracker::run()
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
 
+	pos_tracker = std::make_shared<PosTS>(tv, frame);
+
 	// check if we have a destination node of Tracking API...
 	Trackers * tracker_proc = (Trackers*)getDestNode();
 	TrackerType kind_of_tracker = TrackerType::kLED;
@@ -407,7 +453,8 @@ void PosTracker::run()
 	}
 
 	bool cv_tracker_init = false;
-	pos_tracker = std::make_shared<PosTS>(tv, frame);
+
+	std::cout << "kind_of_tracker " << static_cast<int>(kind_of_tracker) << std::endl;
 
 	while ( isThreadRunning() )
 	{
@@ -432,6 +479,7 @@ void PosTracker::run()
 				// TESTING TRACKING WITH CV TRACKER API
 				if ( tracker_proc && (tracker_proc->getName() == String("Tracker API") ) ) {
 					auto tracker_proc_ed = static_cast<TrackersEditor*>(tracker_proc->getEditor());
+					kind_of_tracker = tracker_proc->getTrackerID();
 					cv_tracker_init = tracker_proc_ed->is_tracker_init();
 					pos_tracker->trackerIsInit = cv_tracker_init;
 					if ( tracker_proc && ! cv_tracker_init) {
@@ -439,10 +487,16 @@ void PosTracker::run()
 						auto bounding_box = tracker_proc_ed->getROI();
 
 						if ( cv_tracker && ! bounding_box.empty() ) {
-							kind_of_tracker = tracker_proc->getTrackerID();
 							pos_tracker->setTracker(cv_tracker);
 						}
+						if ( kind_of_tracker == TrackerType::kBACKGROUND ) {
+							pos_tracker->setBackgroundSubtractor(tracker_proc_ed->getBackgroundSubtractor());
+						}
+						else if ( kind_of_tracker == TrackerType::kBACKGROUNDKNN ) {
+							pos_tracker->setBackgroundSubtractor(tracker_proc_ed->getBackgroundSubtractor());
+						}
 					}
+					cv_tracker_init = true;
 				}
 
 				// Do the actual detection using whatever method the user asked for

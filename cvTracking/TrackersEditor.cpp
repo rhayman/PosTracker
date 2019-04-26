@@ -3,6 +3,8 @@
 #include "../PosTracker/PosTracker.h"
 #include <opencv2/highgui.hpp>
 
+class PosTS;
+
 TrackersEditor::TrackersEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors=true)
 	: GenericEditor(parentNode, useDefaultParameterEditors)
 {
@@ -44,7 +46,7 @@ void TrackersEditor::buttonEvent(Button * button) {
 		cv::Mat frame_clone;
 		int idx = trackerCombo->getSelectedId() - 1;
 		auto trackerKind = kTrackers[idx];
-		if ( trackerKind != "LED" ) {
+		if ( trackerKind != "LED" && trackerKind != "Background" && trackerKind != "BackgroundKNN") {
 			if ( m_trackerUI ) {
 				auto tracker = m_trackerUI->makeTracker();
 				setTracker(tracker);
@@ -69,6 +71,17 @@ void TrackersEditor::buttonEvent(Button * button) {
 						}
 					}
 				}
+			}
+		}
+		if ( trackerKind == "Background" || trackerKind == "BackgroundKNN") {
+			if ( m_trackerUI ) {
+				auto tracker = m_trackerUI->makeTracker();
+				setTracker(tracker);
+				cv::Rect roi = cv::Rect(1,1,10,10); // dummy roi checked by PosTracker
+				setROI(roi);
+				m_tracker_init = false;
+				auto bg_tracker = m_trackerUI->makeBackgroundSubtractor();
+				setBackgroundSubtractor(bg_tracker);
 			}
 		}
 	}
@@ -99,6 +112,20 @@ void TrackersEditor::comboBoxChanged(ComboBox * box) {
 			m_proc->setTrackerID(TrackerType::kMedianFlow);
 			m_trackerUI = std::make_unique<MIL>(this, "MIL");
 			m_trackerUI->makeTrackerUI();
+		}
+		if ( trackerKind == "Background" ) {
+			m_proc->setTrackerID(TrackerType::kBACKGROUND);
+			m_trackerUI = std::make_unique<Background>(this, "Background");
+			m_trackerUI->makeTrackerUI();
+			auto bg_tracker = m_trackerUI->makeBackgroundSubtractor();
+			setBackgroundSubtractor(bg_tracker);
+		}
+		if ( trackerKind == "BackgroundKNN" ) {
+			m_proc->setTrackerID(TrackerType::kBACKGROUNDKNN);
+			m_trackerUI = std::make_unique<BackgroundKNN>(this, "BackgroundKNN");
+			m_trackerUI->makeTrackerUI();
+			auto bg_tracker = m_trackerUI->makeBackgroundSubtractor();
+			setBackgroundSubtractor(bg_tracker);
 		}
 		// TODO: MAKE THE OTHER TRACKER TYPES HERE
 		updateSettings();

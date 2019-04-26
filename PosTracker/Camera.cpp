@@ -11,6 +11,22 @@
 
 #include "Camera.h"
 
+Camera::~Camera() {
+	std::cout << "Camera dtor called\n";
+	if ( started() ) {
+		stop_device();
+		std::cout << "Stopped device\n";
+	}
+	if ( initialized() ) {
+		uninit_device();
+		std::cout << "Uninit device\n";
+	}
+	if ( ready() ) {
+		close_device();
+		std::cout << "Closed device\n";
+	}
+}
+
 int Camera::set_framesize(const unsigned int width, const unsigned int height)
 {
 	struct v4l2_format fmt;

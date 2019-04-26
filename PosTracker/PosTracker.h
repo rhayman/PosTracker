@@ -92,6 +92,7 @@ public:
 	void saveCustomParametersToXml(XmlElement* xml) override;
 	void loadCustomParametersFromXml() override;
 
+	std::shared_ptr<PosTS> pos_tracker;
 private:
 	std::string m_dev_name;
 	std::ofstream ofs;
@@ -101,7 +102,6 @@ private:
 	int currentFormatIdx = -1;
 	std::shared_ptr<Camera> currentCam;
 
-	std::shared_ptr<PosTS> pos_tracker;
 	std::unique_ptr<DisplayMask> displayMask;
 
 	void * m_frame_ptr;

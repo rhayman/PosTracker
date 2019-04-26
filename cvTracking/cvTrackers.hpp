@@ -4,6 +4,7 @@
 #include <memory>
 #include <opencv2/core.hpp>
 #include <opencv2/tracking.hpp>
+#include <opencv2/video/background_segm.hpp>
 #include <EditorHeaders.h>
 
 class cvTracker {
@@ -13,6 +14,7 @@ public:
 	std::string getName() { return m_name; }
 	virtual void makeTrackerUI() = 0;
 	virtual cv::Ptr<cv::Tracker> makeTracker() = 0;
+	virtual cv::Ptr<cv::BackgroundSubtractor> makeBackgroundSubtractor() {};
 	void addLabelToUIElements(const std::string & name, const std::vector<int> & bounds);
 	void addTextEditorToUIElements(const std::string & name, const std::vector<int> & bounds, const std::string & initText, const std::string & tooltip);
 	void addCheckboxTouiElements(const std::string & name, const std::vector<int> & bounds, const std::string & tooltip);
@@ -56,6 +58,24 @@ public:
 	~MIL() {};
 	virtual void makeTrackerUI() override;
 	virtual cv::Ptr<cv::Tracker> makeTracker() override;
+};
+
+class Background : public cvTracker {
+public:
+	Background(GenericEditor * parent, std::string name) : cvTracker(parent, name) {};
+	~Background() {};
+	virtual void makeTrackerUI() override;
+	virtual cv::Ptr<cv::Tracker> makeTracker() override;
+	virtual cv::Ptr<cv::BackgroundSubtractor> makeBackgroundSubtractor() override;
+};
+
+class BackgroundKNN : public cvTracker {
+public:
+	BackgroundKNN(GenericEditor * parent, std::string name) : cvTracker(parent, name) {};
+	~BackgroundKNN() {};
+	virtual void makeTrackerUI() override;
+	virtual cv::Ptr<cv::Tracker> makeTracker() override;
+	virtual cv::Ptr<cv::BackgroundSubtractor> makeBackgroundSubtractor() override;
 };
 
 #endif
