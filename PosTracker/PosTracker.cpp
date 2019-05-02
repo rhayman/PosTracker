@@ -138,7 +138,9 @@ public:
 				// specialised method not using opencv's Tracker API
 				if ( m_background_sub ) {
 					cv::Mat fg_mask;
-					m_background_sub->apply(frame, fg_mask);
+					// get the frame roi
+					cv::Mat roi = frame(roi_rect);
+					m_background_sub->apply(roi, fg_mask);
 					cv::Mat labels, stats, centroids;
 					int nlabels = cv::connectedComponentsWithStats(fg_mask, labels, stats, centroids, 8, CV_32S, cv::CCL_WU);
 					cv::Size stats_size = stats.size();
@@ -155,8 +157,8 @@ public:
 						double x_centroid, y_centroid;
 						x_centroid = centroids.at<double>(biggestComponent, 0);
 						y_centroid = centroids.at<double>(biggestComponent, 1);
-						maxloc.x = static_cast<int>(x_centroid);
-						maxloc.y = static_cast<int>(y_centroid);
+						maxloc.x = static_cast<int>(x_centroid) + roi_rect.x;
+						maxloc.y = static_cast<int>(y_centroid) + roi_rect.y;
 						m_xy[0] = (juce::uint32)maxloc.x;
 						m_xy[1] = (juce::uint32)maxloc.y;
 					}
