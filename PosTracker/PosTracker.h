@@ -3,14 +3,15 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #include <queue>
-#include "common.h"
+#include "../common.h"
 #include <ProcessorHeaders.h>
 
 class Camera;
 class PosTS;
-class PosTrackerEditor;
+class DisplayMask;
 
 class PosTracker : public GenericProcessor, public Thread
 {
@@ -42,6 +43,7 @@ public:
 	void sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p);
 
 	void createNewCamera(std::string dev_name);
+	std::string getDevName() { return m_dev_name; }
 	std::string getDeviceName();
 	std::vector<std::string> getDeviceList();
 	std::string getFormatName();
@@ -53,6 +55,7 @@ public:
 	void stopStreaming();
 	void startRecording();
 	void stopRecording();
+	void playPauseLiveStream(bool val) { m_switchPausePlay = val; }
 
 	// returns 0 if control is ok, 1 if not
 	int getControlValues(__u32, __s32 &, __s32 &, __s32 &);
@@ -70,13 +73,13 @@ public:
 	bool autoExposure() { return auto_exposure; }
 
 	void adjustVideoMask(BORDER, int val);
-	void adjustTrackerMask(int, int, int, int);
 	void makeVideoMask();
 	int getVideoMask(BORDER);
 
 	std::vector<std::string> getDeviceFormats();
 	void setDeviceFormat(std::string);
 
+	std::shared_ptr<Camera> getCurrentCamera() { return currentCam; }
 	int getCurrentCameraIdx() { return currentCameraIdx; }
 	void setCurrentCameraIdx(int idx) { currentCameraIdx = idx; }
 
@@ -84,20 +87,24 @@ public:
 	int getCurrentFormatIdx() { return currentFormatIdx; }
 	Formats * getCurrentFormat();
 
+	void * get_frame_ptr() { return m_frame_ptr; }
+
 	void saveCustomParametersToXml(XmlElement* xml) override;
 	void loadCustomParametersFromXml() override;
 
+	std::shared_ptr<PosTS> pos_tracker;
 private:
-
+	std::string m_dev_name;
 	std::ofstream ofs;
 	bool camReady = false;
-	bool threadRunning = false;
 	bool liveStream = false;
 	int currentCameraIdx = -1;
 	int currentFormatIdx = -1;
-	Camera * currentCam = nullptr;
+	std::shared_ptr<Camera> currentCam;
 
-	std::shared_ptr<PosTS> pos_tracker;
+	std::unique_ptr<DisplayMask> displayMask;
+
+	void * m_frame_ptr;
 
 	CriticalSection lock;
 	CriticalSection displayMutex;
@@ -112,6 +119,7 @@ private:
 
 	bool auto_exposure = false;
 	bool path_overlay = false;
+	bool m_switchPausePlay = true;
 
 	std::queue<std::shared_ptr<PosTS>> posBuffer;
 

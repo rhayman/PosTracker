@@ -7,24 +7,24 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "common.h"
+#include "../common.h"
 
 #include "Camera.h"
 
-Camera::~Camera()
-{
-	std::cout << "Camera destructor called\n";
-	if (n_buffers > 0)
-	{
-		for (int i = 0; i < n_buffers; i++)
-		{
-			std::cout << "buffers " << i << "length = " << buffers[i].length << std::endl;
-			if ( -1 == munmap(buffers[i].start, buffers[i].length))
-				errno_exit("munmap in Camera destructor");
-		}
+Camera::~Camera() {
+	std::cout << "Camera dtor called\n";
+	if ( started() ) {
+		stop_device();
+		std::cout << "Stopped device\n";
 	}
-	if ( fd > -1 )
-		close(fd);
+	if ( initialized() ) {
+		uninit_device();
+		std::cout << "Uninit device\n";
+	}
+	if ( ready() ) {
+		close_device();
+		std::cout << "Closed device\n";
+	}
 }
 
 int Camera::set_framesize(const unsigned int width, const unsigned int height)

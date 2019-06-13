@@ -11,16 +11,17 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	Font font = Font(typeface);
 
 	desiredWidth = 425;
-	m_proc = (PosTracker*)parentNode;
+	m_proc = (PosTracker*)getProcessor();
 
 	// Video source stuff
-	addAndMakeVisible(sourceCombo = new ComboBox("sourceCombo"));
+	sourceCombo = std::make_unique<ComboBox>("sourceCombo");
 	sourceCombo->setBounds(5, 30, 120, 20); // x,y,w,h
 	sourceCombo->setTooltip("The video device (e.g. /dev/video0)");
 	sourceCombo->setEditableText(false);
 	sourceCombo->setJustificationType(Justification::centredLeft);
 	sourceCombo->setTextWhenNothingSelected("Device");
 	sourceCombo->setTextWhenNoChoicesAvailable("Device");
+	addAndMakeVisible(sourceCombo.get());
 
 	auto video_devices = m_proc->getDeviceList();
 	for (int i = 0; i < video_devices.size(); ++i)
@@ -28,7 +29,7 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 
 	sourceCombo->addListener(this);
 
-	addAndMakeVisible(resolution = new ComboBox ("resolutionMenu"));
+	resolution = std::make_unique<ComboBox>("resolutionMenu");
 	resolution->setBounds(5, 55, 120, 20);
 	resolution->setTooltip (("The size and frame rate of the video output (e.g. 640 x 480, 30fps)"));
 	resolution->setEditableText (false);
@@ -36,119 +37,137 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	resolution->setTextWhenNothingSelected (("Resolution/ fps"));
 	resolution->setTextWhenNoChoicesAvailable (("Resolution / fps"));
 	resolution->addListener(this);
+	addAndMakeVisible(resolution.get());
 
-	addAndMakeVisible(refreshBtn = new UtilityButton("Refresh", Font ("Small Text", 10, Font::plain)));
+	refreshBtn = std::make_unique<UtilityButton>("Refresh", Font ("Small Text", 10, Font::plain));
 	refreshBtn->setBounds(5, 80, 60, 20);
 	refreshBtn->setTooltip("Refresh the list of devices");
 	refreshBtn->addListener(this);
+	addAndMakeVisible(refreshBtn.get());
 
-	addAndMakeVisible(showVideo = new ToggleButton("Show video"));
+	showVideo = std::make_unique<ToggleButton>("Show video");
 	showVideo->setBounds(5, 105, 100, 20);
 	showVideo->setTooltip("Show the video stream");
 	showVideo->addListener(this);
 	showVideo->setEnabled(false);
+	addAndMakeVisible(showVideo.get());
 
 	font.setHeight(8);
 
 	// autoexposure button
-	addAndMakeVisible(autoExposure = new ToggleButton("Auto exposure"));
+	autoExposure = std::make_unique<ToggleButton>("Auto exposure");
 	autoExposure->setBounds(345, 72, 60, 40); //  smaller than this and the JUCE graphics_context goes mental
 	autoExposure->setTooltip("Turn auto exposure on or off");
 	autoExposure->setToggleState(true, dontSendNotification);
 	autoExposure->addListener(this);
+	addAndMakeVisible(autoExposure.get());
 
 	// overlaypath button
-	addAndMakeVisible(overlayPath = new ToggleButton("Path overlay"));
+	overlayPath = std::make_unique<ToggleButton>("Path overlay");
 	overlayPath->setBounds(345, 92, 60, 40); //  smaller than this and the JUCE graphics_context goes mental
 	overlayPath->setTooltip("Overlay path on video");
 	overlayPath->setToggleState(false, dontSendNotification);
 	overlayPath->addListener(this);
+	addAndMakeVisible(overlayPath.get());
 
 	// Values used for control ranges & step
 	__s32 min, max, step;
 	// Brightness slider and label
-	addAndMakeVisible(brightnessSldr = new CameraControlSlider(font));
+	brightnessSldr = std::make_unique<CameraControlSlider>(font);
 	brightnessSldr->setBounds(210, 30, 50,50);
 	brightnessSldr->setActive(false);
 	brightnessSldr->addListener(this);
+	addAndMakeVisible(brightnessSldr.get());
 
-	addAndMakeVisible(brightLbl = new Label("Brightness", "Brightness"));
+	brightLbl = std::make_unique<Label>("Brightness", "Brightness");
 	brightLbl->setBounds(200, 18, 70, 20);
 	brightLbl->setFont(font);
 	brightLbl->setEditable (false, false, false);
 	brightLbl->setJustificationType(Justification::centred);
 	brightLbl->setColour (TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(brightLbl.get());
 
 	// Contrast slider and label
-	addAndMakeVisible(contrastSldr = new CameraControlSlider(font));
+	contrastSldr = std::make_unique<CameraControlSlider>(font);
 	contrastSldr->setBounds(295, 30, 50,50);
 	contrastSldr->setActive(false);
 	contrastSldr->addListener(this);
+	addAndMakeVisible(contrastSldr.get());
 
-	addAndMakeVisible(contrLbl = new Label("Contrast", "Contrast"));
+	contrLbl = std::make_unique<Label>("Contrast", "Contrast");
 	contrLbl->setBounds(285, 18, 70, 20);
 	contrLbl->setFont(font);
 	contrLbl->setEditable (false, false, false);
 	contrLbl->setJustificationType(Justification::centred);
 	contrLbl->setColour (TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(contrLbl.get());
 
 	// Exposure slider and label
-	addAndMakeVisible(exposureSldr = new CameraControlSlider(font));
+	exposureSldr = std::make_unique<CameraControlSlider>(font);
 	exposureSldr->setBounds(370, 30, 50,50);
 	exposureSldr->setActive(false);
 	exposureSldr->addListener(this);
+	addAndMakeVisible(exposureSldr.get());
 
-	addAndMakeVisible(exposureLbl = new Label("Exposure", "Exposure"));
+	exposureLbl = std::make_unique<Label>("Exposure", "Exposure");
 	exposureLbl->setBounds(360, 18, 70, 20);
 	exposureLbl->setFont(font);
 	exposureLbl->setEditable(false, false, false);
 	exposureLbl->setJustificationType(Justification::centred);
 	exposureLbl->setColour(TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(exposureLbl.get());
 
 	std::pair<int,int> resolution = m_proc->getResolution();
 	int width = resolution.first;
 	int height = resolution.second;
 
 	// LEFT-RIGHT BOUNDING BOX
-	addAndMakeVisible(leftRightSlider = new FrameControlSlider(m_proc, font));
+	leftRightSlider = std::make_unique<FrameControlSlider>(m_proc, font);
 	leftRightSlider->setBounds(195, 80, 140, 25);
 	leftRightSlider->setRange(0, width, 1);
 	leftRightSlider->setMinValue(0);
 	leftRightSlider->setMaxValue(width);
 	leftRightSlider->setActive(false);
 	leftRightSlider->addListener(this);
+	addAndMakeVisible(leftRightSlider.get());
 
-	addAndMakeVisible(leftRightLbl = new Label("leftRightLbl", "Left-Right"));
+	leftRightLbl = std::make_unique<Label>("leftRightLbl", "Left-Right");
 	leftRightLbl->setBounds(130, 80, 70, 20);
 	leftRightLbl->setFont(font);
 	leftRightLbl->setEditable (false, false, false);
 	leftRightLbl->setJustificationType(Justification::centred);
 	leftRightLbl->setColour (TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(leftRightLbl.get());
 
 	// TOP-BOTTOM BOUNDING BOX
-	addAndMakeVisible(topBottomSlider = new FrameControlSlider(m_proc, font));
+	topBottomSlider = std::make_unique<FrameControlSlider>(m_proc, font);
 	topBottomSlider->setBounds(195, 110, 140, 25);
 	topBottomSlider->setRange(0, height, 1);
 	topBottomSlider->setMinValue(0);
 	topBottomSlider->setMaxValue(height);
 	topBottomSlider->setActive(false);
 	topBottomSlider->addListener(this);
+	addAndMakeVisible(topBottomSlider.get());
 
-	addAndMakeVisible(topBottomLbl = new Label("topBottomLbl", "Top-Bottom"));
+	topBottomLbl = std::make_unique<Label>("topBottomLbl", "Top-Bottom");
 	topBottomLbl->setBounds(130, 110, 70, 20);
 	topBottomLbl->setFont(font);
 	topBottomLbl->setEditable (false, false, false);
 	topBottomLbl->setJustificationType(Justification::centred);
 	topBottomLbl->setColour (TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(topBottomLbl.get());
 
-	addAndMakeVisible(fpslabel = new InfoLabel(m_proc, font, String("FPS")));
+	fpslabel = std::make_unique<InfoLabel>(m_proc, font, String("FPS"));
 	fpslabel->setBounds(125, 30, 100, 40);
+	addAndMakeVisible(fpslabel.get());
 
-	addAndMakeVisible(xPoslabel = new InfoLabel(m_proc, font, String("X")));
+	xPoslabel = std::make_unique<InfoLabel>(m_proc, font, String("X"));
 	xPoslabel->setBounds(125, 40, 100, 40);
+	addAndMakeVisible(xPoslabel.get());
 
-	addAndMakeVisible(yPoslabel = new InfoLabel(m_proc, font, String("Y")));
+	yPoslabel = std::make_unique<InfoLabel>(m_proc, font, String("Y"));
 	yPoslabel->setBounds(125, 50, 100, 40);
+	addAndMakeVisible(yPoslabel.get());
 
 
 }
@@ -180,7 +199,7 @@ void PosTrackerEditor::setInfoValue(InfoLabelType type, double val)
 
 void PosTrackerEditor::sliderValueChanged(Slider * sliderChanged)
 {
-	if ( sliderChanged == leftRightSlider )
+	if ( sliderChanged == leftRightSlider.get() )
 	{
 		auto min = sliderChanged->getMinValue();
 		m_proc->adjustVideoMask(BORDER::LEFT, min);
@@ -188,7 +207,7 @@ void PosTrackerEditor::sliderValueChanged(Slider * sliderChanged)
 		m_proc->adjustVideoMask(BORDER::RIGHT, max);
 		m_proc->makeVideoMask();
 	}
-	if ( sliderChanged == topBottomSlider )
+	if ( sliderChanged == topBottomSlider.get() )
 	{
 		auto min = sliderChanged->getMinValue();
 		m_proc->adjustVideoMask(BORDER::TOP, min);
@@ -196,19 +215,19 @@ void PosTrackerEditor::sliderValueChanged(Slider * sliderChanged)
 		m_proc->adjustVideoMask(BORDER::BOTTOM, max);
 		m_proc->makeVideoMask();
 	}
-	if ( sliderChanged == contrastSldr )
-	{
-		auto val = sliderChanged->getValue();
-		if ( m_proc->isCamReady() )
-			m_proc->adjustBrightness(val);
-	}
-	if ( sliderChanged == brightnessSldr )
+	if ( sliderChanged == contrastSldr.get() )
 	{
 		auto val = sliderChanged->getValue();
 		if ( m_proc->isCamReady() )
 			m_proc->adjustContrast(val);
 	}
-	if ( sliderChanged == exposureSldr )
+	if ( sliderChanged == brightnessSldr.get() )
+	{
+		auto val = sliderChanged->getValue();
+		if ( m_proc->isCamReady() )
+			m_proc->adjustBrightness(val);
+	}
+	if ( sliderChanged == exposureSldr.get() )
 	{
 		if ( autoExposure->getToggleState() == false )
 		{
@@ -221,7 +240,7 @@ void PosTrackerEditor::sliderValueChanged(Slider * sliderChanged)
 
 void PosTrackerEditor::buttonEvent(Button* button)
 {
-	if (button == refreshBtn)
+	if ( button == refreshBtn.get() )
 	{
 		if ( sourceCombo->getNumItems() > 0 )
 		{
@@ -232,7 +251,7 @@ void PosTrackerEditor::buttonEvent(Button* button)
 				sourceCombo->addItem(video_devices.at(i), i+1);
 		}
 	}
-	if ( button == showVideo )
+	if ( button == showVideo.get() )
 	{
 		if ( showVideo->getToggleState() == true )
 		{
@@ -261,7 +280,7 @@ void PosTrackerEditor::buttonEvent(Button* button)
 			m_proc->showLiveStream(false);
 		}
 	}
-	if ( button == autoExposure )
+	if ( button == autoExposure.get() )
 	{
 		if ( autoExposure->getToggleState() == true )
 		{
@@ -274,7 +293,7 @@ void PosTrackerEditor::buttonEvent(Button* button)
 		}
 	}
 
-	if ( button == overlayPath )
+	if ( button == overlayPath.get() )
 	{
 		if ( overlayPath->getToggleState() == true )
 			m_proc->overlayPath(true);
@@ -286,7 +305,7 @@ void PosTrackerEditor::buttonEvent(Button* button)
 void PosTrackerEditor::comboBoxChanged(ComboBox* cb)
 {
 
-	if (cb == sourceCombo)
+	if ( cb == sourceCombo.get() )
 	{
 		if ( resolution->getNumItems() > 0 )
 			resolution->clear();
@@ -298,7 +317,7 @@ void PosTrackerEditor::comboBoxChanged(ComboBox* cb)
 		for (int i = 0; i < fmts.size(); ++i)
 			resolution->addItem(fmts[i], i+1);
 	}
-	else if (cb == resolution)
+	else if ( cb == resolution.get() )
 	{
 		int idx = cb->getSelectedId();
 		auto formatId = cb->getItemText(idx-1).toStdString();
@@ -370,11 +389,11 @@ void PosTrackerEditor::updateSettings()
 	    int control_ok;
 		// ------------- BRIGHTNESS ------------------
 	    control_ok = m_proc->getControlValues(V4L2_CID_BRIGHTNESS, min, max, step);
-	    Array<double>v{double(min), double(max)};
+	    Array<double>brightness_range{double(min), double(max)};
 	    if ( control_ok == 0 ) { // all good
 	    	int new_val = m_proc->getBrightness();
 		    brightnessSldr->setValue(new_val);
-		    brightnessSldr->setValues(v);
+		    brightnessSldr->setValues(brightness_range);
 		    brightnessSldr->setRange(min, max, step);
 		    m_proc->adjustBrightness(new_val);
 		    brightnessSldr->setActive(true);
@@ -383,11 +402,11 @@ void PosTrackerEditor::updateSettings()
 		    brightnessSldr->setActive(false);
 	    // CONTRAST
 	    control_ok = m_proc->getControlValues(V4L2_CID_CONTRAST, min, max, step);
+	    Array<double>contrast_range{double(min), double(max)};
 	    if ( control_ok == 0 ) {
 	    	int new_val = m_proc->getContrast();
 		    contrastSldr->setValue(new_val);
-		    v = {double(min), double(max)};
-		    contrastSldr->setValues(v);
+		    contrastSldr->setValues(contrast_range);
 		    contrastSldr->setRange(min, max, step);
 		    m_proc->adjustContrast(new_val);
 		    contrastSldr->setActive(true);
@@ -397,13 +416,13 @@ void PosTrackerEditor::updateSettings()
 
 	    // EXPOSURE
 	    control_ok = m_proc->getControlValues(V4L2_CID_EXPOSURE_ABSOLUTE, min, max, step);
+	    Array<double>exposure_range{double(min), double(max)};
 	    bool use_auto_exposure = m_proc->autoExposure();
 	    if ( (control_ok == 0) && ( ! use_auto_exposure ) ) {
 	    	int new_val = m_proc->getExposure();
 	    	autoExposure->setToggleState(false, sendNotification);
 		    exposureSldr->setValue(new_val);
-		    v = {double(min), double(max)};
-		    exposureSldr->setValues(v);
+		    exposureSldr->setValues(exposure_range);
 		    exposureSldr->setRange(min, max, step);
 		    m_proc->adjustExposure(new_val);
 		    exposureSldr->setActive(true);
@@ -442,22 +461,24 @@ CameraControlSlider::CameraControlSlider(Font f) : Slider("name"), font(f)
 	setValues(v);
 	setVelocityBasedMode(true);
 
-	addAndMakeVisible(upButton = new TriangleButton(1));
+	upButton = std::make_unique<TriangleButton>(1);
 	upButton->addListener(this);
 	upButton->setBounds(16, 21, 10, 8);
+	addAndMakeVisible(upButton.get());
 
-	addAndMakeVisible(downButton = new TriangleButton(2));
+	downButton = std::make_unique<TriangleButton>(2);
 	downButton->addListener(this);
 	downButton->setBounds(24, 21, 10, 8);
+	addAndMakeVisible(downButton.get());
 }
 
 void CameraControlSlider::buttonClicked(Button * btn) {
-	if ( btn == upButton ) {
+	if ( btn == upButton.get() ) {
 		auto val = getValue();
 		auto inc = getInterval();
 		setValue(val + inc);
 	}
-	if ( btn == downButton ) {
+	if ( btn == downButton.get() ) {
 		auto val = getValue();
 		auto inc = getInterval();
 		setValue(val - inc);
@@ -547,24 +568,24 @@ FrameControlSlider::FrameControlSlider(PosTracker * proc, Font f) : Slider("name
 	setMaxValue(100);
 	setTextBoxStyle(Slider::NoTextBox, false, 40, 20);
 
-	Label * l = new Label("min");
+	auto l = std::make_unique<Label>("min");
 	l->setBounds(0, getHeight()+12, 40, 10);
 	font.setHeight(9.0);
 	l->setFont(f);
 	l->setEditable(true);
 	l->addListener(this);
 	l->setText(String("0000"), dontSendNotification);
-	addAndMakeVisible(l);
-	borderlbl[0] = l;
+	addAndMakeVisible(l.get());
+	borderlbl.push_back(std::move(l));
 
-	l = new Label("max");
+	l = std::make_unique<Label>("max");
 	l->setBounds(110, getHeight()+12, 40, 10);
 	l->setFont(f);
 	l->setEditable(true);
 	l->addListener(this);
 	l->setText(String("9999"), dontSendNotification);
-	addAndMakeVisible(l);
-	borderlbl[1] = l;
+	addAndMakeVisible(l.get());
+	borderlbl.push_back(std::move(l));
 
 	setValue(0, 0);
 	setValue(1, 1);
@@ -693,18 +714,20 @@ void FrameControlSlider::setValue(int idx, int val)
 InfoLabel::InfoLabel(PosTracker * proc, Font f, String name)
 	: m_proc(proc), m_font(f)
 {
-	addAndMakeVisible(lbl = new Label(name, name));
+	lbl = std::make_unique<Label>(name, name);
 	lbl->setBounds(0, 5, 30, 20);
 	lbl->setEditable(false);
 	lbl->setFont(m_font);
 	lbl->setColour(TextEditor::textColourId, Colours::grey);
 	lbl->setJustificationType(Justification::right);
+	addAndMakeVisible(lbl.get());
 
-	addAndMakeVisible(lblvalue = new Label("value"));
+	lblvalue = std::make_unique<Label>("value");
 	lblvalue->setBounds(30, 5, 50, 20);
 	lblvalue->setEditable(false);
 	lblvalue->setFont(m_font);
 	setInfo(0.0);
+	addAndMakeVisible(lblvalue.get());
 }
 
 void InfoLabel::handleAsyncUpdate()

@@ -1,10 +1,11 @@
 #ifndef POSTRACKEREDITOR_H_
 #define POSTRACKEREDITOR_H_
 
+#include <memory>
 #include <EditorHeaders.h>
 #include "PosTracker.h"
 
-#include "common.h"
+#include "../common.h"
 
 class CameraControlSlider;
 class FrameControlSlider;
@@ -37,35 +38,35 @@ public:
 private:
 	PosTracker * m_proc;
 
-	ScopedPointer<ComboBox> sourceCombo;
-	ScopedPointer<ComboBox> resolution;
-	ScopedPointer<UtilityButton> refreshBtn;
+	std::unique_ptr<ComboBox> sourceCombo;
+	std::unique_ptr<ComboBox> resolution;
+	std::unique_ptr<UtilityButton> refreshBtn;
 
-	ScopedPointer<ToggleButton> showVideo;
-	ScopedPointer<ToggleButton> autoExposure;
-	ScopedPointer<ToggleButton> overlayPath;
+	std::unique_ptr<ToggleButton> showVideo;
+	std::unique_ptr<ToggleButton> autoExposure;
+	std::unique_ptr<ToggleButton> overlayPath;
 
-	ScopedPointer<CameraControlSlider> brightnessSldr;
-	ScopedPointer<CameraControlSlider> contrastSldr;
-	ScopedPointer<CameraControlSlider> exposureSldr;
+	std::unique_ptr<CameraControlSlider> brightnessSldr;
+	std::unique_ptr<CameraControlSlider> contrastSldr;
+	std::unique_ptr<CameraControlSlider> exposureSldr;
 
-	ScopedPointer<Label> brightnessVal;
-	ScopedPointer<Label> contrastVal;
-	ScopedPointer<Label> exposureVal;
+	std::unique_ptr<Label> brightnessVal;
+	std::unique_ptr<Label> contrastVal;
+	std::unique_ptr<Label> exposureVal;
 
-	ScopedPointer<Label> brightLbl;
-	ScopedPointer<Label> contrLbl;
-	ScopedPointer<Label> exposureLbl;
+	std::unique_ptr<Label> brightLbl;
+	std::unique_ptr<Label> contrLbl;
+	std::unique_ptr<Label> exposureLbl;
 
-	ScopedPointer<FrameControlSlider> leftRightSlider;
-	ScopedPointer<FrameControlSlider> topBottomSlider;
+	std::unique_ptr<FrameControlSlider> leftRightSlider;
+	std::unique_ptr<FrameControlSlider> topBottomSlider;
 
-	ScopedPointer<Label> leftRightLbl;
-	ScopedPointer<Label> topBottomLbl;
+	std::unique_ptr<Label> leftRightLbl;
+	std::unique_ptr<Label> topBottomLbl;
 
-	ScopedPointer<InfoLabel> fpslabel;
-	ScopedPointer<InfoLabel> xPoslabel;
-	ScopedPointer<InfoLabel> yPoslabel;
+	std::unique_ptr<InfoLabel> fpslabel;
+	std::unique_ptr<InfoLabel> xPoslabel;
+	std::unique_ptr<InfoLabel> yPoslabel;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PosTrackerEditor);
 };
@@ -93,8 +94,8 @@ private:
 	Font font;
 	bool m_isActive;
 	Array<double> valueArray;
-	ScopedPointer<TriangleButton> upButton;
-	ScopedPointer<TriangleButton> downButton;
+	std::unique_ptr<TriangleButton> upButton;
+	std::unique_ptr<TriangleButton> downButton;
 };
 
 class FrameControlSlider : public Slider, public Label::Listener, public AsyncUpdater
@@ -113,7 +114,7 @@ private:
 	void paint(Graphics & g);
 	Path makeFilledPath(double, int);
 	Path makeArrowHead(double, int);
-	ScopedPointer<Label> borderlbl[2];
+	std::vector<std::unique_ptr<Label>> borderlbl;
 	String labelText[2];
 
 	PosTracker * m_proc;
@@ -132,8 +133,8 @@ public:
 	 void setEnable(bool);
 	 void setInfo(double);
 private:
-	ScopedPointer<Label> lbl;
-	ScopedPointer<Label> lblvalue;
+	std::unique_ptr<Label> lbl;
+	std::unique_ptr<Label> lblvalue;
 	double infoVal = 0.0;
 
 	PosTracker * m_proc;

@@ -7,9 +7,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "common.h"
-
-
+#include "../common.h"
 
 class Camera
 {
@@ -17,7 +15,6 @@ public:
 	Camera() : dev_name("/dev/video1")  {};
 	Camera(std::string _dev_name) : dev_name(_dev_name) { };
 	~Camera();
-
 	/*
 	Returns a list of attached video devices e.g /dev/vided0 etc
 	NB doesn't open them or assign fd

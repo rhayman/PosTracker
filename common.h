@@ -128,13 +128,20 @@ enum class FMTFLAGS
 };
 
 // used for filling out list boxes or whatever JUCE calls em
-static std::vector<std::string> trackerTypes{"Boosting", "KCF", "MedianFlow", "MIL"};
+static const std::vector<std::string> kTrackers {"LED", "Boosting", "KCF", "MedianFlow", "MIL", "MOSSE", "TLD", "Background", "BackgroundKNN" };
+static const std::vector<std::string> kcf_modes {"GRAY", "COLOR"};
 
-enum class TrackerType {
+enum class TrackerType : int {
+	kLED = 0,
 	kBoosting,
+	kGOTURN,
 	kKCF,
 	kMedianFlow,
-	kMIL
+	kMIL,
+	kMOSSE,
+	kTLD,
+	kBACKGROUND,
+	kBACKGROUNDKNN
 };
 
 const std::array<std::string, 14> buf_type = {
@@ -160,5 +167,4 @@ const std::array<std::string, 4> frm_type = {
 	"Step-wise",
 	"Continuous"
 };
-
 #endif

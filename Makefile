@@ -9,7 +9,7 @@ VPATH := $(SOURCE_DIRS)
 SRC := $(foreach sdir,$(SRC_DIR),$(wildcard $(sdir)/*.cpp))
 OBJ := $(addprefix $(OBJDIR)/,$(notdir $(SRC:.cpp=.o)))
 
-LDFLAGS += -lv4l2 -lopencv_tracking `pkg-config --libs --cflags opencv`
+LDFLAGS += -lv4l2 `pkg-config --libs --cflags opencv`
 
 BLDCMD := $(CXX) -shared -o $(OUTDIR)/$(TARGET) $(OBJ) $(LDFLAGS) $(RESOURCES) $(TARGET_ARCH)
 
