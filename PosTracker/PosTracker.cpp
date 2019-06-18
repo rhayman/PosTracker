@@ -297,7 +297,7 @@ PosTracker::~PosTracker()
 	if ( isThreadRunning () ) {
 		std::cout << "Stopping thread...\n";
 		signalThreadShouldExit();
-		stopThread(10000);
+		stopThread(1000);
 	}
 	displayMask.reset();
 }
@@ -455,8 +455,6 @@ void PosTracker::run()
 	}
 
 	bool cv_tracker_init = false;
-
-	std::cout << "kind_of_tracker " << static_cast<int>(kind_of_tracker) << std::endl;
 
 	while ( isThreadRunning() )
 	{
