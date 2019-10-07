@@ -90,13 +90,13 @@ std::string CameraCV::get_format_name()
 	else
 		return "";
 }
-
-std::vector<Formats*> CameraCV::get_formats()
-{
-	availableFormats.clear();
-
-	return availableFormats;
-}
+//
+//std::vector<Formats*> CameraCV::get_formats()
+//{
+//	availableFormats.clear();
+//
+//	return availableFormats;
+//}
 
 int CameraCV::open_device()
 {
@@ -157,13 +157,20 @@ int CameraCV::switch_exposure_type(int autoOrManual)
 
 int CameraCV::set_control_value(__u32 id, int val)
 {
-	// CODE!
+	if (id == V4L2_CID_BRIGHTNESS)
+		cap.set(cv::CAP_PROP_BRIGHTNESS, val);
+	if (id == V4L2_CID_BRIGHTNESS)
+		cap.set(cv::CAP_PROP_CONTRAST, val);
+	// TODO: DEAL WITH EXPOSURE
 	return 0;
 }
 
 int CameraCV::get_control_values(__u32 id, __s32 & min, __s32 & max, __s32 & step)
 {
 	// CODE!
+	min = 0;
+	max = 100;
+	step = 10;
 	return 0;
 }
 

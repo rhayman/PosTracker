@@ -10,7 +10,7 @@
 class CameraBase
 {
 public:
-	CameraBase() : dev_name("")  {};
+	CameraBase() : dev_name("cap0")  {};
 	CameraBase(std::string _dev_name) : dev_name(_dev_name) {};
 	~CameraBase() {};
 	/*
@@ -32,11 +32,16 @@ public:
 	is no straightforward way under openCV to retrieve these values given the number
 	of APIs it has to support
 	*/
-	virtual std::vector<Formats*> get_formats() { 
-		Formats *  fmt{};
-		std::vector<Formats*> dummy{};
-		dummy.push_back(fmt);
-		return dummy;
+	virtual std::vector<Formats*> get_formats() {
+		availableFormats.clear();
+		Formats *  fmt = new Formats();
+		fmt->denominator = 30;
+		fmt->numerator = 1;
+		fmt->height = 480;
+		fmt->width = 640;
+		availableFormats.push_back(fmt);
+		currentFmt = fmt;
+		return availableFormats;
 	}
 	Formats * get_current_format() { return currentFmt; };
 
@@ -74,8 +79,8 @@ public:
 	}
 
 	int & getfd() { return fd; };
-	std::string get_dev_name() { return dev_name; }
 	virtual std::string get_format_name() { return ""; }
+	std::string get_dev_name() { return dev_name; }
 
 protected:
 	int fd = -1;

@@ -10,11 +10,11 @@
 class CameraCV : public CameraBase
 {
 public:
-	CameraCV() : CameraBase("openCV") {};
+	CameraCV() : CameraBase("cap0") {};
 	CameraCV(std::string _dev_name) : CameraBase(_dev_name) {};
 	~CameraCV();
 
-	std::vector<Formats*> get_formats() override;
+	//std::vector<Formats*> get_formats() override;
 
 	int open_device() override;
 	void close_device() override;
@@ -42,7 +42,6 @@ public:
 
 private:
 	cv::VideoCapture cap;
-	std::string dev_name = "openCV";
 	// Default a list of Formats under openCV as there is no 'easy' way to
 	// interrogate all the available formats, framerates, frame widths/ heights
 	// etc etc according to the interwebs

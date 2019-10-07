@@ -224,6 +224,8 @@ public:
 		cv::minMaxLoc(roi, NULL, NULL, NULL, &maxloc, ~roi);
 		maxloc.x = maxloc.x + roi_rect.x;
 		maxloc.y = maxloc.y + roi_rect.y;
+		m_xy[0] = (juce::uint32)maxloc.x;
+		m_xy[1] = (juce::uint32)maxloc.y;
 	};
 	cv::Mat processFrame(cv::Mat & frame)
 	{
