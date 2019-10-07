@@ -5,66 +5,60 @@
 #include <opencv2/imgproc.hpp>
 #include "PosTracker.h"
 #include "PosTrackerEditor.h"
-#ifdef __unix__
-#include "Camera.h"
-#endif
-#ifdef _WIN32
 #include "CameraCV.h"
-#endif
 #include "CameraBase.h"
 #include "../cvTracking/TrackersEditor.hpp"
 
 #include <array>
 #include <vector>
-using namespace timey;
 // originally nabbed this from:
 // https://www.gnu.org/software/libc/manual/html_node/Elapsed-Time.html
 // then adpated to work with timespec struct as third arg (*y)
-int timevalspec_subtract (struct timeval *result, struct timeval *x, struct timeval *y)
-{
-  /* Perform the carry for the later subtraction by updating y. */
-  if (x->tv_usec < y->tv_usec) {
-    int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
-    y->tv_usec -= 1000000 * nsec;
-    y->tv_sec += nsec;
-  }
-  if (x->tv_usec - y->tv_usec > 1000000) {
-    int nsec = (x->tv_usec - y->tv_usec) / 1000000;
-    y->tv_usec += 1000000 * nsec;
-    y->tv_sec -= nsec;
-  }
+// int timevalspec_subtract (struct timeval *result, struct timeval *x, struct timeval *y)
+// {
+//   /* Perform the carry for the later subtraction by updating y. */
+//   if (x->tv_usec < y->tv_usec) {
+//     int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
+//     y->tv_usec -= 1000000 * nsec;
+//     y->tv_sec += nsec;
+//   }
+//   if (x->tv_usec - y->tv_usec > 1000000) {
+//     int nsec = (x->tv_usec - y->tv_usec) / 1000000;
+//     y->tv_usec += 1000000 * nsec;
+//     y->tv_sec -= nsec;
+//   }
 
-  /* Compute the time remaining to wait.
-     tv_usec is certainly positive. */
-  result->tv_sec = x->tv_sec - y->tv_sec;
-  result->tv_usec = x->tv_usec - y->tv_usec;
+//   /* Compute the time remaining to wait.
+//      tv_usec is certainly positive. */
+//   result->tv_sec = x->tv_sec - y->tv_sec;
+//   result->tv_usec = x->tv_usec - y->tv_usec;
 
-  /* Return 1 if result is negative. */
-  return x->tv_sec < y->tv_sec;
-};
-int
-timeval_subtract (struct timeval *result, struct timeval *x, struct timeval *y)
-{
-  /* Perform the carry for the later subtraction by updating y. */
-  if (x->tv_usec < y->tv_usec) {
-    int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
-    y->tv_usec -= 1000000 * nsec;
-    y->tv_sec += nsec;
-  }
-  if (x->tv_usec - y->tv_usec > 1000000) {
-    int nsec = (x->tv_usec - y->tv_usec) / 1000000;
-    y->tv_usec += 1000000 * nsec;
-    y->tv_sec -= nsec;
-  }
+//   /* Return 1 if result is negative. */
+//   return x->tv_sec < y->tv_sec;
+// };
+// int
+// timeval_subtract (struct timeval *result, struct timeval *x, struct timeval *y)
+// {
+//   /* Perform the carry for the later subtraction by updating y. */
+//   if (x->tv_usec < y->tv_usec) {
+//     int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
+//     y->tv_usec -= 1000000 * nsec;
+//     y->tv_sec += nsec;
+//   }
+//   if (x->tv_usec - y->tv_usec > 1000000) {
+//     int nsec = (x->tv_usec - y->tv_usec) / 1000000;
+//     y->tv_usec += 1000000 * nsec;
+//     y->tv_sec -= nsec;
+//   }
 
-  /* Compute the time remaining to wait.
-     tv_usec is certainly positive. */
-  result->tv_sec = x->tv_sec - y->tv_sec;
-  result->tv_usec = x->tv_usec - y->tv_usec;
+//   /* Compute the time remaining to wait.
+//      tv_usec is certainly positive. */
+//   result->tv_sec = x->tv_sec - y->tv_sec;
+//   result->tv_usec = x->tv_usec - y->tv_usec;
 
-  /* Return 1 if result is negative. */
-  return x->tv_sec < y->tv_sec;
-};
+//   /* Return 1 if result is negative. */
+//   return x->tv_sec < y->tv_sec;
+// };
 
 /*
 A class for decorating the video output frame with a windowed border,
@@ -315,7 +309,9 @@ void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
 	auto tv = p->getTimeVal();
 	xy_ts[0] = xy[0];
 	xy_ts[1] = xy[1];
-	clock_gettime(CLOCK_MONOTONIC, &ts);
+	// clock_gettime(CLOCK_MONOTONIC, &ts);
+	timespec ts{};
+
 	double nowTime = ts.tv_sec + ((double)ts.tv_nsec / 1e9);
 	double frameTime = tv.tv_sec + ((double)tv.tv_usec / 1e6);
 	double time_delta = nowTime - frameTime;
@@ -443,7 +439,7 @@ void PosTracker::showLiveStream(bool val)
 void PosTracker::run()
 {
 	cv::Mat frame,  roi;
-	struct timeval tv;
+	timeval tv;
 	std::vector<cv::Point2d> pts{2};
 	unsigned int count = 0;
 	if ( ! displayMask->getPathFrame().empty() ) {
@@ -621,7 +617,7 @@ std::vector<std::string> PosTracker::getDeviceFormats()
 {
 	if ( ! currentCam->ready() )
 		currentCam->open_device();
-	currentCam->get_formats();
+	currentCam->get_formats(); // clears the Container holding the descriptions of available camera formats
 	return currentCam->get_format_descriptions();
 }
 
@@ -684,12 +680,7 @@ void PosTracker::createNewCamera(std::string dev_name)
 	for ( auto & dev : devices )
 	{
 		if ( dev.compare(dev_name) == 0 ) {
-			#ifdef _WIN32
 			currentCam = std::make_shared<CameraCV>(dev_name);
-			#endif
-			#ifdef __unix__
-			currentCam = std::make_shared<Camera>(dev_name);
-			#endif
 		}
 	}
 }

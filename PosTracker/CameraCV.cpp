@@ -143,7 +143,6 @@ int CameraCV::read_frame(cv::Mat & result, struct timeval &tv)
 
 void CameraCV::close_device()
 {
-	fprintf(stdout, "Closing %s\n", dev_name.c_str());
 	// CLOSING CODE
 	cap.release();
 	fd = -1;

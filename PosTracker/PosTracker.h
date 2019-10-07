@@ -131,7 +131,7 @@ private:
 	juce::uint32 * old_xy = nullptr;
 	juce::uint32 * new_xy = nullptr;
 	juce::uint32 xy_ts[3];
-	struct timespec ts;
+	timespec ts;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PosTracker);
 };

@@ -4,15 +4,13 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#ifdef __unix__
-#include <unistd.h>
-#endif
+#include <winsock.h>
 #include "../common.h"
-using namespace timey;
+
 class CameraBase
 {
 public:
-	CameraBase() : dev_name("/dev/video1")  {};
+	CameraBase() : dev_name("")  {};
 	CameraBase(std::string _dev_name) : dev_name(_dev_name) {};
 	~CameraBase() {};
 	/*
@@ -21,28 +19,25 @@ public:
 	*/
 	static std::vector<std::string> get_devices() {
 		std::vector<std::string> device_list;
-		#ifdef _WIN32
 		cv::VideoCapture _cap;
 		_cap.open(0);
 		if ( _cap.isOpened() )
-			device_list.push_back("0");
-		#endif // _WIN32
-		#ifdef __unix__
-		unsigned int max_devices = 64;
-		int fd = -1;
-		for (int i = 0; i < max_devices; ++i)
-		{
-			char dev[64];
-			sprintf(dev, "/dev/video%d", i);
-			if ( -1 == (fd = open(dev, O_RDWR)))
-				break;
-			device_list.push_back(std::string(dev));
-			close(fd);
-		}
-		#endif // __unix__
+			device_list.push_back("cap0");
 		return device_list;
 	};
-	virtual std::vector<Formats*> get_formats() { return std::vector<Formats*>(); }
+	/*
+	This is the method that under Linux populates the Container with valid formats
+	by iterating over the V4L2 format enum. Here we give the default Format which 
+	should contain some sane values for resolution and fps etc. Apparently there
+	is no straightforward way under openCV to retrieve these values given the number
+	of APIs it has to support
+	*/
+	virtual std::vector<Formats*> get_formats() { 
+		Formats *  fmt{};
+		std::vector<Formats*> dummy{};
+		dummy.push_back(fmt);
+		return dummy;
+	}
 	Formats * get_current_format() { return currentFmt; };
 
 	bool ready() { return is_ready; };
@@ -86,7 +81,7 @@ protected:
 	int fd = -1;
 	struct buffer *buffers;
 	unsigned int n_buffers = 0;
-	std::string dev_name ="";
+	std::string dev_name = "";
 	bool is_ready = false;
 	bool is_initialized = false;
 	bool has_started = false;
@@ -95,8 +90,6 @@ protected:
 
 	std::vector<Formats*> availableFormats;
 	std::vector<std::string> formatDescriptions;
-
-
 };
 
 #endif
