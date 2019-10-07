@@ -676,8 +676,14 @@ void PosTracker::createNewCamera(std::string dev_name)
 	std::vector<std::string> devices = Camera::get_devices();
 	for ( auto & dev : devices )
 	{
-		if ( dev.compare(dev_name) == 0 )
+		if ( dev.compare(dev_name) == 0 ) {
+			#ifdef _WIN32
+			currentCam = std::make_shared<CameraCV>(dev_name);
+			#endif
+			#ifdef __unix__
 			currentCam = std::make_shared<Camera>(dev_name);
+			#endif
+		}
 	}
 }
 

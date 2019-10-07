@@ -1,7 +1,6 @@
 #include "cvTrackers.hpp"
 #include "Trackers.hpp"
 #include "TrackersEditor.hpp"
-#include <typeinfo>
 
 Trackers::Trackers() : GenericProcessor("Tracker API")
 {

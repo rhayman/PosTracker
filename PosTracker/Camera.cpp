@@ -174,11 +174,6 @@ int Camera::set_format(const Formats * format)
 	return 0;
 }
 
-std::string Camera::get_dev_name()
-{
-	return dev_name;
-}
-
 std::string Camera::get_format_name()
 {
 	if ( currentFmt )
@@ -448,9 +443,6 @@ int Camera::read_frame(cv::Mat & result, struct timeval &tv)
 	return 0;
 }
 
-cv::Mat Camera::process_image(void *p, int size, struct timeval tv)
-{}
-
 void Camera::close_device()
 {
 	fprintf(stdout, "Closing %s\n", dev_name.c_str());
@@ -594,21 +586,4 @@ void Camera::uninit_device()
 		free(buffers);
 	}
 	is_initialized = false;
-}
-
-std::vector<std::string> Camera::get_devices()
-{
-	std::vector<std::string> device_list;
-	unsigned int max_devices = 64;
-	int fd = -1;
-	for (int i = 0; i < max_devices; ++i)
-	{
-		char dev[64];
-		sprintf(dev, "/dev/video%d", i);
-		if ( -1 == (fd = open(dev, O_RDWR)))
-			break;
-		device_list.push_back(std::string(dev));
-		close(fd);
-	}
-	return device_list;
 }
