@@ -1,10 +1,12 @@
+#ifdef __unix__
+#include <unistd.h>
+#endif
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/features2d.hpp>
 #include <opencv2/calib3d.hpp>
-#include <unistd.h>
 #include <cuchar>
 #include <ctime>
 #include <algorithm>
@@ -12,7 +14,12 @@
 #include "StereoPos.h"
 #include "StereoPosEditor.h"
 #include "../PosTracker/PosTracker.h"
+#ifdef __unix__
 #include "../PosTracker/Camera.h"
+#endif
+#ifdef _WIN32
+#include "../PosTracker/CameraCV.h"
+#endif
 
 template<typename T>
 using ioArray = std::vector<std::vector<T>>;

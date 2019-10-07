@@ -2,22 +2,60 @@
 #define COMMON_H_
 
 #include <array>
+#include <string>
+#include <cstring>
+#include <cstdio>
+#include <cerrno>
+
+#ifdef __unix__
+#include <sys/ioctl.h>
+#include <linux/videodev2.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <stdint.h>
-
-#ifdef __unix__
-#include <sys/ioctl.h>
-#include <linux/videodev2.h>
 #endif
 
 #ifdef _WIN32
-struct timeval
-{
-	std::string aww("Imma empty!");
+using __u32 = unsigned int;
+using __s32 = int;
+unsigned int V4L2_EXPOSURE_AUTO = 0;
+unsigned int V4L2_EXPOSURE_MANUAL = 1;
+unsigned int V4L2_CID_BRIGHTNESS = 2;
+unsigned int V4L2_CID_CONTRAST = 2;
+unsigned int V4L2_CID_EXPOSURE_ABSOLUTE = 2;
+unsigned int CLOCK_MONOTONIC = 1;
+namespace timey {
+	struct timeval
+	{
+		unsigned int tv_usec = 1;
+		unsigned int tv_sec = 1;
+	};
+};
+struct v4l2_frmsize_stepwise {
+	unsigned int step_width = 0;
+	unsigned int step_height = 0;
+	unsigned int max_width = 0;
+	unsigned int max_height = 0;
+	unsigned int min_height = 0;
+	unsigned int min_width = 0;
+};
+
+struct v4l2_frmival_stepwise {
+	struct min {
+		unsigned int denominator = 0;
+		unsigned int numerator = 0;
+	};
+	struct max {
+		unsigned int denominator = 0;
+		unsigned int numerator = 0;
+	};
+};
+
+void clock_gettime(unsigned int cm, timespec * ts) {
+
 };
 #endif
 
@@ -65,40 +103,41 @@ std::string charcode2str(T & in)
 	return std::string(c);
 };
 
-struct Formats
+class Formats
 {
-	__u32 index; // 0,1,2,...
+public:
+	unsigned int index; // 0,1,2,...
 	std::string stream_type; // V4L2_BUF_TYPE_VIDEO_CAPTURE etc
 	std::string description; // “YUV 4:2:2” etc
-	__u32 pixelformat; // four-character code e.g. 'YUYV'
+	unsigned int pixelformat; // four-character code e.g. 'YUYV'
 	std::string framesize_type; // Discrete, step-wise or continuous
-	struct v4l2_frmsize_discrete discrete_frmsizes;
+	// struct v4l2_frmsize_discrete discrete_frmsizes;
 	struct v4l2_frmsize_stepwise stepwise_frmsizes;
 	struct v4l2_frmival_stepwise stepwise_intervals;
-	__u32 numerator = 0;
-	__u32 denominator = 0;
-	__u32 width = 0;
-	__u32 height = 0;
+	unsigned int numerator = 0;
+	unsigned int denominator = 0;
+	unsigned int width = 0;
+	unsigned int height = 0;
 
-	friend std::ostream & operator<<(std::ostream & out, const Formats & fmt)
-	{
-		out << "\tIndex\t\t: " << fmt.index << "\n\tType\t\t: " << fmt.stream_type
-			<< "\n\tDescription\t: " << fmt.description << "\n\tPixel format\t: " << charcode2str(fmt.pixelformat);
-			if ( fmt.framesize_type == "Discrete")
-			{
-				out << "\n\t\tSize\t: " << fmt.framesize_type << " " << fmt.width << "x" << fmt.height
-					<< "\n\t\tFramerate(denom/numer)\t: " << fmt.denominator << "/" << fmt.numerator << std::endl;  
-			}
-			else if ( fmt.framesize_type == "Step-wise" || fmt.framesize_type == "Continuous")
-			{
-				out << "\n\t\tSize\t: " << fmt.framesize_type << " " << fmt.stepwise_frmsizes.min_width << "x" << fmt.stepwise_frmsizes.min_height
-					<< " - " << fmt.stepwise_frmsizes.max_width << "x" << fmt.stepwise_frmsizes.max_height
-					<< " with step " << fmt.stepwise_frmsizes.step_width << "/" << fmt.stepwise_frmsizes.step_height
-					<< "\n\tFramerate(denom/numer)\t: " << fmt.stepwise_intervals.max.denominator << "/" <<  fmt.stepwise_intervals.max.numerator
-					<< " - " << fmt.stepwise_intervals.min.denominator << "/" << fmt.stepwise_intervals.min.numerator << std::endl;  
-			}
-		return out;
-	}
+	// friend std::ostream & operator<<(std::ostream & out, const Formats & fmt)
+	// {
+	// 	out << "\tIndex\t\t: " << fmt.index << "\n\tType\t\t: " << fmt.stream_type
+	// 		<< "\n\tDescription\t: " << fmt.description << "\n\tPixel format\t: " << charcode2str(fmt.pixelformat);
+	// 		if ( fmt.framesize_type == "Discrete")
+	// 		{
+	// 			out << "\n\t\tSize\t: " << fmt.framesize_type << " " << fmt.width << "x" << fmt.height
+	// 				<< "\n\t\tFramerate(denom/numer)\t: " << fmt.denominator << "/" << fmt.numerator << std::endl;  
+	// 		}
+	// 		else if ( fmt.framesize_type == "Step-wise" || fmt.framesize_type == "Continuous")
+	// 		{
+	// 			out << "\n\t\tSize\t: " << fmt.framesize_type << " " << fmt.stepwise_frmsizes.min_width << "x" << fmt.stepwise_frmsizes.min_height
+	// 				<< " - " << fmt.stepwise_frmsizes.max_width << "x" << fmt.stepwise_frmsizes.max_height
+	// 				<< " with step " << fmt.stepwise_frmsizes.step_width << "/" << fmt.stepwise_frmsizes.step_height
+	// 				<< "\n\tFramerate(denom/numer)\t: " << fmt.stepwise_intervals.max.denominator << "/" <<  fmt.stepwise_intervals.max.numerator
+	// 				<< " - " << fmt.stepwise_intervals.min.denominator << "/" << fmt.stepwise_intervals.min.numerator << std::endl;  
+	// 		}
+	// 	return out;
+	// }
 
 	friend bool operator==(const Formats & lhs, const Formats & rhs)
 	{

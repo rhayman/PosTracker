@@ -1,9 +1,11 @@
-#include <iostream>
+#ifdef __unix__
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <assert.h>
 #include <sys/types.h>
+
+#include <iostream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -587,3 +589,4 @@ void Camera::uninit_device()
 	}
 	is_initialized = false;
 }
+#endif

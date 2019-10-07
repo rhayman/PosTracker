@@ -5,12 +5,18 @@
 #include <opencv2/imgproc.hpp>
 #include "PosTracker.h"
 #include "PosTrackerEditor.h"
+#ifdef __unix__
 #include "Camera.h"
+#endif
+#ifdef _WIN32
+#include "CameraCV.h"
+#endif
+#include "CameraBase.h"
 #include "../cvTracking/TrackersEditor.hpp"
 
 #include <array>
 #include <vector>
-
+using namespace timey;
 // originally nabbed this from:
 // https://www.gnu.org/software/libc/manual/html_node/Elapsed-Time.html
 // then adpated to work with timespec struct as third arg (*y)
@@ -100,6 +106,7 @@ public:
 			case BORDER::RIGHT: return m_right_mat_edge;
 			case BORDER::TOP: return m_top_mat_edge;// co-ords switched
 			case BORDER::BOTTOM: return m_bottom_mat_edge;
+			default: return m_top_mat_edge;
 		}
 	};
 	cv::Rect getROIRect()
@@ -305,7 +312,7 @@ PosTracker::~PosTracker()
 void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
 {
 	xy = p->getPos();
-	tv = p->getTimeVal();
+	auto tv = p->getTimeVal();
 	xy_ts[0] = xy[0];
 	xy_ts[1] = xy[1];
 	clock_gettime(CLOCK_MONOTONIC, &ts);
@@ -657,7 +664,7 @@ std::string PosTracker::getFormatName()
 
 std::vector<std::string> PosTracker::getDeviceList()
 {
-	std::vector<std::string> devices = Camera::get_devices();
+	std::vector<std::string> devices = CameraBase::get_devices();
 	return devices;
 }
 
@@ -673,7 +680,7 @@ void PosTracker::createNewCamera(std::string dev_name)
 		}
 		currentCam.reset();
 	}
-	std::vector<std::string> devices = Camera::get_devices();
+	std::vector<std::string> devices = CameraBase::get_devices();
 	for ( auto & dev : devices )
 	{
 		if ( dev.compare(dev_name) == 0 ) {
@@ -694,11 +701,10 @@ std::pair<int,int> PosTracker::getResolution()
 		if ( currentCam->get_current_format() )
 		{
 			auto format = currentCam->get_current_format();
-			return std::make_pair<int,int>(format->width, format->height);
+			return std::make_pair<int,int>(static_cast<int>(format->width), static_cast<int>(format->height));
 		}
 	}
-	else
-		return std::make_pair<int,int>(1, 1);
+	return std::make_pair<int,int>(1, 1);
 }
 
 void PosTracker::saveCustomParametersToXml(XmlElement* xml)

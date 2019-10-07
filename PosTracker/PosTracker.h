@@ -130,11 +130,8 @@ private:
 	juce::uint32 * xy;
 	juce::uint32 * old_xy = nullptr;
 	juce::uint32 * new_xy = nullptr;
-	struct timeval tv;
 	juce::uint32 xy_ts[3];
 	struct timespec ts;
-	struct timeval tv1;
-	struct timeval result;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PosTracker);
 };
