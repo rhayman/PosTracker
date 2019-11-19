@@ -64,9 +64,11 @@ public:
 	void adjustBrightness(int val);
 	void adjustContrast(int val);
 	void adjustExposure(int val);
+	void adjustThreshold(int val);
 	int getBrightness() { return brightness; }
 	int getContrast() { return contrast; }
 	int getExposure()  { return exposure; }
+	int getThreshold() { return threshold; }
 	void overlayPath(bool state);
 	bool overlayPath() { return path_overlay; }
 	void autoExposure(bool state) { auto_exposure = state; }
@@ -112,6 +114,7 @@ private:
 	int brightness = 50;
 	int contrast = 50;
 	int exposure = 10;
+	int threshold = 100;
 	int left_border = 0;
 	int right_border = 0;
 	int top_border = 0;

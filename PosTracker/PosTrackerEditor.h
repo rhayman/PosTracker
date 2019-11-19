@@ -49,10 +49,12 @@ private:
 	std::unique_ptr<CameraControlSlider> brightnessSldr;
 	std::unique_ptr<CameraControlSlider> contrastSldr;
 	std::unique_ptr<CameraControlSlider> exposureSldr;
+	std::unique_ptr<CameraControlSlider> thresholdSldr;
 
 	std::unique_ptr<Label> brightnessVal;
 	std::unique_ptr<Label> contrastVal;
 	std::unique_ptr<Label> exposureVal;
+	std::unique_ptr<Label> thresholdLbl;
 
 	std::unique_ptr<Label> brightLbl;
 	std::unique_ptr<Label> contrLbl;

@@ -128,6 +128,7 @@ public:
 	void setROIRect(cv::Rect roi) { roi_rect = roi; }
 	void setMask(cv::Mat m) { mask = m; }
 	void setTV(struct timeval t) { m_tv = t; }
+	void setThreshold(int val) { m_thresh = val; }
 	void setTracker(cv::Ptr<cv::Tracker> t) { m_tracker = t; }
 	void setBackgroundSubtractor(cv::Ptr<cv::BackgroundSubtractor> bg) { m_background_sub = bg; }
 	void doDetection(const TrackerType method, const cv::Mat & frame, cv::Rect2d & bounding_box) {
@@ -181,7 +182,7 @@ public:
 					//DO FALL BACK METHOD
 					cv::extractChannel(frame, red_channel, 0);
 					cv::Mat roi = red_channel(roi_rect);
-					cv::threshold(roi, roi, 200, 1000, cv::THRESH_BINARY);
+					cv::threshold(roi, roi, m_thresh, 1000, cv::THRESH_BINARY);
 					fallbackDetection(roi);
 				}
 			}
@@ -192,7 +193,7 @@ public:
 		if ( ! frame.empty() ) {
 			cv::extractChannel(frame, red_channel, 0);
 			cv::Mat roi = red_channel(roi_rect);
-			cv::threshold(roi, roi, 200, 1000, cv::THRESH_BINARY);
+			cv::threshold(roi, roi, m_thresh, 1000, cv::THRESH_BINARY);
 			cv::Mat labels, stats, centroids;
 			int nlabels = cv::connectedComponentsWithStats(roi, labels, stats, centroids, 8, CV_32S, cv::CCL_WU);
 			cv::Size stats_size = stats.size();
@@ -271,6 +272,7 @@ public:
 	cv::Point maxloc;
 	juce::uint32 m_xy[2];
 	struct timeval m_tv;
+	int m_thresh = 100;
 	std::vector<cv::KeyPoint> kps;
 	cv::Rect roi_rect;
 	cv::Mat mask;
@@ -561,6 +563,13 @@ void PosTracker::adjustExposure(int val)
 	if ( currentCam )
 		currentCam->set_control_value(V4L2_CID_EXPOSURE_ABSOLUTE, val);
 	exposure = val;
+}
+
+void PosTracker::adjustThreshold(int val) {
+	if ( currentCam ) {
+		if ( pos_tracker )
+			pos_tracker->setThreshold(val);
+	}
 }
 
 void PosTracker::adjustVideoMask(BORDER edge, int val)

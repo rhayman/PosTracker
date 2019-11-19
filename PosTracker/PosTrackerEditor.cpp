@@ -10,7 +10,7 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	Typeface::Ptr typeface = new CustomTypeface(mis);
 	Font font = Font(typeface);
 
-	desiredWidth = 425;
+	desiredWidth = 495;
 	m_proc = (PosTracker*)getProcessor();
 
 	// Video source stuff
@@ -117,6 +117,22 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	exposureLbl->setColour(TextEditor::textColourId, Colours::grey);
 	addAndMakeVisible(exposureLbl.get());
 
+	// Threshold slider and label
+	thresholdSldr = std::make_unique<CameraControlSlider>(font);
+	thresholdSldr->setBounds(445, 30, 50, 50);
+	thresholdSldr->setActive(false);
+	thresholdSldr->addListener(this);
+	addAndMakeVisible(thresholdSldr.get());
+
+	thresholdLbl = std::make_unique<Label>("Threshold", "Threshold");
+	thresholdLbl->setBounds(435, 18, 70, 20);
+	thresholdLbl->setFont(font);
+	thresholdLbl->setEditable(false, false, false);
+	thresholdLbl->setJustificationType(Justification::centred);
+	thresholdLbl->setColour(TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(thresholdLbl.get());
+
+	// Need this to set up the bounds of the sliders for the window box
 	std::pair<int,int> resolution = m_proc->getResolution();
 	int width = resolution.first;
 	int height = resolution.second;
@@ -234,6 +250,12 @@ void PosTrackerEditor::sliderValueChanged(Slider * sliderChanged)
 			auto val = sliderChanged->getValue();
 			if ( m_proc->isCamReady() )
 				m_proc->adjustExposure(val);
+		}
+	}
+	if ( sliderChanged == thresholdSldr.get() ) {
+		auto val = sliderChanged->getValue();
+		if ( m_proc->isCamReady() ) {
+			m_proc->adjustThreshold(val);
 		}
 	}
 }
@@ -380,6 +402,13 @@ void PosTrackerEditor::updateSettings()
 		// int height_frac = height * 0.1;
 		topBottomSlider->setMinValue(top);
 		topBottomSlider->setMaxValue(bottom);
+
+		thresholdSldr->setActive(true);
+		Array<double>thresh_range{double(0), double(255)};
+		thresholdSldr->setValues(thresh_range);
+		thresholdSldr->setRange(0, 255, 1);
+		int new_val = m_proc->getThreshold();
+		m_proc->adjustThreshold(new_val);
 
 		m_proc->makeVideoMask();
 
