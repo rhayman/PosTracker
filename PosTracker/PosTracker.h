@@ -86,6 +86,7 @@ public:
 	void setCurrentCameraIdx(int idx) { currentCameraIdx = idx; }
 
 	std::pair<int,int> getResolution();
+	unsigned int getFrameRate();
 	int getCurrentFormatIdx() { return currentFormatIdx; }
 	Formats * getCurrentFormat();
 

@@ -51,14 +51,15 @@ int CameraCV::set_format(const unsigned int index)
 		get_formats();
 
 	Formats * thisfmt = availableFormats.at(index);
-	// attempt to set frame size
-	if ( set_framesize(thisfmt->width, thisfmt->height) ) {
+	// attempt to set frame size and sample rate
+	if (set_framesize(thisfmt->width, thisfmt->height)) {
 		std::cout << "Set frame size to " << thisfmt->width << "x" << thisfmt->height;
 		std::cout << " (w x h) on " << dev_name << std::endl;
-
-		currentFmt = thisfmt;
-		std::cout << *currentFmt << std::endl;
-		return 0;
+	}
+	cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('m', 'j', 'p', 'g'));
+	cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
+	if ( set_framerate(30) ) {
+		std::cout << "Set frame rate to 30 fps" << std::endl;
 	}
 	return 1;
 }
@@ -160,13 +161,20 @@ int CameraCV::switch_exposure_type(int autoOrManual)
 
 int CameraCV::set_control_value(__u32 id, int val)
 {
-	// CODE!
+	if (id == V4L2_CID_BRIGHTNESS)
+		cap.set(cv::CAP_PROP_BRIGHTNESS, val);
+	if (id == V4L2_CID_CONTRAST)
+		cap.set(cv::CAP_PROP_CONTRAST, val);
+	if (id == V4L2_CID_EXPOSURE_ABSOLUTE)
+		cap.set(cv::CAP_PROP_EXPOSURE, 10-val);
 	return 0;
 }
 
 int CameraCV::get_control_values(__u32 id, __s32 & min, __s32 & max, __s32 & step)
 {
-	// CODE!
+	min = 0;
+	max = 100;
+	step = 1;
 	return 0;
 }
 

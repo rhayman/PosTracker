@@ -108,6 +108,7 @@ struct Formats
 
 	std::string get_resolution() { return std::to_string(width) + "x" + std::to_string(height); }
 	std::string get_fps() { return std::to_string(int(denominator / numerator)) + " fps"; }
+	unsigned int get_framerate() { return int(denominator / numerator); }
 	std::string get_pixel_format() { return description; }
 	std::string get_description() { return get_resolution() + " " + get_fps() + " " + get_pixel_format(); }
 };
