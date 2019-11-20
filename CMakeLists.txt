@@ -6,7 +6,6 @@ include(../PluginRules.cmake)
 
 find_package( OpenCV 4.1.0 REQUIRED core highgui xfeatures2d features2d imgproc videostab tracking )
 
-
 #add sources, not including OpenEphysLib.cpp
 add_sources(${PLUGIN_NAME}
 	PosTracker/CameraBase.h
@@ -32,6 +31,4 @@ add_sources(${PLUGIN_NAME}
 	)
 
 target_link_libraries(${PLUGIN_NAME} ${OpenCV_LIBS})
-
-#optional: create IDE groups
 plugin_create_filters()

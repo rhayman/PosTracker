@@ -333,8 +333,10 @@ void PosTrackerEditor::comboBoxChanged(ComboBox* cb)
 			resolution->clear();
 		int idx = cb->getSelectedId();
 		std::string dev_name = cb->getItemText(idx-1).toStdString();
-		if ( m_proc->getDeviceName() != dev_name )
+		if (m_proc->getDeviceName() != dev_name) {
 			m_proc->createNewCamera(dev_name);
+			m_proc->getDeviceName();
+		}
 		auto fmts = m_proc->getDeviceFormats();
 		for (int i = 0; i < fmts.size(); ++i)
 			resolution->addItem(fmts[i], i+1);
@@ -413,9 +415,11 @@ void PosTrackerEditor::updateSettings()
 		m_proc->makeVideoMask();
 
 		// Ranges and step for controls
-	    __s32 min, max, step;
+		__s32 min = 0;
+		__s32 max = 100;
+		__s32 step = 10;
 	    // return code for control (0 ok, 1 fucked)
-	    int control_ok;
+	    int control_ok = 1;
 		// ------------- BRIGHTNESS ------------------
 	    control_ok = m_proc->getControlValues(V4L2_CID_BRIGHTNESS, min, max, step);
 	    Array<double>brightness_range{double(min), double(max)};

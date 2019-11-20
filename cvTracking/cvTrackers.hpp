@@ -14,7 +14,7 @@ public:
 	std::string getName() { return m_name; }
 	virtual void makeTrackerUI() = 0;
 	virtual cv::Ptr<cv::Tracker> makeTracker() = 0;
-	virtual cv::Ptr<cv::BackgroundSubtractor> makeBackgroundSubtractor() {};
+	virtual cv::Ptr<cv::BackgroundSubtractor> makeBackgroundSubtractor() { return cv::Ptr<cv::BackgroundSubtractor>(); }
 	void addLabel(const std::string & name, const std::vector<int> & bounds);
 	void addTextEditor(const std::string & name, const std::vector<int> & bounds, const std::string & initText, const std::string & tooltip);
 	void addCheckbox(const std::string & name, const std::vector<int> & bounds, const std::string & tooltip);

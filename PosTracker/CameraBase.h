@@ -4,15 +4,23 @@
 #include <iostream>
 #include <string>
 #include <vector>
+
 #ifdef __unix__
 #include <unistd.h>
 #endif
+
+#include <winsock.h>
+>>>>>>> 6033c9a39e587b8d0f1cef07dbeefa9822281347
 #include "../common.h"
 
 class CameraBase
 {
 public:
+<<<<<<< HEAD
 	CameraBase() : dev_name("/dev/video1")  {};
+=======
+	CameraBase() : dev_name("cap0")  {};
+>>>>>>> 6033c9a39e587b8d0f1cef07dbeefa9822281347
 	CameraBase(std::string _dev_name) : dev_name(_dev_name) {};
 	~CameraBase() {};
 	/*
@@ -43,33 +51,50 @@ public:
 		return device_list;
 	};
 	virtual std::vector<Formats*> get_formats() {};
-	Formats * get_current_format() { return currentFmt; };
+	/*
+	This is the method that under Linux populates the Container with valid formats
+	by iterating over the V4L2 format enum. Here we give the default Format which
+	should contain some sane values for resolution and fps etc. Apparently there
+	is no straightforward way under openCV to retrieve these values given the number
+	of APIs it has to support
+	*/
+	virtual std::vector<Formats*> get_formats() {
+		availableFormats.clear();
+		Formats *  fmt = new Formats();
+		fmt->denominator = 30;
+		fmt->numerator = 1;
+		fmt->height = 480;
+		fmt->width = 640;
+		availableFormats.push_back(fmt);
+		currentFmt = fmt;
+		return availableFormats;
+	}
+	Formats * get_current_format() { return currentFmt; }
 
 	bool ready() { return is_ready; };
 	bool initialized() { return is_initialized; }
 	bool started() { return has_started; }
 
-	virtual int open_device() {};
+	virtual int open_device() { return 1; }
 	virtual void close_device() {};
-	virtual int init_device() {};
+	virtual int init_device() { return 1; }
 	virtual void uninit_device() {};
-	virtual int start_device() {};
-	virtual int stop_device() {};
+	virtual int start_device() { return 1; }
+	virtual int stop_device() { return 1; }
 	/*
 	Reads the buffer and returns an openCV matrix & a timeval struct
 	(in time.h) of the time when the first data byte was captured
 	*/
-	virtual int read_frame(cv::Mat &, struct timeval &) {};
-
-	virtual int get_control_values(__u32, __s32 &, __s32 &, __s32 &) {};
-	virtual int set_control_value(__u32, int) {};
-	virtual int switch_exposure_type(int) {};
-	virtual int set_format() {}; // overloads below method using zero index
-	virtual int set_format(const unsigned int /* index into availableFormats */) {};
-	virtual int set_format(const std::string /* overloads with string of format from Formats::get_description()*/) {};
-	virtual int set_format(const Formats * /* overloads with Format*/) {};
-	virtual int set_framesize(const unsigned int w, const unsigned int h) {};
-	virtual int set_framerate(const unsigned int fps) {};
+	virtual int read_frame(cv::Mat &, struct timeval &) { return 1; }
+	virtual int get_control_values(__u32, __s32 &, __s32 &, __s32 &) { return 1; }
+	virtual int set_control_value(__u32, int) { return 1; }
+	virtual int switch_exposure_type(int) { return 1; }
+	virtual int set_format() { return 1; } // overloads below method using zero index
+	virtual int set_format(const unsigned int /* index into availableFormats */) { return 1; }
+	virtual int set_format(const std::string /* overloads with string of format from Formats::get_description()*/) { return 1; }
+	virtual int set_format(const Formats * /* overloads with Format*/) { return 1; }
+	virtual int set_framesize(const unsigned int w, const unsigned int h) { return 1; }
+	virtual int set_framerate(const unsigned int fps) { return 1; }
 
 	std::vector<std::string> get_format_descriptions() {
 		formatDescriptions.clear();
@@ -79,24 +104,21 @@ public:
 	}
 
 	int & getfd() { return fd; };
+
+	virtual std::string get_format_name() { return ""; }
 	std::string get_dev_name() { return dev_name; }
-	virtual std::string get_format_name() {};
 
 protected:
 	int fd = -1;
 	struct buffer *buffers;
 	unsigned int n_buffers = 0;
-	std::string dev_name ="";
+	std::string dev_name = "";
 	bool is_ready = false;
 	bool is_initialized = false;
 	bool has_started = false;
-
 	Formats * currentFmt = nullptr;
-
 	std::vector<Formats*> availableFormats;
 	std::vector<std::string> formatDescriptions;
-
-
 };
 
 #endif

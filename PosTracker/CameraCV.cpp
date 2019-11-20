@@ -1,6 +1,4 @@
 #include <iostream>
-#include <unistd.h>
-#include <assert.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -58,9 +56,9 @@ int CameraCV::set_format(const unsigned int index)
 	}
 	cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('m', 'j', 'p', 'g'));
 	cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'));
-	if ( set_framerate(30) ) {
+	if ( set_framerate(30) )
 		std::cout << "Set frame rate to 30 fps" << std::endl;
-	}
+
 	return 1;
 }
 
@@ -144,10 +142,7 @@ int CameraCV::read_frame(cv::Mat & result, struct timeval &tv)
 	return 0;
 }
 
-void CameraCV::close_device()
-{
-	fprintf(stdout, "Closing %s\n", dev_name.c_str());
-	// CLOSING CODE
+void CameraCV::close_device() {
 	cap.release();
 	fd = -1;
 	is_ready = false;
@@ -165,23 +160,21 @@ int CameraCV::set_control_value(__u32 id, int val)
 		cap.set(cv::CAP_PROP_BRIGHTNESS, val);
 	if (id == V4L2_CID_CONTRAST)
 		cap.set(cv::CAP_PROP_CONTRAST, val);
-	if (id == V4L2_CID_EXPOSURE_ABSOLUTE)
+	if (id == V4L2_CID_EXPOSURE_ABSOLUTE) {
+		//cap.set(cv::CAP_PROP_AUTO_EXPOSURE, 1);
 		cap.set(cv::CAP_PROP_EXPOSURE, 10-val);
+	}
 	return 0;
 }
 
-int CameraCV::get_control_values(__u32 id, __s32 & min, __s32 & max, __s32 & step)
-{
+int CameraCV::get_control_values(__u32 id, __s32 & min, __s32 & max, __s32 & step) {
 	min = 0;
 	max = 100;
 	step = 1;
 	return 0;
 }
 
-void CameraCV::uninit_device()
-{
-	if ( is_initialized )
-	{
-	}
+void CameraCV::uninit_device() {
+	if ( is_initialized ) {}
 	is_initialized = false;
 }

@@ -5,7 +5,8 @@
 #include <opencv2/imgproc.hpp>
 #include "PosTracker.h"
 #include "PosTrackerEditor.h"
-#include "Camera.h"
+#include "CameraCV.h"
+#include "CameraBase.h"
 #include "../cvTracking/TrackersEditor.hpp"
 
 #include <array>
@@ -51,6 +52,7 @@ public:
 			case BORDER::RIGHT: return m_right_mat_edge;
 			case BORDER::TOP: return m_top_mat_edge;// co-ords switched
 			case BORDER::BOTTOM: return m_bottom_mat_edge;
+			default: return m_top_mat_edge;
 		}
 	};
 	cv::Rect getROIRect()
@@ -175,6 +177,8 @@ public:
 		cv::minMaxLoc(roi, NULL, NULL, NULL, &maxloc, ~roi);
 		maxloc.x = maxloc.x + roi_rect.x;
 		maxloc.y = maxloc.y + roi_rect.y;
+		m_xy[0] = (juce::uint32)maxloc.x;
+		m_xy[1] = (juce::uint32)maxloc.y;
 	};
 	cv::Mat processFrame(cv::Mat & frame)
 	{
@@ -258,10 +262,12 @@ PosTracker::~PosTracker()
 void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
 {
 	xy = p->getPos();
-	tv = p->getTimeVal();
+	auto tv = p->getTimeVal();
 	xy_ts[0] = xy[0];
 	xy_ts[1] = xy[1];
-	clock_gettime(CLOCK_MONOTONIC, &ts);
+	// clock_gettime(CLOCK_MONOTONIC, &ts);
+	timespec ts{};
+
 	double nowTime = ts.tv_sec + ((double)ts.tv_nsec / 1e9);
 	double frameTime = tv.tv_sec + ((double)tv.tv_usec / 1e6);
 	double time_delta = nowTime - frameTime;
@@ -389,7 +395,7 @@ void PosTracker::showLiveStream(bool val)
 void PosTracker::run()
 {
 	cv::Mat frame,  roi;
-	struct timeval tv;
+	timeval tv;
 	std::vector<cv::Point2d> pts{2};
 	unsigned int count = 0;
 	if ( ! displayMask->getPathFrame().empty() ) {
@@ -574,7 +580,7 @@ std::vector<std::string> PosTracker::getDeviceFormats()
 {
 	if ( ! currentCam->ready() )
 		currentCam->open_device();
-	currentCam->get_formats();
+	currentCam->get_formats(); // clears the Container holding the descriptions of available camera formats
 	return currentCam->get_format_descriptions();
 }
 
@@ -617,7 +623,7 @@ std::string PosTracker::getFormatName()
 
 std::vector<std::string> PosTracker::getDeviceList()
 {
-	std::vector<std::string> devices = Camera::get_devices();
+	std::vector<std::string> devices = CameraBase::get_devices();
 	return devices;
 }
 
@@ -633,16 +639,11 @@ void PosTracker::createNewCamera(std::string dev_name)
 		}
 		currentCam.reset();
 	}
-	std::vector<std::string> devices = Camera::get_devices();
+	std::vector<std::string> devices = CameraBase::get_devices();
 	for ( auto & dev : devices )
 	{
 		if ( dev.compare(dev_name) == 0 ) {
-			#ifdef _WIN32
 			currentCam = std::make_shared<CameraCV>(dev_name);
-			#endif
-			#ifdef __unix__
-			currentCam = std::make_shared<Camera>(dev_name);
-			#endif
 		}
 	}
 }
@@ -654,11 +655,10 @@ std::pair<int,int> PosTracker::getResolution()
 		if ( currentCam->get_current_format() )
 		{
 			auto format = currentCam->get_current_format();
-			return std::make_pair<int,int>(format->width, format->height);
+			return std::make_pair<int,int>(static_cast<int>(format->width), static_cast<int>(format->height));
 		}
 	}
-	else
-		return std::make_pair<int,int>(1, 1);
+	return std::make_pair<int,int>(1, 1);
 }
 
 unsigned int PosTracker::getFrameRate() {
