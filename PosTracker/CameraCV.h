@@ -39,6 +39,7 @@ public:
 	int set_framerate(const unsigned int fps) override;
 
 	std::string get_format_name() override;
+	std::vector<Formats*> get_formats() override;
 
 private:
 	cv::VideoCapture cap;

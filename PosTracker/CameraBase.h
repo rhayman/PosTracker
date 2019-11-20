@@ -9,18 +9,16 @@
 #include <unistd.h>
 #endif
 
+#ifdef _WIN32
 #include <winsock.h>
->>>>>>> 6033c9a39e587b8d0f1cef07dbeefa9822281347
+#endif
+
 #include "../common.h"
 
 class CameraBase
 {
 public:
-<<<<<<< HEAD
-	CameraBase() : dev_name("/dev/video1")  {};
-=======
 	CameraBase() : dev_name("cap0")  {};
->>>>>>> 6033c9a39e587b8d0f1cef07dbeefa9822281347
 	CameraBase(std::string _dev_name) : dev_name(_dev_name) {};
 	~CameraBase() {};
 	/*
@@ -50,7 +48,6 @@ public:
 		#endif // __unix__
 		return device_list;
 	};
-	virtual std::vector<Formats*> get_formats() {};
 	/*
 	This is the method that under Linux populates the Container with valid formats
 	by iterating over the V4L2 format enum. Here we give the default Format which
@@ -107,6 +104,7 @@ public:
 
 	virtual std::string get_format_name() { return ""; }
 	std::string get_dev_name() { return dev_name; }
+	unsigned int getFrameRate() { return currentFmt->get_framerate(); }
 
 protected:
 	int fd = -1;

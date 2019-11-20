@@ -6,7 +6,7 @@
 #include "PosTracker.h"
 #include "PosTrackerEditor.h"
 #include "CameraCV.h"
-#include "CameraBase.h"
+#include "Camera.h"
 #include "../cvTracking/TrackersEditor.hpp"
 
 #include <array>
@@ -291,7 +291,8 @@ void PosTracker::process(AudioSampleBuffer& buffer)
 
 void PosTracker::createEventChannels()
 {
-	EventChannel * chan = new EventChannel(EventChannel::UINT32_ARRAY, 1, 3, 30, this);
+	auto camera_framerate = getFrameRate();
+	EventChannel * chan = new EventChannel(EventChannel::UINT32_ARRAY, 1, 3, camera_framerate, this);
 	chan->setName(m_dev_name);
 	chan->setDescription("x-y position of animal");
 	chan->setIdentifier("external.position.rawData");
@@ -580,7 +581,7 @@ std::vector<std::string> PosTracker::getDeviceFormats()
 {
 	if ( ! currentCam->ready() )
 		currentCam->open_device();
-	currentCam->get_formats(); // clears the Container holding the descriptions of available camera formats
+	auto f = currentCam->get_formats(); // clears the Container holding the descriptions of available camera formats
 	return currentCam->get_format_descriptions();
 }
 
@@ -639,11 +640,16 @@ void PosTracker::createNewCamera(std::string dev_name)
 		}
 		currentCam.reset();
 	}
-	std::vector<std::string> devices = CameraBase::get_devices();
+	std::vector<std::string> devices = Camera::get_devices();
 	for ( auto & dev : devices )
 	{
 		if ( dev.compare(dev_name) == 0 ) {
+			#ifdef _WIN32
 			currentCam = std::make_shared<CameraCV>(dev_name);
+			#endif
+			#ifdef __unix__
+			currentCam = std::make_shared<Camera>(dev_name);
+			#endif
 		}
 	}
 }
