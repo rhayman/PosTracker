@@ -1,7 +1,7 @@
+#include <opencv2/highgui.hpp>
 #include "cvTrackers.hpp"
 #include "TrackersEditor.hpp"
 #include "../PosTracker/PosTracker.h"
-#include <opencv2/highgui.hpp>
 
 class PosTS;
 
