@@ -619,7 +619,10 @@ std::string PosTracker::getDeviceName()
 
 std::string PosTracker::getFormatName()
 {
-	return currentCam->get_format_name();
+	std::string name;
+	if ( currentCam )
+		name = currentCam->get_format_name();
+	return name;
 }
 
 std::vector<std::string> PosTracker::getDeviceList()
