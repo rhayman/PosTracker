@@ -73,7 +73,11 @@ public:
 	bool overlayPath() { return path_overlay; }
 	void autoExposure(bool state) { auto_exposure = state; }
 	bool autoExposure() { return auto_exposure; }
-
+	void doTwoSpotTracking(bool val) { m_doTwoSpotTracking = val; }
+	bool doTwoSpotTracking() { return m_doTwoSpotTracking; }
+	void twoSpotMinDistance(unsigned int val) { m_twoSpotMinDist = val; }
+	unsigned int twoSpotMinDistance() { return m_twoSpotMinDist; }
+	
 	void adjustVideoMask(BORDER, int val);
 	void makeVideoMask();
 	int getVideoMask(BORDER);
@@ -124,6 +128,8 @@ private:
 	bool auto_exposure = false;
 	bool path_overlay = false;
 	bool m_switchPausePlay = true;
+	bool m_doTwoSpotTracking = false;
+	unsigned int m_twoSpotMinDist = 10;
 
 	std::queue<std::shared_ptr<PosTS>> posBuffer;
 

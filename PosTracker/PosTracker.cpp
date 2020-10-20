@@ -88,6 +88,8 @@ public:
 		if ( ! frame.empty() ) {
 			if ( method == TrackerType::kLED )
 				singleLEDDetection(frame);
+			else if ( method == TrackerType::kTwoSpotTracking )
+				doubleLEDDetection(frame);
 			else if ( method == TrackerType::kBACKGROUND || method == TrackerType::kBACKGROUNDKNN ) {
 				// specialised method not using opencv's Tracker API
 				if ( m_background_sub ) {
@@ -141,6 +143,53 @@ public:
 			}
 		}
 	};
+	// Deal with a directional LED setup ie one small and one large LED
+	void doubleLEDDetection(const cv::Mat & frame) {
+		if ( ! frame.empty() ) {
+			cv::extractChannel(frame, red_channel, 0);
+			cv::Mat roi = red_channel(roi_rect);
+			cv::threshold(roi, roi, m_thresh, 1000, cv::THRESH_BINARY);
+			cv::Mat labels, stats, centroids;
+			int nlabels = cv::connectedComponentsWithStats(roi, labels, stats, centroids, 8, CV_32S, cv::CCL_WU);
+			cv::Size stats_size = stats.size();
+			if ( stats_size.height > 2 ) {
+				cv::Mat sorted_stats;
+				cv::sortIdx(stats, sorted_stats, cv::SORT_ASCENDING + cv::SORT_EVERY_COLUMN);
+				
+				int bigSpotIdx = sorted_stats.at<int>(1, cv::CC_STAT_AREA); // 0 is background
+
+				double x_centroid, y_centroid;
+				
+				x_centroid = centroids.at<double>(bigSpotIdx, 0);
+				y_centroid = centroids.at<double>(bigSpotIdx, 1);
+				maxloc.x = static_cast<int>(x_centroid) + roi_rect.x;
+				maxloc.y = static_cast<int>(y_centroid) + roi_rect.y;
+
+				// try and pick out the next largest spot that is at least min_pix away
+				for (int i = 1; i < stats_size.height; i++)
+				{
+					int smallSpotIdx = stats.at<int>(i, cv::CC_STAT_AREA);
+					std::cout << "stats.size() = " << stats.size() << std::endl;
+					std::cout << "smallSpotIdx = " << smallSpotIdx << std::endl;
+					// x_centroid = centroids.at<double>(smallSpotIdx, 0);
+					// y_centroid = centroids.at<double>(smallSpotIdx, 1);
+					// maxloc2.x = static_cast<int>(x_centroid) + roi_rect.x;
+					// maxloc2.y = static_cast<int>(y_centroid) + roi_rect.y;
+
+				// 	// do the distance calculation
+				// 	double dist = std::abs(cv::norm(maxloc-maxloc2));
+				// 	if ( dist > twoSpotMinDistance ) {
+				// 		std::cout << "dist = " << dist << std::endl;
+				// 		std::cout << "twoSpotMinDistance = " << twoSpotMinDistance << std::endl;
+					// }
+				}
+			}
+			m_xy[0] = (juce::uint32)maxloc.x;
+			m_xy[1] = (juce::uint32)maxloc.y;
+			m_xy[2] = (juce::uint32)maxloc2.x;
+			m_xy[3] = (juce::uint32)maxloc2.y;
+		}
+	};
 	void singleLEDDetection(const cv::Mat & frame)
 	{
 		if ( ! frame.empty() ) {
@@ -153,7 +202,7 @@ public:
 			if ( stats_size.height > 1 ) {
 				int maxpix = 0;
 				int biggestComponent = 0;
-				for (int i = 1; i < stats_size.height; ++i)
+				for (int i = 1; i < stats_size.height; ++i) // starts at 1 as 0 is background
 				{
 					if ( stats.at<int>(i, cv::CC_STAT_AREA) > maxpix ) {
 						maxpix = stats.at<int>(i, cv::CC_STAT_AREA);
@@ -171,6 +220,8 @@ public:
 
 			m_xy[0] = (juce::uint32)maxloc.x;
 			m_xy[1] = (juce::uint32)maxloc.y;
+			m_xy[2] = (juce::uint32)maxloc2.x;
+			m_xy[3] = (juce::uint32)maxloc2.y;
 		}
 	};
 	void fallbackDetection(cv::Mat roi) {
@@ -224,8 +275,8 @@ public:
 	};
 	cv::Mat kern = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
 	cv::Mat red_channel, m_src;
-	cv::Point maxloc;
-	juce::uint32 m_xy[2];
+	cv::Point maxloc, maxloc2;
+	juce::uint32 m_xy[4] = {}; // zero-initialize the array
 	struct timeval m_tv;
 	int m_thresh = 100;
 	std::vector<cv::KeyPoint> kps;
@@ -234,6 +285,8 @@ public:
 	cv::Ptr<cv::Tracker> m_tracker;
 	cv::Ptr<cv::BackgroundSubtractor> m_background_sub;
 	bool trackerIsInit = false;
+	bool useTwoSpotTracking = false;
+	unsigned int twoSpotMinDistance = 10;
 private:
 };
 
@@ -262,17 +315,11 @@ PosTracker::~PosTracker()
 void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
 {
 	xy = p->getPos();
-	auto tv = p->getTimeVal();
 	xy_ts[0] = xy[0];
 	xy_ts[1] = xy[1];
-	// clock_gettime(CLOCK_MONOTONIC, &ts);
-	timespec ts{};
-
-	double nowTime = ts.tv_sec + ((double)ts.tv_nsec / 1e9);
-	double frameTime = tv.tv_sec + ((double)tv.tv_usec / 1e6);
-	double time_delta = nowTime - frameTime;
-	xy_ts[2] = juce::uint32(time_delta * 1e6);
-	BinaryEventPtr event = BinaryEvent::createBinaryEvent(messageChannel, CoreServices::getGlobalTimestamp(), xy_ts, sizeof(juce::uint32)*3);
+	xy_ts[2] = xy[2];
+	xy_ts[3] = xy[3];
+	BinaryEventPtr event = BinaryEvent::createBinaryEvent(messageChannel, CoreServices::getGlobalTimestamp(), xy_ts, sizeof(juce::uint32)*4);
 	addEvent(messageChannel, event, 0);
 }
 
@@ -292,7 +339,7 @@ void PosTracker::process(AudioSampleBuffer& buffer)
 void PosTracker::createEventChannels()
 {
 	auto camera_framerate = getFrameRate();
-	EventChannel * chan = new EventChannel(EventChannel::UINT32_ARRAY, 1, 3, camera_framerate, this);
+	EventChannel * chan = new EventChannel(EventChannel::UINT32_ARRAY, 1, 4, camera_framerate, this);
 	chan->setName(m_dev_name);
 	chan->setDescription("x-y position of animal");
 	chan->setIdentifier("external.position.rawData");
@@ -404,12 +451,19 @@ void PosTracker::run()
 	}
 
 	auto ed = static_cast<PosTrackerEditor*>(getEditor());
-
+		
 	pos_tracker = std::make_shared<PosTS>(tv, frame);
 
 	// check if we have a destination node of Tracking API...
 	Trackers * tracker_proc = (Trackers*)getDestNode();
 	TrackerType kind_of_tracker = TrackerType::kLED;
+	if ( doTwoSpotTracking() ) {
+		kind_of_tracker = TrackerType::kTwoSpotTracking;
+		pos_tracker->useTwoSpotTracking = true;
+	}
+	else
+		pos_tracker->useTwoSpotTracking = false;
+
 	if ( tracker_proc && (tracker_proc->getName() == String("Tracker API") ) ) {
 		kind_of_tracker = tracker_proc->getTrackerID();
 	}
@@ -458,7 +512,9 @@ void PosTracker::run()
 					}
 					cv_tracker_init = true;
 				}
-
+				if ( doTwoSpotTracking() ) {
+					pos_tracker->twoSpotMinDistance = twoSpotMinDistance();
+				}
 				// Do the actual detection using whatever method the user asked for
 				cv::Rect2d bb;
 				pos_tracker->doDetection(kind_of_tracker, frame, bb);
@@ -478,7 +534,12 @@ void PosTracker::run()
 						cv::line(pathFrame, pts[0], pts[1], cv::Scalar(0,255,0), 2, cv::LINE_8);
 						cv::addWeighted(frame, 1.0, pathFrame, 0.5, 0.0, frame);
 					}
+					// Draw a little red square to denote the tracked position...
 					cv::rectangle(frame, cv::Point(double(xy[0])-3, double(xy[1])-3), cv::Point(double(xy[0])+3, double(xy[1])+3), cv::Scalar(0,0,255), -1,1);
+					// and a little yellow one in the case of two-spot tracking
+					if ( doTwoSpotTracking() ) {
+						cv::rectangle(frame, cv::Point(double(xy[2])-3, double(xy[3])-3), cv::Point(double(xy[2])+3, double(xy[3])+3), cv::Scalar(0,255,255), -1,1);
+					}
 					if ( ! bb.empty() ) {
 						cv::rectangle(frame, bb, cv::Scalar(255, 0, 0), 1, 1);
 					}
@@ -677,8 +738,7 @@ unsigned int PosTracker::getFrameRate() {
 			return format->get_framerate();
 		}
 	}
-	else
-		return 0;
+	return 0;
 }
 
 void PosTracker::saveCustomParametersToXml(XmlElement* xml)

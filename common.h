@@ -140,6 +140,7 @@ static const std::vector<std::string> kcf_modes {"GRAY", "COLOR"};
 
 enum class TrackerType : int {
 	kLED = 0,
+	kTwoSpotTracking,
 	kBoosting,
 	kGOTURN,
 	kKCF,

@@ -18,7 +18,7 @@ enum class InfoLabelType
 	YPOS
 };
 
-class PosTrackerEditor : public GenericEditor, public ComboBox::Listener
+class PosTrackerEditor : public GenericEditor, public ComboBox::Listener, public TextEditor::Listener
 {
 public:
 	PosTrackerEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors);
@@ -28,6 +28,8 @@ public:
 
 	void comboBoxChanged(ComboBox* cb);
 	void buttonEvent(Button* button);
+	void textEditorReturnKeyPressed(TextEditor &);
+	unsigned int getTwoSpotMinDistance();
 	void updateSettings();
 	void update();
 
@@ -45,6 +47,11 @@ private:
 	std::unique_ptr<ToggleButton> showVideo;
 	std::unique_ptr<ToggleButton> autoExposure;
 	std::unique_ptr<ToggleButton> overlayPath;
+	std::unique_ptr<ToggleButton> twoSpotTracking;
+
+	std::unique_ptr<TextEditor> twoSpotMinDistance;
+	std::unique_ptr<TextEditor> twoSpotBigSpotSize;
+	std::unique_ptr<TextEditor> twoSpotSmallSpotSize;
 
 	std::unique_ptr<CameraControlSlider> brightnessSldr;
 	std::unique_ptr<CameraControlSlider> contrastSldr;

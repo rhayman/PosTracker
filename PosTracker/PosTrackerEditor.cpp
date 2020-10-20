@@ -70,6 +70,41 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	overlayPath->addListener(this);
 	addAndMakeVisible(overlayPath.get());
 
+	// two spot tracking button
+	twoSpotTracking = std::make_unique<ToggleButton>("Two spot");
+	twoSpotTracking->setBounds(400, 72, 60, 40); //  smaller than this and the JUCE graphics_context goes mental
+	twoSpotTracking->setTooltip("Use two-spot tracking");
+	twoSpotTracking->setToggleState(false, dontSendNotification);
+	twoSpotTracking->addListener(this);
+	addAndMakeVisible(twoSpotTracking.get());
+
+	// two spot tracking big spot size
+	twoSpotBigSpotSize = std::make_unique<TextEditor>("Big spot size");
+	twoSpotBigSpotSize->setBounds(403,102, 30, 20); //  smaller than this and the JUCE graphics_context goes mental
+	twoSpotBigSpotSize->setTooltip("Max area of the big spot");
+	twoSpotBigSpotSize->setFont(font);
+	twoSpotBigSpotSize->setText("300", false);
+	twoSpotBigSpotSize->addListener(this);
+	addAndMakeVisible(twoSpotBigSpotSize.get());
+
+	// two spot tracking small spot size
+	twoSpotSmallSpotSize = std::make_unique<TextEditor>("Small spot size");
+	twoSpotSmallSpotSize->setBounds(428, 102, 30, 20); //  smaller than this and the JUCE graphics_context goes mental
+	twoSpotSmallSpotSize->setTooltip("Max area of the small spot");
+	twoSpotSmallSpotSize->setFont(font);
+	twoSpotSmallSpotSize->setText("100", false);
+	twoSpotSmallSpotSize->addListener(this);
+	addAndMakeVisible(twoSpotSmallSpotSize.get());
+
+	// two spot tracking minimum distance
+	twoSpotMinDistance = std::make_unique<TextEditor>("2-spot min dist");
+	twoSpotMinDistance->setBounds(453, 102, 30, 20); //  smaller than this and the JUCE graphics_context goes mental
+	twoSpotMinDistance->setTooltip("Min distance between the 2 LEDs");
+	twoSpotMinDistance->setFont(font);
+	twoSpotMinDistance->setText("10", false);
+	twoSpotMinDistance->addListener(this);
+	addAndMakeVisible(twoSpotMinDistance.get());
+
 	// Values used for control ranges & step
 	__s32 min, max, step;
 	// Brightness slider and label
@@ -322,6 +357,12 @@ void PosTrackerEditor::buttonEvent(Button* button)
 		else
 			m_proc->overlayPath(false);
 	}
+	if ( button == twoSpotTracking.get() ) {
+		if ( twoSpotTracking->getToggleState() == true )
+			m_proc->doTwoSpotTracking(true);
+		else
+			m_proc->doTwoSpotTracking(false);
+	}
 }
 
 void PosTrackerEditor::comboBoxChanged(ComboBox* cb)
@@ -350,6 +391,20 @@ void PosTrackerEditor::comboBoxChanged(ComboBox* cb)
 		showVideo->setEnabled(true);
 		updateSettings();
 	}
+}
+
+void PosTrackerEditor::textEditorReturnKeyPressed(TextEditor & te) {
+	if ( &te == twoSpotMinDistance.get() ) {
+		auto mindist = getTwoSpotMinDistance();
+		m_proc->twoSpotMinDistance(mindist);
+	}
+}
+
+unsigned int PosTrackerEditor::getTwoSpotMinDistance() {
+	std::string str = twoSpotMinDistance->getText().toStdString();
+	if ( str.empty() )
+		str = "10";
+	return std::stoul(str);
 }
 
 void PosTrackerEditor::updateSettings()
@@ -472,6 +527,13 @@ void PosTrackerEditor::updateSettings()
 	    	overlayPath->setToggleState(true, sendNotification);
 	    else
 	    	overlayPath->setToggleState(false, sendNotification);
+
+		// two spot tracking?
+	    bool two_spot = m_proc->doTwoSpotTracking();
+	    if ( two_spot )
+	    	twoSpotTracking->setToggleState(true, sendNotification);
+	    else
+	    	twoSpotTracking->setToggleState(false, sendNotification);
 
 	    showVideo->setEnabled(true);
 	}
