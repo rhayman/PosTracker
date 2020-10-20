@@ -28,15 +28,17 @@ AudioProcessorEditor * Trackers::createEditor() {
 void Trackers::saveCustomParametersToXml(XmlElement * xml)
 {
 	xml->setAttribute("Type", "Trackers");
-	XmlElement * paramXml = xml->createNewChildElement("Parameters");
-	auto ed = static_cast<GenericEditor*>(getEditor());
+	XmlElement * paramXml = xml->createNewChildElement("Tracker");
+	auto ed = static_cast<TrackersEditor*>(getEditor());
+	auto name = ed->getTrackerName();
+	paramXml->setAttribute("TrackerName", name);
+	ed->saveToXml(paramXml);
 }
 
 void Trackers::loadCustomParametersFromXml()
 {
-	auto ed = static_cast<GenericEditor*>(getEditor());
-	forEachXmlChildElementWithTagName(*parametersAsXml, paramXml, "Parameters")
-	{
-	}
+	auto ed = static_cast<TrackersEditor*>(getEditor());
+	forEachXmlChildElementWithTagName(*parametersAsXml, paramXml, "Tracker")
+		ed->loadXmlParams(paramXml);
 	updateSettings();
 };

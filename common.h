@@ -8,42 +8,53 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <stdint.h>
+
+#ifdef __unix__
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
+#endif
 
-#define CLEAR(x) memset(&(x), 0, sizeof(x))
-
-struct buffer {
-	void   *start;
-	size_t  length;
+#ifdef _WIN32
+struct timeval
+{
+	std::string aww("Imma empty!");
 };
+#endif
 
-static void errno_exit(const char *s)
-{
-	fprintf(stderr, "%s error %d, %s\\n", s, errno, strerror(errno));
-	exit(EXIT_FAILURE);
-};
+#ifdef __unix__
+	#define CLEAR(x) memset(&(x), 0, sizeof(x))
 
-static void errno_exit(std::string s)
-{
-	const char * c = s.c_str();
-	fprintf(stderr, "%s error %d, %s\\n", c, errno, strerror(errno));
-	exit(EXIT_FAILURE);
-}
+	struct buffer {
+		void   *start;
+		size_t  length;
+	};
 
-static int xioctl(int fh, int request, void *arg)
-{
-	int r;
-
-	do
+	static void errno_exit(const char *s)
 	{
-		r = ioctl(fh, request, arg);
+		fprintf(stderr, "%s error %d, %s\\n", s, errno, strerror(errno));
+		exit(EXIT_FAILURE);
+	};
+
+	static void errno_exit(std::string s)
+	{
+		const char * c = s.c_str();
+		fprintf(stderr, "%s error %d, %s\\n", c, errno, strerror(errno));
+		exit(EXIT_FAILURE);
 	}
-	while (-1 == r && EINTR == errno);
 
-	return r;
-};
+	static int xioctl(int fh, int request, void *arg)
+	{
+		int r;
 
+		do
+		{
+			r = ioctl(fh, request, arg);
+		}
+		while (-1 == r && EINTR == errno);
+
+		return r;
+	};
+#endif //__unix__
 
 template <typename T>
 std::string charcode2str(T & in)
@@ -52,11 +63,6 @@ std::string charcode2str(T & in)
 	char c[sz+1] = {0};
 	strncpy(c, (char*)&in, sz);
 	return std::string(c);
-};
-
-struct CameraControlProps
-{
-	bool available;
 };
 
 struct Formats
@@ -96,12 +102,13 @@ struct Formats
 
 	friend bool operator==(const Formats & lhs, const Formats & rhs)
 	{
-		return lhs.numerator == rhs.numerator && lhs.denominator == rhs.denominator && 
+		return lhs.numerator == rhs.numerator && lhs.denominator == rhs.denominator &&
 			   lhs.width == rhs.width && lhs.height == rhs.height;
 	}
 
 	std::string get_resolution() { return std::to_string(width) + "x" + std::to_string(height); }
 	std::string get_fps() { return std::to_string(int(denominator / numerator)) + " fps"; }
+	unsigned int get_framerate() { return int(denominator / numerator); }
 	std::string get_pixel_format() { return description; }
 	std::string get_description() { return get_resolution() + " " + get_fps() + " " + get_pixel_format(); }
 };

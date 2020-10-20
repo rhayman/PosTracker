@@ -1,26 +1,20 @@
-#ifndef CAMERA_H_
-#define CAMERA_H_
+#ifndef CAMERACV_H_
+#define CAMERACV_H_
 
-#include <iostream>
-#include <string>
-#include <vector>
+#include "CameraBase.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "../common.h"
-#include "CameraBase.h"
+#include <opencv2/videoio.hpp>
 
-class Camera : public CameraBase
+class CameraCV : public CameraBase
 {
 public:
-	Camera() : CameraBase("/dev/video1")  {};
-	Camera(std::string _dev_name) : CameraBase(_dev_name) {};
-	~Camera();
-	/*
-	Returns a list of attached video devices e.g /dev/vided0 etc
-	NB doesn't open them or assign fd
-	*/
-	std::vector<Formats*> get_formats() override;
+	CameraCV() : CameraBase("cap0") {};
+	CameraCV(std::string _dev_name) : CameraBase(_dev_name) {};
+	~CameraCV();
+
+	//std::vector<Formats*> get_formats() override;
 
 	int open_device() override;
 	void close_device() override;
@@ -45,9 +39,14 @@ public:
 	int set_framerate(const unsigned int fps) override;
 
 	std::string get_format_name() override;
+	std::vector<Formats*> get_formats() override;
 
 private:
-	void init_mmap();
+	cv::VideoCapture cap;
+	// Default a list of Formats under openCV as there is no 'easy' way to
+	// interrogate all the available formats, framerates, frame widths/ heights
+	// etc etc according to the interwebs
+	// TODO
 };
 
 #endif

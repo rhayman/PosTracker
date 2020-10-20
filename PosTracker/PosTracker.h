@@ -9,7 +9,7 @@
 #include "../common.h"
 #include <ProcessorHeaders.h>
 
-class Camera;
+class CameraBase;
 class PosTS;
 class DisplayMask;
 
@@ -64,9 +64,11 @@ public:
 	void adjustBrightness(int val);
 	void adjustContrast(int val);
 	void adjustExposure(int val);
+	void adjustThreshold(int val);
 	int getBrightness() { return brightness; }
 	int getContrast() { return contrast; }
 	int getExposure()  { return exposure; }
+	int getThreshold() { return threshold; }
 	void overlayPath(bool state);
 	bool overlayPath() { return path_overlay; }
 	void autoExposure(bool state) { auto_exposure = state; }
@@ -79,11 +81,12 @@ public:
 	std::vector<std::string> getDeviceFormats();
 	void setDeviceFormat(std::string);
 
-	std::shared_ptr<Camera> getCurrentCamera() { return currentCam; }
+	std::shared_ptr<CameraBase> getCurrentCamera() { return currentCam; }
 	int getCurrentCameraIdx() { return currentCameraIdx; }
 	void setCurrentCameraIdx(int idx) { currentCameraIdx = idx; }
 
 	std::pair<int,int> getResolution();
+	unsigned int getFrameRate();
 	int getCurrentFormatIdx() { return currentFormatIdx; }
 	Formats * getCurrentFormat();
 
@@ -100,7 +103,7 @@ private:
 	bool liveStream = false;
 	int currentCameraIdx = -1;
 	int currentFormatIdx = -1;
-	std::shared_ptr<Camera> currentCam;
+	std::shared_ptr<CameraBase> currentCam;
 
 	std::unique_ptr<DisplayMask> displayMask;
 
@@ -112,6 +115,7 @@ private:
 	int brightness = 50;
 	int contrast = 50;
 	int exposure = 10;
+	int threshold = 100;
 	int left_border = 0;
 	int right_border = 0;
 	int top_border = 0;
@@ -130,11 +134,8 @@ private:
 	juce::uint32 * xy;
 	juce::uint32 * old_xy = nullptr;
 	juce::uint32 * new_xy = nullptr;
-	struct timeval tv;
 	juce::uint32 xy_ts[3];
-	struct timespec ts;
-	struct timeval tv1;
-	struct timeval result;
+	timespec ts;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PosTracker);
 };

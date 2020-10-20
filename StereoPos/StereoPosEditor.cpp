@@ -1,6 +1,7 @@
 #include "StereoPosEditor.h"
+#ifdef __unix__
 #include <unistd.h>
-
+#endif
 StereoPosEditor::StereoPosEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors=true)
 	: GenericEditor(parentNode, useDefaultParameterEditors)
 {
@@ -161,6 +162,7 @@ double StereoPosEditor::getBoardDims(BOARDPROP prop) {
 		case BOARDPROP::kSquareSize: {
 			return boardSquareSizeText->getText().getDoubleValue();
 		}
+		default: return 1.0;
 	}
 }
 
@@ -190,6 +192,7 @@ BOARDPROP StereoPosEditor::getBoardType() {
 			return BOARDPROP::kCircularSymmetric;
 		case 3:
 			return BOARDPROP::kCircularAsymmetric;
+		default: return BOARDPROP::kChessBoard;
 	}
 }
 

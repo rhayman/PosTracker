@@ -4,7 +4,6 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/features2d.hpp>
 #include <opencv2/calib3d.hpp>
-#include <unistd.h>
 #include <cuchar>
 #include <ctime>
 #include <algorithm>
@@ -12,7 +11,7 @@
 #include "StereoPos.h"
 #include "StereoPosEditor.h"
 #include "../PosTracker/PosTracker.h"
-#include "../PosTracker/Camera.h"
+#include "../PosTracker/CameraCV.h"
 
 template<typename T>
 using ioArray = std::vector<std::vector<T>>;

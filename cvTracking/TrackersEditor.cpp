@@ -1,7 +1,7 @@
+#include <opencv2/highgui.hpp>
 #include "cvTrackers.hpp"
 #include "TrackersEditor.hpp"
 #include "../PosTracker/PosTracker.h"
-#include <opencv2/highgui.hpp>
 
 class PosTS;
 
@@ -46,6 +46,7 @@ void TrackersEditor::buttonEvent(Button * button) {
 		cv::Mat frame_clone;
 		int idx = trackerCombo->getSelectedId() - 1;
 		auto trackerKind = kTrackers[idx];
+		// TODO: switch / case this
 		if ( trackerKind != "LED" && trackerKind != "Background" && trackerKind != "BackgroundKNN") {
 			if ( m_trackerUI ) {
 				auto tracker = m_trackerUI->makeTracker();
@@ -91,53 +92,91 @@ void TrackersEditor::comboBoxChanged(ComboBox * box) {
 	if ( box == trackerCombo.get() ) {
 		int idx = trackerCombo->getSelectedId() - 1;
 		auto trackerKind = kTrackers[idx];
-		if ( ! m_UIElements.empty() )
-			m_UIElements.clear();
-		if ( trackerKind == "Boosting" ) {
-			m_proc->setTrackerID(TrackerType::kBoosting);
-			m_trackerUI = std::make_unique<BoostingTracker>(this, "Boosting");
-			m_trackerUI->makeTrackerUI();
-		}
-		if ( trackerKind == "KCF" ) {
-			m_proc->setTrackerID(TrackerType::kKCF);
-			m_trackerUI = std::make_unique<KCFTracker>(this, "KCF");
-			m_trackerUI->makeTrackerUI();
-		}
-		if ( trackerKind == "MedianFlow") {
-			m_proc->setTrackerID(TrackerType::kMedianFlow);
-			m_trackerUI = std::make_unique<MedianFlow>(this, "MedianFlow");
-			m_trackerUI->makeTrackerUI();
-		}
-		if ( trackerKind == "MIL") {
-			m_proc->setTrackerID(TrackerType::kMedianFlow);
-			m_trackerUI = std::make_unique<MIL>(this, "MIL");
-			m_trackerUI->makeTrackerUI();
-		}
-		if ( trackerKind == "Background" ) {
-			m_proc->setTrackerID(TrackerType::kBACKGROUND);
-			m_trackerUI = std::make_unique<Background>(this, "Background");
-			m_trackerUI->makeTrackerUI();
-			auto bg_tracker = m_trackerUI->makeBackgroundSubtractor();
-			setBackgroundSubtractor(bg_tracker);
-		}
-		if ( trackerKind == "BackgroundKNN" ) {
-			m_proc->setTrackerID(TrackerType::kBACKGROUNDKNN);
-			m_trackerUI = std::make_unique<BackgroundKNN>(this, "BackgroundKNN");
-			m_trackerUI->makeTrackerUI();
-			auto bg_tracker = m_trackerUI->makeBackgroundSubtractor();
-			setBackgroundSubtractor(bg_tracker);
-		}
-		// TODO: MAKE THE OTHER TRACKER TYPES HERE
+		// clear the containers holding the UI elements
+		makeTracker(trackerKind);
+		//TODO: MAKE THE OTHER TRACKER TYPES HERE
 		updateSettings();
+	}
+}
+
+void TrackersEditor::makeTracker(const std::string & trackerKind) {
+	if ( trackerKind == "Boosting" ) {
+		m_proc->setTrackerID(TrackerType::kBoosting);
+		m_trackerUI = std::make_unique<BoostingTracker>(this, "Boosting");
+		m_trackerUI->makeTrackerUI();
+	}
+	if ( trackerKind == "KCF" ) {
+		m_proc->setTrackerID(TrackerType::kKCF);
+		m_trackerUI = std::make_unique<KCFTracker>(this, "KCF");
+		m_trackerUI->makeTrackerUI();
+	}
+	if ( trackerKind == "MedianFlow") {
+		m_proc->setTrackerID(TrackerType::kMedianFlow);
+		m_trackerUI = std::make_unique<MedianFlow>(this, "MedianFlow");
+		m_trackerUI->makeTrackerUI();
+	}
+	if ( trackerKind == "MIL") {
+		m_proc->setTrackerID(TrackerType::kMedianFlow);
+		m_trackerUI = std::make_unique<MIL>(this, "MIL");
+		m_trackerUI->makeTrackerUI();
+	}
+	if ( trackerKind == "Background" ) {
+		m_proc->setTrackerID(TrackerType::kBACKGROUND);
+		m_trackerUI = std::make_unique<Background>(this, "Background");
+		m_trackerUI->makeTrackerUI();
+		auto bg_tracker = m_trackerUI->makeBackgroundSubtractor();
+		setBackgroundSubtractor(bg_tracker);
+	}
+	if ( trackerKind == "BackgroundKNN" ) {
+		m_proc->setTrackerID(TrackerType::kBACKGROUNDKNN);
+		m_trackerUI = std::make_unique<BackgroundKNN>(this, "BackgroundKNN");
+		m_trackerUI->makeTrackerUI();
+		auto bg_tracker = m_trackerUI->makeBackgroundSubtractor();
+		setBackgroundSubtractor(bg_tracker);
 	}
 }
 
 void TrackersEditor::updateSettings() {
 	if ( m_trackerUI ) {
-		if ( ! m_trackerUI->m_UIElements.empty() ) {
-			for ( auto & element : m_trackerUI->m_UIElements ) {
+		if ( ! m_trackerUI->m_UILabels.empty() ) {
+			for ( auto & element : m_trackerUI->m_UILabels ) {
+				addAndMakeVisible(element.get());
+			}
+		}
+		if ( ! m_trackerUI->m_UITextEditors.empty() ) {
+			for ( auto & element : m_trackerUI->m_UITextEditors ) {
+				addAndMakeVisible(element.get());
+			}
+		}
+		if ( ! m_trackerUI->m_UICheckBoxes.empty() ) {
+			for ( auto & element : m_trackerUI->m_UICheckBoxes ) {
+				addAndMakeVisible(element.get());
+			}
+		}
+		if ( ! m_trackerUI->m_UIComboBoxes.empty() ) {
+			for ( auto & element : m_trackerUI->m_UIComboBoxes ) {
 				addAndMakeVisible(element.get());
 			}
 		}
 	}
+}
+
+void TrackersEditor::loadXmlParams(XmlElement * paramXml) {
+	// get the name of the tracker from the xml file
+	auto tracker_name = paramXml->getStringAttribute("TrackerName");
+	makeTracker(tracker_name.toStdString());
+	if ( m_trackerUI  ) {
+		forEachXmlChildElement(*paramXml, childElement) {
+			forEachXmlChildElement(*childElement, UIElement) {
+				auto name = UIElement->getTagName();
+				auto val = UIElement->getStringAttribute("Value");
+				m_trackerUI->setValue(name, val);
+			}
+		}
+		for (int i = 0; i < kTrackers.size(); ++i) {
+			if ( tracker_name == kTrackers[i] )
+				trackerCombo->setSelectedId(i+1, dontSendNotification);
+		}
+	}
+	updateSettings();
 }

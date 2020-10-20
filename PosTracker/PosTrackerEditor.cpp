@@ -10,7 +10,7 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	Typeface::Ptr typeface = new CustomTypeface(mis);
 	Font font = Font(typeface);
 
-	desiredWidth = 425;
+	desiredWidth = 495;
 	m_proc = (PosTracker*)getProcessor();
 
 	// Video source stuff
@@ -117,6 +117,22 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	exposureLbl->setColour(TextEditor::textColourId, Colours::grey);
 	addAndMakeVisible(exposureLbl.get());
 
+	// Threshold slider and label
+	thresholdSldr = std::make_unique<CameraControlSlider>(font);
+	thresholdSldr->setBounds(445, 30, 50, 50);
+	thresholdSldr->setActive(false);
+	thresholdSldr->addListener(this);
+	addAndMakeVisible(thresholdSldr.get());
+
+	thresholdLbl = std::make_unique<Label>("Threshold", "Threshold");
+	thresholdLbl->setBounds(435, 18, 70, 20);
+	thresholdLbl->setFont(font);
+	thresholdLbl->setEditable(false, false, false);
+	thresholdLbl->setJustificationType(Justification::centred);
+	thresholdLbl->setColour(TextEditor::textColourId, Colours::grey);
+	addAndMakeVisible(thresholdLbl.get());
+
+	// Need this to set up the bounds of the sliders for the window box
 	std::pair<int,int> resolution = m_proc->getResolution();
 	int width = resolution.first;
 	int height = resolution.second;
@@ -236,6 +252,12 @@ void PosTrackerEditor::sliderValueChanged(Slider * sliderChanged)
 				m_proc->adjustExposure(val);
 		}
 	}
+	if ( sliderChanged == thresholdSldr.get() ) {
+		auto val = sliderChanged->getValue();
+		if ( m_proc->isCamReady() ) {
+			m_proc->adjustThreshold(val);
+		}
+	}
 }
 
 void PosTrackerEditor::buttonEvent(Button* button)
@@ -311,9 +333,12 @@ void PosTrackerEditor::comboBoxChanged(ComboBox* cb)
 			resolution->clear();
 		int idx = cb->getSelectedId();
 		std::string dev_name = cb->getItemText(idx-1).toStdString();
-		if ( m_proc->getDeviceName() != dev_name )
+		if (m_proc->getDeviceName() != dev_name) {
 			m_proc->createNewCamera(dev_name);
+			m_proc->getDeviceName();
+		}
 		auto fmts = m_proc->getDeviceFormats();
+		std::cout << "fmts.size() " << fmts.size() << std::endl;
 		for (int i = 0; i < fmts.size(); ++i)
 			resolution->addItem(fmts[i], i+1);
 	}
@@ -381,12 +406,21 @@ void PosTrackerEditor::updateSettings()
 		topBottomSlider->setMinValue(top);
 		topBottomSlider->setMaxValue(bottom);
 
+		thresholdSldr->setActive(true);
+		Array<double>thresh_range{double(0), double(255)};
+		thresholdSldr->setValues(thresh_range);
+		thresholdSldr->setRange(0, 255, 1);
+		int new_val = m_proc->getThreshold();
+		m_proc->adjustThreshold(new_val);
+
 		m_proc->makeVideoMask();
 
 		// Ranges and step for controls
-	    __s32 min, max, step;
+		__s32 min = 0;
+		__s32 max = 100;
+		__s32 step = 10;
 	    // return code for control (0 ok, 1 fucked)
-	    int control_ok;
+	    int control_ok = 1;
 		// ------------- BRIGHTNESS ------------------
 	    control_ok = m_proc->getControlValues(V4L2_CID_BRIGHTNESS, min, max, step);
 	    Array<double>brightness_range{double(min), double(max)};

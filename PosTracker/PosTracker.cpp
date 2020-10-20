@@ -5,60 +5,12 @@
 #include <opencv2/imgproc.hpp>
 #include "PosTracker.h"
 #include "PosTrackerEditor.h"
+#include "CameraCV.h"
 #include "Camera.h"
 #include "../cvTracking/TrackersEditor.hpp"
 
 #include <array>
 #include <vector>
-
-// originally nabbed this from:
-// https://www.gnu.org/software/libc/manual/html_node/Elapsed-Time.html
-// then adpated to work with timespec struct as third arg (*y)
-int timevalspec_subtract (struct timeval *result, struct timeval *x, struct timeval *y)
-{
-  /* Perform the carry for the later subtraction by updating y. */
-  if (x->tv_usec < y->tv_usec) {
-    int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
-    y->tv_usec -= 1000000 * nsec;
-    y->tv_sec += nsec;
-  }
-  if (x->tv_usec - y->tv_usec > 1000000) {
-    int nsec = (x->tv_usec - y->tv_usec) / 1000000;
-    y->tv_usec += 1000000 * nsec;
-    y->tv_sec -= nsec;
-  }
-
-  /* Compute the time remaining to wait.
-     tv_usec is certainly positive. */
-  result->tv_sec = x->tv_sec - y->tv_sec;
-  result->tv_usec = x->tv_usec - y->tv_usec;
-
-  /* Return 1 if result is negative. */
-  return x->tv_sec < y->tv_sec;
-};
-int
-timeval_subtract (struct timeval *result, struct timeval *x, struct timeval *y)
-{
-  /* Perform the carry for the later subtraction by updating y. */
-  if (x->tv_usec < y->tv_usec) {
-    int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
-    y->tv_usec -= 1000000 * nsec;
-    y->tv_sec += nsec;
-  }
-  if (x->tv_usec - y->tv_usec > 1000000) {
-    int nsec = (x->tv_usec - y->tv_usec) / 1000000;
-    y->tv_usec += 1000000 * nsec;
-    y->tv_sec -= nsec;
-  }
-
-  /* Compute the time remaining to wait.
-     tv_usec is certainly positive. */
-  result->tv_sec = x->tv_sec - y->tv_sec;
-  result->tv_usec = x->tv_usec - y->tv_usec;
-
-  /* Return 1 if result is negative. */
-  return x->tv_sec < y->tv_sec;
-};
 
 /*
 A class for decorating the video output frame with a windowed border,
@@ -100,6 +52,7 @@ public:
 			case BORDER::RIGHT: return m_right_mat_edge;
 			case BORDER::TOP: return m_top_mat_edge;// co-ords switched
 			case BORDER::BOTTOM: return m_bottom_mat_edge;
+			default: return m_top_mat_edge;
 		}
 	};
 	cv::Rect getROIRect()
@@ -128,6 +81,7 @@ public:
 	void setROIRect(cv::Rect roi) { roi_rect = roi; }
 	void setMask(cv::Mat m) { mask = m; }
 	void setTV(struct timeval t) { m_tv = t; }
+	void setThreshold(int val) { m_thresh = val; }
 	void setTracker(cv::Ptr<cv::Tracker> t) { m_tracker = t; }
 	void setBackgroundSubtractor(cv::Ptr<cv::BackgroundSubtractor> bg) { m_background_sub = bg; }
 	void doDetection(const TrackerType method, const cv::Mat & frame, cv::Rect2d & bounding_box) {
@@ -181,7 +135,7 @@ public:
 					//DO FALL BACK METHOD
 					cv::extractChannel(frame, red_channel, 0);
 					cv::Mat roi = red_channel(roi_rect);
-					cv::threshold(roi, roi, 200, 1000, cv::THRESH_BINARY);
+					cv::threshold(roi, roi, m_thresh, 1000, cv::THRESH_BINARY);
 					fallbackDetection(roi);
 				}
 			}
@@ -192,7 +146,7 @@ public:
 		if ( ! frame.empty() ) {
 			cv::extractChannel(frame, red_channel, 0);
 			cv::Mat roi = red_channel(roi_rect);
-			cv::threshold(roi, roi, 200, 1000, cv::THRESH_BINARY);
+			cv::threshold(roi, roi, m_thresh, 1000, cv::THRESH_BINARY);
 			cv::Mat labels, stats, centroids;
 			int nlabels = cv::connectedComponentsWithStats(roi, labels, stats, centroids, 8, CV_32S, cv::CCL_WU);
 			cv::Size stats_size = stats.size();
@@ -223,6 +177,8 @@ public:
 		cv::minMaxLoc(roi, NULL, NULL, NULL, &maxloc, ~roi);
 		maxloc.x = maxloc.x + roi_rect.x;
 		maxloc.y = maxloc.y + roi_rect.y;
+		m_xy[0] = (juce::uint32)maxloc.x;
+		m_xy[1] = (juce::uint32)maxloc.y;
 	};
 	cv::Mat processFrame(cv::Mat & frame)
 	{
@@ -271,6 +227,7 @@ public:
 	cv::Point maxloc;
 	juce::uint32 m_xy[2];
 	struct timeval m_tv;
+	int m_thresh = 100;
 	std::vector<cv::KeyPoint> kps;
 	cv::Rect roi_rect;
 	cv::Mat mask;
@@ -297,7 +254,7 @@ PosTracker::~PosTracker()
 	if ( isThreadRunning () ) {
 		std::cout << "Stopping thread...\n";
 		signalThreadShouldExit();
-		stopThread(10000);
+		stopThread(1000);
 	}
 	displayMask.reset();
 }
@@ -305,10 +262,12 @@ PosTracker::~PosTracker()
 void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
 {
 	xy = p->getPos();
-	tv = p->getTimeVal();
+	auto tv = p->getTimeVal();
 	xy_ts[0] = xy[0];
 	xy_ts[1] = xy[1];
-	clock_gettime(CLOCK_MONOTONIC, &ts);
+	// clock_gettime(CLOCK_MONOTONIC, &ts);
+	timespec ts{};
+
 	double nowTime = ts.tv_sec + ((double)ts.tv_nsec / 1e9);
 	double frameTime = tv.tv_sec + ((double)tv.tv_usec / 1e6);
 	double time_delta = nowTime - frameTime;
@@ -332,7 +291,8 @@ void PosTracker::process(AudioSampleBuffer& buffer)
 
 void PosTracker::createEventChannels()
 {
-	EventChannel * chan = new EventChannel(EventChannel::UINT32_ARRAY, 1, 3, CoreServices::getGlobalSampleRate(), this);
+	auto camera_framerate = getFrameRate();
+	EventChannel * chan = new EventChannel(EventChannel::UINT32_ARRAY, 1, 3, camera_framerate, this);
 	chan->setName(m_dev_name);
 	chan->setDescription("x-y position of animal");
 	chan->setIdentifier("external.position.rawData");
@@ -436,7 +396,7 @@ void PosTracker::showLiveStream(bool val)
 void PosTracker::run()
 {
 	cv::Mat frame,  roi;
-	struct timeval tv;
+	timeval tv;
 	std::vector<cv::Point2d> pts{2};
 	unsigned int count = 0;
 	if ( ! displayMask->getPathFrame().empty() ) {
@@ -455,8 +415,6 @@ void PosTracker::run()
 	}
 
 	bool cv_tracker_init = false;
-
-	std::cout << "kind_of_tracker " << static_cast<int>(kind_of_tracker) << std::endl;
 
 	while ( isThreadRunning() )
 	{
@@ -565,6 +523,13 @@ void PosTracker::adjustExposure(int val)
 	exposure = val;
 }
 
+void PosTracker::adjustThreshold(int val) {
+	if ( currentCam ) {
+		if ( pos_tracker )
+			pos_tracker->setThreshold(val);
+	}
+}
+
 void PosTracker::adjustVideoMask(BORDER edge, int val)
 {
 	displayMask->setEdge(edge, val);
@@ -616,7 +581,7 @@ std::vector<std::string> PosTracker::getDeviceFormats()
 {
 	if ( ! currentCam->ready() )
 		currentCam->open_device();
-	currentCam->get_formats();
+	auto f = currentCam->get_formats(); // clears the Container holding the descriptions of available camera formats
 	return currentCam->get_format_descriptions();
 }
 
@@ -654,12 +619,15 @@ std::string PosTracker::getDeviceName()
 
 std::string PosTracker::getFormatName()
 {
-	return currentCam->get_format_name();
+	std::string name;
+	if ( currentCam )
+		name = currentCam->get_format_name();
+	return name;
 }
 
 std::vector<std::string> PosTracker::getDeviceList()
 {
-	std::vector<std::string> devices = Camera::get_devices();
+	std::vector<std::string> devices = CameraBase::get_devices();
 	return devices;
 }
 
@@ -678,8 +646,14 @@ void PosTracker::createNewCamera(std::string dev_name)
 	std::vector<std::string> devices = Camera::get_devices();
 	for ( auto & dev : devices )
 	{
-		if ( dev.compare(dev_name) == 0 )
+		if ( dev.compare(dev_name) == 0 ) {
+			#ifdef _WIN32
+			currentCam = std::make_shared<CameraCV>(dev_name);
+			#endif
+			#ifdef __unix__
 			currentCam = std::make_shared<Camera>(dev_name);
+			#endif
+		}
 	}
 }
 
@@ -690,11 +664,21 @@ std::pair<int,int> PosTracker::getResolution()
 		if ( currentCam->get_current_format() )
 		{
 			auto format = currentCam->get_current_format();
-			return std::make_pair<int,int>(format->width, format->height);
+			return std::make_pair<int,int>(static_cast<int>(format->width), static_cast<int>(format->height));
+		}
+	}
+	return std::make_pair<int,int>(1, 1);
+}
+
+unsigned int PosTracker::getFrameRate() {
+	if ( currentCam ) {
+		if ( currentCam->get_current_format() ) {
+			auto format = currentCam->get_current_format();
+			return format->get_framerate();
 		}
 	}
 	else
-		return std::make_pair<int,int>(1, 1);
+		return 0;
 }
 
 void PosTracker::saveCustomParametersToXml(XmlElement* xml)
