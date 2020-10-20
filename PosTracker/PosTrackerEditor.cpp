@@ -379,7 +379,6 @@ void PosTrackerEditor::comboBoxChanged(ComboBox* cb)
 			m_proc->getDeviceName();
 		}
 		auto fmts = m_proc->getDeviceFormats();
-		std::cout << "fmts.size() " << fmts.size() << std::endl;
 		for (int i = 0; i < fmts.size(); ++i)
 			resolution->addItem(fmts[i], i+1);
 	}
@@ -395,15 +394,33 @@ void PosTrackerEditor::comboBoxChanged(ComboBox* cb)
 
 void PosTrackerEditor::textEditorReturnKeyPressed(TextEditor & te) {
 	if ( &te == twoSpotMinDistance.get() ) {
-		auto mindist = getTwoSpotMinDistance();
-		m_proc->twoSpotMinDistance(mindist);
+		auto mindist = getTextAsUnsignedInt(te);
+		if (mindist == 0)
+			m_proc->twoSpotMinDistance(50);
+		else
+			m_proc->twoSpotMinDistance(mindist);
+	}
+	if ( &te == twoSpotSmallSpotSize.get() ) {
+		auto spotsize = getTextAsUnsignedInt(te);
+		if (spotsize == 0)
+			m_proc->twoSpotSmallSpotSize(300);
+		else
+			m_proc->twoSpotSmallSpotSize(spotsize);
+
+	}
+	if ( &te == twoSpotBigSpotSize.get() ) {
+		auto spotsize = getTextAsUnsignedInt(te);
+		if (spotsize == 0)
+			m_proc->twoSpotBigSpotSize(100);
+		else
+			m_proc->twoSpotBigSpotSize(spotsize);
 	}
 }
 
-unsigned int PosTrackerEditor::getTwoSpotMinDistance() {
-	std::string str = twoSpotMinDistance->getText().toStdString();
+unsigned int PosTrackerEditor::getTextAsUnsignedInt(TextEditor & te) {
+	std::string str = te.getText().toStdString();
 	if ( str.empty() )
-		str = "10";
+		return 0;
 	return std::stoul(str);
 }
 

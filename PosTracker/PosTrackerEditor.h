@@ -29,7 +29,7 @@ public:
 	void comboBoxChanged(ComboBox* cb);
 	void buttonEvent(Button* button);
 	void textEditorReturnKeyPressed(TextEditor &);
-	unsigned int getTwoSpotMinDistance();
+	unsigned int getTextAsUnsignedInt(TextEditor &);
 	void updateSettings();
 	void update();
 

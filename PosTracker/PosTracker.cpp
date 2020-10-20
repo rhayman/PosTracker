@@ -145,7 +145,7 @@ public:
 	};
 	// Deal with a directional LED setup ie one small and one large LED
 	void doubleLEDDetection(const cv::Mat & frame) {
-		if ( ! frame.empty() ) {
+		// if ( ! frame.empty() ) {
 			cv::extractChannel(frame, red_channel, 0);
 			cv::Mat roi = red_channel(roi_rect);
 			cv::threshold(roi, roi, m_thresh, 1000, cv::THRESH_BINARY);
@@ -153,42 +153,46 @@ public:
 			int nlabels = cv::connectedComponentsWithStats(roi, labels, stats, centroids, 8, CV_32S, cv::CCL_WU);
 			cv::Size stats_size = stats.size();
 			if ( stats_size.height > 2 ) {
-				cv::Mat sorted_stats;
-				cv::sortIdx(stats, sorted_stats, cv::SORT_ASCENDING + cv::SORT_EVERY_COLUMN);
-				
-				int bigSpotIdx = sorted_stats.at<int>(1, cv::CC_STAT_AREA); // 0 is background
-
-				double x_centroid, y_centroid;
-				
-				x_centroid = centroids.at<double>(bigSpotIdx, 0);
-				y_centroid = centroids.at<double>(bigSpotIdx, 1);
-				maxloc.x = static_cast<int>(x_centroid) + roi_rect.x;
-				maxloc.y = static_cast<int>(y_centroid) + roi_rect.y;
-
-				// try and pick out the next largest spot that is at least min_pix away
-				for (int i = 1; i < stats_size.height; i++)
+				int maxpix = 0;
+				int biggestComponent = 0;
+				for (int i = 1; i < stats_size.height; ++i) // starts at 1 as 0 is background
 				{
-					int smallSpotIdx = stats.at<int>(i, cv::CC_STAT_AREA);
-					std::cout << "stats.size() = " << stats.size() << std::endl;
-					std::cout << "smallSpotIdx = " << smallSpotIdx << std::endl;
-					// x_centroid = centroids.at<double>(smallSpotIdx, 0);
-					// y_centroid = centroids.at<double>(smallSpotIdx, 1);
-					// maxloc2.x = static_cast<int>(x_centroid) + roi_rect.x;
-					// maxloc2.y = static_cast<int>(y_centroid) + roi_rect.y;
-
-				// 	// do the distance calculation
-				// 	double dist = std::abs(cv::norm(maxloc-maxloc2));
-				// 	if ( dist > twoSpotMinDistance ) {
-				// 		std::cout << "dist = " << dist << std::endl;
-				// 		std::cout << "twoSpotMinDistance = " << twoSpotMinDistance << std::endl;
-					// }
+					auto area = stats.at<int>(i, cv::CC_STAT_AREA);
+					if ( area > maxpix && area > bigSpotSize ) {
+						maxpix = stats.at<int>(i, cv::CC_STAT_AREA);
+						biggestComponent = i;
+						double x_centroid, y_centroid;
+			
+						x_centroid = centroids.at<double>(biggestComponent, 0);
+						y_centroid = centroids.at<double>(biggestComponent, 1);
+						maxloc.x = static_cast<int>(x_centroid) + roi_rect.x;
+						maxloc.y = static_cast<int>(y_centroid) + roi_rect.y;
+					}
 				}
+				maxpix = 0;
+				for (int i = 1; i < stats_size.height; ++i) // starts at 1 as 0 is background
+				{
+					if ( i != biggestComponent ) {
+						auto area = stats.at<int>(i, cv::CC_STAT_AREA);
+						if ( area > maxpix && area < bigSpotSize && area > smallSpotSize ) {
+							maxpix = stats.at<int>(i, cv::CC_STAT_AREA);
+							biggestComponent = i;
+							double x_centroid, y_centroid;
+				
+							x_centroid = centroids.at<double>(biggestComponent, 0);
+							y_centroid = centroids.at<double>(biggestComponent, 1);
+							maxloc2.x = static_cast<int>(x_centroid) + roi_rect.x;
+							maxloc2.y = static_cast<int>(y_centroid) + roi_rect.y;
+						}
+					}
+				}
+
 			}
 			m_xy[0] = (juce::uint32)maxloc.x;
 			m_xy[1] = (juce::uint32)maxloc.y;
 			m_xy[2] = (juce::uint32)maxloc2.x;
 			m_xy[3] = (juce::uint32)maxloc2.y;
-		}
+		// }
 	};
 	void singleLEDDetection(const cv::Mat & frame)
 	{
@@ -287,6 +291,8 @@ public:
 	bool trackerIsInit = false;
 	bool useTwoSpotTracking = false;
 	unsigned int twoSpotMinDistance = 10;
+	unsigned int bigSpotSize = 300;
+	unsigned int smallSpotSize = 100;
 private:
 };
 
@@ -514,6 +520,8 @@ void PosTracker::run()
 				}
 				if ( doTwoSpotTracking() ) {
 					pos_tracker->twoSpotMinDistance = twoSpotMinDistance();
+					pos_tracker->bigSpotSize = twoSpotBigSpotSize();
+					pos_tracker->smallSpotSize = twoSpotSmallSpotSize();
 				}
 				// Do the actual detection using whatever method the user asked for
 				cv::Rect2d bb;

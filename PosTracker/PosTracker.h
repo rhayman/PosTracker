@@ -73,11 +73,17 @@ public:
 	bool overlayPath() { return path_overlay; }
 	void autoExposure(bool state) { auto_exposure = state; }
 	bool autoExposure() { return auto_exposure; }
+	
+	// Two spot tracking stuff
 	void doTwoSpotTracking(bool val) { m_doTwoSpotTracking = val; }
 	bool doTwoSpotTracking() { return m_doTwoSpotTracking; }
 	void twoSpotMinDistance(unsigned int val) { m_twoSpotMinDist = val; }
 	unsigned int twoSpotMinDistance() { return m_twoSpotMinDist; }
-	
+	void twoSpotSmallSpotSize(unsigned int val) { m_twoSpotSmallSpotSize = val; }
+	unsigned int twoSpotSmallSpotSize() { return m_twoSpotSmallSpotSize; }
+	void twoSpotBigSpotSize(unsigned int val) { m_twoSpotBigSpotSize = val; }
+	unsigned int twoSpotBigSpotSize() { return m_twoSpotBigSpotSize; }
+
 	void adjustVideoMask(BORDER, int val);
 	void makeVideoMask();
 	int getVideoMask(BORDER);
@@ -130,6 +136,8 @@ private:
 	bool m_switchPausePlay = true;
 	bool m_doTwoSpotTracking = false;
 	unsigned int m_twoSpotMinDist = 10;
+	unsigned int m_twoSpotBigSpotSize = 300;
+	unsigned int m_twoSpotSmallSpotSize = 100;
 
 	std::queue<std::shared_ptr<PosTS>> posBuffer;
 
