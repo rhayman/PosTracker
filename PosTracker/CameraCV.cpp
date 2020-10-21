@@ -92,12 +92,12 @@ std::string CameraCV::get_format_name()
 		return "";
 }
 
-std::vector<Formats*> CameraCV::get_formats()
-{
-	availableFormats.clear();
-
-	return availableFormats;
-}
+//std::vector<Formats*> CameraCV::get_formats()
+//{
+//	//availableFormats.clear();
+//
+//	return availableFormats;
+//}
 
 int CameraCV::open_device()
 {

@@ -651,6 +651,7 @@ std::vector<std::string> PosTracker::getDeviceFormats()
 	if ( ! currentCam->ready() )
 		currentCam->open_device();
 	auto f = currentCam->get_formats(); // clears the Container holding the descriptions of available camera formats
+	std::cout << "f size = " << f.size() << std::endl;
 	return currentCam->get_format_descriptions();
 }
 
@@ -702,6 +703,7 @@ std::vector<std::string> PosTracker::getDeviceList()
 
 void PosTracker::createNewCamera(std::string dev_name)
 {
+	std::cout << "dev_name = " << dev_name << std::endl;
 	if ( currentCam )
 	{
 		if ( currentCam->ready() )
@@ -713,8 +715,10 @@ void PosTracker::createNewCamera(std::string dev_name)
 		currentCam.reset();
 	}
 	std::vector<std::string> devices = Camera::get_devices();
+	std::cout << "devices size = " << devices.size() << std::endl;
 	for ( auto & dev : devices )
 	{
+		std::cout << "dev = " << dev << std::endl;
 		if ( dev.compare(dev_name) == 0 ) {
 			#ifdef _WIN32
 			currentCam = std::make_shared<CameraCV>(dev_name);
