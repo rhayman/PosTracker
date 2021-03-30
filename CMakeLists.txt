@@ -10,7 +10,6 @@ find_package( OpenCV 4.1.0 REQUIRED core highgui xfeatures2d features2d imgproc 
 add_sources(${PLUGIN_NAME}
 	PosTracker/CameraBase.h
 	PosTracker/Camera.h
-	PosTracker/Camera.cpp
 	PosTracker/CameraCV.cpp
 	PosTracker/CameraCV.h
 	PosTracker/PosTracker.cpp
