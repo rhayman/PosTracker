@@ -9,18 +9,16 @@
 #include <unistd.h>
 #endif
 
+#ifdef _WIN32
 #include <winsock.h>
->>>>>>> 6033c9a39e587b8d0f1cef07dbeefa9822281347
+#endif
+
 #include "../common.h"
 
 class CameraBase
 {
 public:
-<<<<<<< HEAD
-	CameraBase() : dev_name("/dev/video1")  {};
-=======
 	CameraBase() : dev_name("cap0")  {};
->>>>>>> 6033c9a39e587b8d0f1cef07dbeefa9822281347
 	CameraBase(std::string _dev_name) : dev_name(_dev_name) {};
 	~CameraBase() {};
 	/*
