@@ -7,7 +7,6 @@
 #include "PosTrackerEditor.h"
 #include "CameraCV.h"
 #include "CameraBase.h"
-#include "../cvTracking/TrackersEditor.hpp"
 
 #include <array>
 #include <vector>

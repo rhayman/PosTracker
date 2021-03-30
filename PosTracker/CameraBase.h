@@ -50,7 +50,6 @@ public:
 		#endif // __unix__
 		return device_list;
 	};
-	virtual std::vector<Formats*> get_formats() {};
 	/*
 	This is the method that under Linux populates the Container with valid formats
 	by iterating over the V4L2 format enum. Here we give the default Format which
