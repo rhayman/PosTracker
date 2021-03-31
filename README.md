@@ -12,16 +12,31 @@ those studying spatial behaviour / neurophysiology
 
 Prerequisites include the following:
 
-* opencv (tested with v3.1.0)
+* openCV (https://opencv.org/)
 
-Download the files and extract to a folder and make sure it's in the plugin folder of
-your openephys installation and then re-compile with
+* a suitable c/c++ compiler (gcc for Linux; Visual Studio or whatever Microsoft call theirs)
 
-```
-make -f Makefile.plugins
-```
+I've found it's easiest under both Windows and Linux to build openCV from source. Clone the opencv repo and, if you want, the opencv_contrib repo too. There are plenty of instructions online on how to build openCV from source. It has a lot of options and there are a large range of extra things you can install to boost the peformance of openCV. You'll need to make sure the openCV libraries and include directories are known to your machine - this usually involves setting an environment variable under Windows. Under Linux I think the usual make, sudo make install process will put the files in the usual places the gcc compiler checks.
 
-Once installed the PosTracker plugin should appear as a Source in openephys
+Clone the PosTracker repo as usual but do this from the Plugins folder of your open-ephys clone.
+
+I've always installed this at the same time as open-ephys. The instructions that follow assume that's what'll be happening.
+
+Under Linux you can follow the usual cmake process for the whole open-ephys package, including PosTracker.
+
+Under Windows use cmake-gui to point to the open-ephys folder and also to a separate "Build" folder (usually within the main open-ephys folder).
+
+Then do "Configure" and pick the version of Visual Studio you have installed. Select the architecture to be x86.
+
+Now "Generate" and this should dump all the relevant stuff for Visual Studio (VS) into the Build folder you specified above. Now open Visual Studio.
+
+Navigate to the Build folder and select the open-ephys-GUI.sln file and wait while VS does its thing. Once complete you'lll want to select the configuration to be "Release" (think it defaults to "Debug").
+
+Right-click on open-ephys in the Solution Explorer and select "Select as Startup Project".
+
+Check that you are statically linking the PosTracker plugin (ie creating a .lib file *not* a .dll); right-click on PosTracker, go to Properties --> C/C++ --> Code Generation --> Runtime Library and select the Multi-threaded (/MT) option from the drop-down menu. Now go to the Build menu in the main GUI thingy and select Build. 
+
+Once installed the PosTracker plugin should appear as a Source in openephys.
 
 ## Usage
 
