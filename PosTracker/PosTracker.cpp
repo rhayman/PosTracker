@@ -83,7 +83,7 @@ public:
 	void setThreshold(int val) { m_thresh = val; }
 	void setTracker(cv::Ptr<cv::Tracker> t) { m_tracker = t; }
 	void setBackgroundSubtractor(cv::Ptr<cv::BackgroundSubtractor> bg) { m_background_sub = bg; }
-	void doDetection(const TrackerType method, const cv::Mat & frame, cv::Rect2d & bounding_box) {
+	void doDetection(const TrackerType method, const cv::Mat & frame, cv::Rect & bounding_box) {
 		if ( ! frame.empty() ) {
 			if ( method == TrackerType::kLED )
 				singleLEDDetection(frame);
@@ -405,15 +405,6 @@ void PosTracker::run()
 
 	pos_tracker = std::make_shared<PosTS>(tv, frame);
 
-	// check if we have a destination node of Tracking API...
-	Trackers * tracker_proc = (Trackers*)getDestNode();
-	TrackerType kind_of_tracker = TrackerType::kLED;
-	if ( tracker_proc && (tracker_proc->getName() == String("Tracker API") ) ) {
-		kind_of_tracker = tracker_proc->getTrackerID();
-	}
-
-	bool cv_tracker_init = false;
-
 	while ( isThreadRunning() )
 	{
 		if ( threadShouldExit() )
@@ -434,31 +425,8 @@ void PosTracker::run()
 				pos_tracker->setMask(displayMask_mask);
 				pos_tracker->setROIRect(displayMask->getROIRect());
 
-				// TESTING TRACKING WITH CV TRACKER API
-				if ( tracker_proc && (tracker_proc->getName() == String("Tracker API") ) ) {
-					auto tracker_proc_ed = static_cast<TrackersEditor*>(tracker_proc->getEditor());
-					kind_of_tracker = tracker_proc->getTrackerID();
-					cv_tracker_init = tracker_proc_ed->is_tracker_init();
-					pos_tracker->trackerIsInit = cv_tracker_init;
-					if ( tracker_proc && ! cv_tracker_init) {
-						auto cv_tracker = tracker_proc_ed->getTracker();
-						auto bounding_box = tracker_proc_ed->getROI();
-
-						if ( cv_tracker && ! bounding_box.empty() ) {
-							pos_tracker->setTracker(cv_tracker);
-						}
-						if ( kind_of_tracker == TrackerType::kBACKGROUND ) {
-							pos_tracker->setBackgroundSubtractor(tracker_proc_ed->getBackgroundSubtractor());
-						}
-						else if ( kind_of_tracker == TrackerType::kBACKGROUNDKNN ) {
-							pos_tracker->setBackgroundSubtractor(tracker_proc_ed->getBackgroundSubtractor());
-						}
-					}
-					cv_tracker_init = true;
-				}
-
 				// Do the actual detection using whatever method the user asked for
-				cv::Rect2d bb;
+				cv::Rect bb;
 				pos_tracker->doDetection(kind_of_tracker, frame, bb);
 
 				if ( liveStream == true )
