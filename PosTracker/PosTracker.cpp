@@ -405,6 +405,8 @@ void PosTracker::run()
 
 	pos_tracker = std::make_shared<PosTS>(tv, frame);
 
+	TrackerType kind_of_tracker = TrackerType::kLED;
+
 	while ( isThreadRunning() )
 	{
 		if ( threadShouldExit() )
