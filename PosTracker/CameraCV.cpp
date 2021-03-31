@@ -92,13 +92,6 @@ std::string CameraCV::get_format_name()
 		return "";
 }
 
-std::vector<Formats*> CameraCV::get_formats()
-{
-	availableFormats.clear();
-
-	return availableFormats;
-}
-
 int CameraCV::open_device()
 {
 	fprintf(stdout, "Attempting to open %s\n", dev_name.c_str());
