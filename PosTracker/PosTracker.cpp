@@ -345,7 +345,7 @@ void PosTracker::process(AudioSampleBuffer& buffer)
 void PosTracker::createEventChannels()
 {
 	auto camera_framerate = getFrameRate();
-	EventChannel * chan = new EventChannel(EventChannel::UINT32_ARRAY, 1, 4, camera_framerate, this);
+	EventChannel * chan = new EventChannel(EventChannel::UINT32_ARRAY, 1, 4, CoreServices::getGlobalSampleRate(), this);
 	chan->setName(m_dev_name);
 	chan->setDescription("x-y position of animal");
 	chan->setIdentifier("external.position.rawData");
