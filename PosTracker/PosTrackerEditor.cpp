@@ -379,6 +379,7 @@ void PosTrackerEditor::comboBoxChanged(ComboBox* cb)
 			m_proc->getDeviceName();
 		}
 		auto fmts = m_proc->getDeviceFormats();
+		std::cout << "fmts size = " << fmts.size() << std::endl;
 		for (int i = 0; i < fmts.size(); ++i)
 			resolution->addItem(fmts[i], i+1);
 	}
