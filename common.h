@@ -134,7 +134,7 @@ struct Formats
 	std::string description; // “YUV 4:2:2” etc
 	__u32 pixelformat; // four-character code e.g. 'YUYV'
 	std::string framesize_type; // Discrete, step-wise or continuous
-	//struct v4l2_frmsize_discrete discrete_frmsizes;
+	struct v4l2_frmsize_discrete discrete_frmsizes;
 	struct v4l2_frmsize_stepwise stepwise_frmsizes;
 	struct v4l2_frmival_stepwise stepwise_intervals;
 	__u32 numerator = 0;
