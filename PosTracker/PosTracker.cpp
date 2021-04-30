@@ -567,7 +567,7 @@ void PosTracker::run()
 				}
 				posBuffer.push(pos_tracker->getPos());
 			}
-			wait(100);
+			wait(40);
 		}
 	}
 }
