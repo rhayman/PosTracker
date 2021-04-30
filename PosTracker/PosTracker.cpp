@@ -336,23 +336,17 @@ void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
 void PosTracker::process(AudioSampleBuffer& buffer)
 {
 	setTimestampAndSamples(CoreServices::getGlobalTimestamp(), 4);
-	// lock.enter();
 	if ( ! posBuffer.empty() )
 	{
-		auto xy = std::move(posBuffer.front());
-		auto tv = p->getTimeVal();
-		double frameTime = tv.tv_sec + ((double)tv.tv_usec / 1e6);
+		auto xy = posBuffer.front();
 		xy_ts[0] = xy[0];
 		xy_ts[1] = xy[1];
 		xy_ts[2] = juce::uint32(posBuffer.size());
 		// xy_ts[3] = xy[3];
-		xy_ts[3] = juce::uint32(frameTime * 1e6);
 		BinaryEventPtr event = BinaryEvent::createBinaryEvent(messageChannel, CoreServices::getGlobalTimestamp(), xy_ts, sizeof(juce::uint32)*4);
 		addEvent(messageChannel, event, 0);
-		// sendTimeStampedPosToMidiBuffer(std::move(p));
 		posBuffer.pop();
 	}
-	// lock.exit();
 }
 
 void PosTracker::createEventChannels()
@@ -436,7 +430,7 @@ void PosTracker::startStreaming()
 		{
 			cv::namedWindow(currentCam->get_dev_name(), cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO & cv::WINDOW_GUI_NORMAL);
 		}
-		posBuffer = std::queue<std::shared_ptr<juce::uint32*>>{}; // clear the buffer
+		posBuffer = std::queue<juce::uint32*>{}; // clear the buffer
 		startThread(); // calls run()
 	}
 }
@@ -448,7 +442,7 @@ void PosTracker::stopStreaming()
 	if ( camReady )
 		stopCamera();
 	liveStream = false;
-	posBuffer = std::queue<std::shared_ptr<juce::uint32*>>{};
+	posBuffer = std::queue<juce::uint32*>{};
 }
 
 void PosTracker::showLiveStream(bool val)
