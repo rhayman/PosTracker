@@ -337,7 +337,7 @@ void PosTracker::process(AudioSampleBuffer& buffer)
 {
 	setTimestampAndSamples(CoreServices::getGlobalTimestamp(), 0);
 	// lock.enter();
-	while ( ! posBuffer.empty() )
+	if ( ! posBuffer.empty() )
 	{
 		std::shared_ptr<PosTS> p = std::move(posBuffer.front());
 		xy = p->getPos();
