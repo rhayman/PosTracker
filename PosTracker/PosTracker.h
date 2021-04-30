@@ -36,7 +36,7 @@ public:
 
 	bool isReady() override { return true; }
 
-	bool isGeneratesTimestamps() override { return false; }
+	bool isGeneratesTimestamps() const override { return false; }
 
 	void run();
 
