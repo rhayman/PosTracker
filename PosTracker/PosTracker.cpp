@@ -564,8 +564,8 @@ void PosTracker::run()
 					double fps = cv::getTickFrequency() / (cv::getTickCount() - st);
 					ed->setInfoValue(InfoLabelType::FPS, fps);
 					++count;
-					posBuffer.push(pos_tracker->getPos());
 				}
+				posBuffer.push(pos_tracker->getPos());
 			}
 			wait(30);
 		}
