@@ -139,7 +139,7 @@ private:
 	unsigned int m_twoSpotBigSpotSize = 300;
 	unsigned int m_twoSpotSmallSpotSize = 100;
 
-	std::queue<std::shared_ptr<PosTS>> posBuffer;
+	std::queue<std::shared_ptr<juce::uint32*>> posBuffer;
 
 	const EventChannel* messageChannel{ nullptr };
 

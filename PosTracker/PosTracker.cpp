@@ -339,8 +339,7 @@ void PosTracker::process(AudioSampleBuffer& buffer)
 	// lock.enter();
 	if ( ! posBuffer.empty() )
 	{
-		std::shared_ptr<PosTS> p = std::move(posBuffer.front());
-		xy = p->getPos();
+		auto xy = std::move(posBuffer.front());
 		auto tv = p->getTimeVal();
 		double frameTime = tv.tv_sec + ((double)tv.tv_usec / 1e6);
 		xy_ts[0] = xy[0];
@@ -437,7 +436,7 @@ void PosTracker::startStreaming()
 		{
 			cv::namedWindow(currentCam->get_dev_name(), cv::WINDOW_NORMAL & cv::WND_PROP_ASPECT_RATIO & cv::WINDOW_GUI_NORMAL);
 		}
-		posBuffer = std::queue<std::shared_ptr<PosTS>>{}; // clear the buffer
+		posBuffer = std::queue<std::shared_ptr<juce::uint32*>>{}; // clear the buffer
 		startThread(); // calls run()
 	}
 }
@@ -449,7 +448,7 @@ void PosTracker::stopStreaming()
 	if ( camReady )
 		stopCamera();
 	liveStream = false;
-	posBuffer = std::queue<std::shared_ptr<PosTS>>{};
+	posBuffer = std::queue<std::shared_ptr<juce::uint32*>>{};
 }
 
 void PosTracker::showLiveStream(bool val)
@@ -573,13 +572,12 @@ void PosTracker::run()
 					++count;
 				}
 				// if ( CoreServices::getRecordingStatus() )
-					posBuffer.push(pos_tracker);
+					posBuffer.push(pos_tracker->getPos());
 
 			}
 			wait(30);
 		}
 	}
-	std::cout << std::endl;
 }
 
 void PosTracker::adjustBrightness(int val)
