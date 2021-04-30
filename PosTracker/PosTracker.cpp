@@ -331,15 +331,22 @@ void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
 
 void PosTracker::process(AudioSampleBuffer& buffer)
 {
-	setTimestampAndSamples(CoreServices::getGlobalTimestamp(), 1);
-	lock.enter();
+	setTimestampAndSamples(CoreServices::getGlobalTimestamp(), 0);
+	// lock.enter();
 	while ( ! posBuffer.empty() )
 	{
 		std::shared_ptr<PosTS> p = std::move(posBuffer.front());
-		sendTimeStampedPosToMidiBuffer(std::move(p));
+		xy = p->getPos();
+		xy_ts[0] = xy[0];
+		xy_ts[1] = xy[1];
+		xy_ts[2] = xy[2];
+		xy_ts[3] = xy[3];
+		BinaryEventPtr event = BinaryEvent::createBinaryEvent(messageChannel, CoreServices::getGlobalTimestamp(), xy_ts, sizeof(juce::uint32)*4);
+		addEvent(messageChannel, event, 0);
+		// sendTimeStampedPosToMidiBuffer(std::move(p));
 		posBuffer.pop();
 	}
-	lock.exit();
+	// lock.exit();
 }
 
 void PosTracker::createEventChannels()
@@ -488,7 +495,7 @@ void PosTracker::run()
 
 			if ( !frame.empty() )
 			{
-				lock.enter();
+				// lock.enter();
 				m_frame_ptr = static_cast<void*>(frame.data);
 
 				// provide the PosTS instance with masks etc
@@ -564,7 +571,7 @@ void PosTracker::run()
 				if ( CoreServices::getRecordingStatus() )
 					posBuffer.push(pos_tracker);
 
-				lock.exit();
+				// lock.exit();
 			}
 		}
 	}
