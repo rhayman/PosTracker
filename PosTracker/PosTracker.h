@@ -36,6 +36,8 @@ public:
 
 	bool isReady() override { return true; }
 
+	bool isGeneratesTimestamps() override { return false; }
+
 	void run();
 
 	bool isCamReady() { return camReady; }
@@ -148,7 +150,7 @@ private:
 	juce::uint32 * xy;
 	juce::uint32 * old_xy = nullptr;
 	juce::uint32 * new_xy = nullptr;
-	juce::uint32 xy_ts[4];
+	juce::uint32 xy_ts[4] = {};
 	timespec ts;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PosTracker);
