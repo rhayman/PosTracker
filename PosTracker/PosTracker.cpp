@@ -490,7 +490,7 @@ void PosTracker::run()
 
 	bool cv_tracker_init = false;
 
-	while ( !threadShouldExit )
+	while ( !threadShouldExit() )
 	{
 		if ( camReady )
 		{
