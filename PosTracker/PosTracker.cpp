@@ -321,10 +321,14 @@ PosTracker::~PosTracker()
 void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
 {
 	xy = p->getPos();
+	auto tv = p->getTimeVal();
+	double frameTime = tv.tv_sec + ((double)tv.tv_usec / 1e6);
+	// timespec ts{};
+	// clock_gettime(CLOCK_MONOTONIC, &ts);
 	xy_ts[0] = xy[0];
 	xy_ts[1] = xy[1];
 	xy_ts[2] = xy[2];
-	xy_ts[3] = xy[3];
+	xy_ts[3] = juce::uint32(frameTime * 1e6);
 	BinaryEventPtr event = BinaryEvent::createBinaryEvent(messageChannel, CoreServices::getGlobalTimestamp(), xy_ts, sizeof(juce::uint32)*4);
 	addEvent(messageChannel, event, 0);
 }
@@ -337,10 +341,13 @@ void PosTracker::process(AudioSampleBuffer& buffer)
 	{
 		std::shared_ptr<PosTS> p = std::move(posBuffer.front());
 		xy = p->getPos();
+		auto tv = p->getTimeVal();
+		double frameTime = tv.tv_sec + ((double)tv.tv_usec / 1e6);
 		xy_ts[0] = xy[0];
 		xy_ts[1] = xy[1];
 		xy_ts[2] = xy[2];
-		xy_ts[3] = xy[3];
+		// xy_ts[3] = xy[3];
+		xy_ts[3] = juce::uint32(frameTime * 1e6);
 		BinaryEventPtr event = BinaryEvent::createBinaryEvent(messageChannel, CoreServices::getGlobalTimestamp(), xy_ts, sizeof(juce::uint32)*4);
 		addEvent(messageChannel, event, 0);
 		// sendTimeStampedPosToMidiBuffer(std::move(p));
