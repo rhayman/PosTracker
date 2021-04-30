@@ -490,10 +490,8 @@ void PosTracker::run()
 
 	bool cv_tracker_init = false;
 
-	while ( isThreadRunning() )
+	while ( !threadShouldExit )
 	{
-		if ( threadShouldExit() )
-			return;
 		if ( camReady )
 		{
 			juce::int64 st = cv::getTickCount();
@@ -502,7 +500,6 @@ void PosTracker::run()
 
 			if ( !frame.empty() )
 			{
-				lock.enter();
 				m_frame_ptr = static_cast<void*>(frame.data);
 
 				// provide the PosTS instance with masks etc
@@ -578,8 +575,8 @@ void PosTracker::run()
 				// if ( CoreServices::getRecordingStatus() )
 					posBuffer.push(pos_tracker);
 
-				lock.exit();
 			}
+			wait(30);
 		}
 	}
 	std::cout << std::endl;
