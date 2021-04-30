@@ -335,7 +335,7 @@ void PosTracker::sendTimeStampedPosToMidiBuffer(std::shared_ptr<PosTS> p)
 
 void PosTracker::process(AudioSampleBuffer& buffer)
 {
-	setTimestampAndSamples(CoreServices::getGlobalTimestamp(), 0);
+	setTimestampAndSamples(CoreServices::getGlobalTimestamp(), 4);
 	// lock.enter();
 	if ( ! posBuffer.empty() )
 	{
