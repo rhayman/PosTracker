@@ -502,7 +502,7 @@ void PosTracker::run()
 
 			if ( !frame.empty() )
 			{
-				// lock.enter();
+				lock.enter();
 				m_frame_ptr = static_cast<void*>(frame.data);
 
 				// provide the PosTS instance with masks etc
@@ -575,10 +575,10 @@ void PosTracker::run()
 					ed->setInfoValue(InfoLabelType::FPS, fps);
 					++count;
 				}
-				if ( CoreServices::getRecordingStatus() )
+				// if ( CoreServices::getRecordingStatus() )
 					posBuffer.push(pos_tracker);
 
-				// lock.exit();
+				lock.exit();
 			}
 		}
 	}
