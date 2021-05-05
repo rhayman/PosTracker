@@ -95,7 +95,7 @@ std::string CameraCV::get_format_name()
 int CameraCV::open_device()
 {
 	fprintf(stdout, "Attempting to open %s\n", dev_name.c_str());
-	if ( cap.open(0) ) {
+	if ( cap.open(0, cv::CAP_FFMPEG) ) {
 		fprintf(stdout, "Successfully opened %s\n", dev_name.c_str());
 		is_ready = true;
 		return 0;
