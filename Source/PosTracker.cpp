@@ -81,9 +81,8 @@ public:
 	void setMask(cv::Mat m) { mask = m; }
 	void setTV(struct timeval t) { m_tv = t; }
 	void setThreshold(int val) { m_thresh = val; }
-	void setTracker(cv::Ptr<cv::Tracker> t) { m_tracker = t; }
 	void setBackgroundSubtractor(cv::Ptr<cv::BackgroundSubtractor> bg) { m_background_sub = bg; }
-	void doDetection(const TrackerType method, const cv::Mat & frame, cv::Rect & bounding_box) {
+	void doDetection(const TrackerType method, const cv::Mat & frame, cv::Rect2d & bounding_box) {
 		if ( ! frame.empty() ) {
 			if ( method == TrackerType::kLED )
 				singleLEDDetection(frame);
@@ -120,16 +119,6 @@ public:
 				}
 			}
 			else {
-				if ( trackerIsInit ) {
-					m_tracker->update(frame, bounding_box);
-					// fill out the x,y data for saving open-ephys data stream
-					auto centre_x = bounding_box.x + (bounding_box.width/2.0);
-					auto centre_y = bounding_box.y + (bounding_box.height/2.0);
-					maxloc.x = centre_x;
-					maxloc.y = centre_y;
-					m_xy[0] = (juce::uint32)maxloc.x;
-					m_xy[1] = (juce::uint32)maxloc.y;
-				}
 				if ( bounding_box.empty() ) {
 					//DO FALL BACK METHOD
 					cv::extractChannel(frame, red_channel, 0);
@@ -230,7 +219,6 @@ public:
 	std::vector<cv::KeyPoint> kps;
 	cv::Rect roi_rect;
 	cv::Mat mask;
-	cv::Ptr<cv::Tracker> m_tracker;
 	cv::Ptr<cv::BackgroundSubtractor> m_background_sub;
 	bool trackerIsInit = false;
 private:
@@ -428,7 +416,7 @@ void PosTracker::run()
 				pos_tracker->setROIRect(displayMask->getROIRect());
 
 				// Do the actual detection using whatever method the user asked for
-				cv::Rect bb;
+				cv::Rect2d bb;
 				pos_tracker->doDetection(kind_of_tracker, frame, bb);
 
 				if ( liveStream == true )

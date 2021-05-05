@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <PluginInfo.h>
-#include "PosTracker/PosTracker.h"
+#include "PosTracker.h"
 #include <string>
 #ifdef WIN32
 #include <Windows.h>
@@ -50,9 +50,9 @@ extern "C" EXPORT int getPluginInfo(int index, Plugin::PluginInfo* info)
 	{
 	//one case per plugin. This example is for a processor which connects directly to the signal chain
 	case 0:
-		info->type = Plugin::PLUGIN_TYPE_PROCESSOR; //Type of plugin. See "Source/Processors/PluginManager/OpenEphysPlugin.h" for complete info about the different type structures
+		info->type = PluginType::PLUGIN_TYPE_PROCESSOR; //Type of plugin. See "Source/Processors/PluginManager/OpenEphysPlugin.h" for complete info about the different type structures
 		info->processor.name = "Pos Tracker"; //Processor name shown in the GUI
-		info->processor.type = Plugin::SourceProcessor; //Type of processor. Can be FilterProcessor, SourceProcessor, SinkProcessor or UtilityProcessor. Specifies where on the processor list will appear
+		info->processor.type = ProcessorType::SourceProcessor; //Type of processor. Can be FilterProcessor, SourceProcessor, SinkProcessor or UtilityProcessor. Specifies where on the processor list will appear
 		info->processor.creator = &(Plugin::createProcessor<PosTracker>); //Class factory pointer. Replace "ExampleProcessor" with the name of your class.
 		break;
 	default:
