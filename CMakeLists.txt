@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.5.0)
 #include common rules
 include(../PluginRules.cmake)
 
-find_package( OpenCV 4.1.0 REQUIRED core highgui xfeatures2d features2d imgproc videostab tracking )
+find_package( OpenCV REQUIRED core highgui imgproc tracking )
 
 #add sources, not including OpenEphysLib.cpp
 add_sources(${PLUGIN_NAME}
