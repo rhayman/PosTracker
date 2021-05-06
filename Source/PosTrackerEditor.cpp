@@ -425,7 +425,7 @@ void PosTrackerEditor::updateSettings()
 	    	auto new_val = m_proc->getBrightness();
 		    brightnessSldr->setValue(new_val);
 		    brightnessSldr->setValues(brightness_range);
-		    brightnessSldr->setRange(0, 100, 5);
+		    brightnessSldr->setRange(0, 100, 1);
 		    m_proc->adjustBrightness(new_val);
 		    brightnessSldr->setActive(true);
 	    }
@@ -438,7 +438,7 @@ void PosTrackerEditor::updateSettings()
 	    	auto new_val = m_proc->getContrast();
 		    contrastSldr->setValue(new_val);
 		    contrastSldr->setValues(contrast_range);
-		    contrastSldr->setRange(0, 100, 5);
+		    contrastSldr->setRange(0, 100, 1);
 		    m_proc->adjustContrast(new_val);
 		    contrastSldr->setActive(true);
 	    }
@@ -454,7 +454,7 @@ void PosTrackerEditor::updateSettings()
 	    	autoExposure->setToggleState(false, sendNotification);
 		    exposureSldr->setValue(new_val);
 		    exposureSldr->setValues(exposure_range);
-		    exposureSldr->setRange(0, 100, 5);
+		    exposureSldr->setRange(0, 100, 1);
 		    m_proc->adjustExposure(new_val);
 		    exposureSldr->setActive(true);
 	    }
