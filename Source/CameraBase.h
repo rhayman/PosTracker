@@ -4,16 +4,81 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include <opencv2/opencv.hpp>
+#include "common.h"
 #ifdef __unix__
 #include <unistd.h>
 #endif
 
 #ifdef _WIN32
+#include <string>
+#include <cstring>
+#include <cstdio>
+#include <cerrno>
 #include <winsock.h>
 #endif
 
-#include "../common.h"
+struct v4l2_frmsize_stepwise {
+	unsigned int step_width = 10;
+	unsigned int step_height = 10;
+	unsigned int max_width = 640;
+	unsigned int max_height = 480;
+	unsigned int min_height = 480;
+	unsigned int min_width = 640;
+};
+
+struct v4l2_frmival_stepwise {
+	struct min {
+		unsigned int denominator = 30;
+		unsigned int numerator = 1;
+	};
+	struct max {
+		unsigned int denominator = 30;
+		unsigned int numerator = 1;
+	};
+};
+
+enum class TrackerType : int {
+	kLED = 0,
+	kTwoSpotTracking,
+	kBoosting,
+	kGOTURN,
+	kKCF,
+	kMedianFlow,
+	kMIL,
+	kMOSSE,
+	kTLD,
+	kBACKGROUND,
+	kBACKGROUNDKNN
+};
+
+class Formats
+{
+public:
+	unsigned int index; // 0,1,2,...
+	std::string stream_type; // V4L2_BUF_TYPE_VIDEO_CAPTURE etc
+	std::string description = "openCV"; // “YUV 4:2:2” etc
+	unsigned int pixelformat; // four-character code e.g. 'YUYV'
+	std::string framesize_type; // Discrete, step-wise or continuous
+	struct v4l2_frmsize_stepwise stepwise_frmsizes;
+	struct v4l2_frmival_stepwise stepwise_intervals;
+	unsigned int numerator = 1;
+	unsigned int denominator = 30;
+	unsigned int width = 640;
+	unsigned int height = 480;
+
+	friend bool operator==(const Formats& lhs, const Formats& rhs)
+	{
+		return lhs.numerator == rhs.numerator && lhs.denominator == rhs.denominator &&
+			lhs.width == rhs.width && lhs.height == rhs.height;
+	}
+
+	std::string get_resolution() { return std::to_string(width) + "x" + std::to_string(height); }
+	std::string get_fps() { return std::to_string(int(denominator / numerator)) + " fps"; }
+	unsigned int get_framerate() { return int(denominator / numerator); }
+	std::string get_pixel_format() { return description; }
+	std::string get_description() { return get_resolution() + " " + get_fps() + " " + get_pixel_format(); }
+};
 
 class CameraBase
 {
@@ -27,25 +92,10 @@ public:
 	*/
 	static std::vector<std::string> get_devices() {
 		std::vector<std::string> device_list;
-		#ifdef _WIN32
 		cv::VideoCapture _cap;
 		_cap.open(0);
 		if ( _cap.isOpened() )
 			device_list.push_back("0");
-		#endif // _WIN32
-		#ifdef __unix__
-		unsigned int max_devices = 64;
-		int fd = -1;
-		for (int i = 0; i < max_devices; ++i)
-		{
-			char dev[64];
-			sprintf(dev, "/dev/video%d", i);
-			if ( -1 == (fd = open(dev, O_RDWR)))
-				break;
-			device_list.push_back(std::string(dev));
-			close(fd);
-		}
-		#endif // __unix__
 		return device_list;
 	};
 	/*
@@ -72,7 +122,9 @@ public:
 	bool initialized() { return is_initialized; }
 	bool started() { return has_started; }
 
-	virtual int open_device() { return 1; }
+	// Make this class abstract - maybe make more methods pure virtual to
+	// make the concept clearer
+	virtual int open_device() = 0; // pure virtual
 	virtual void close_device() {};
 	virtual int init_device() { return 1; }
 	virtual void uninit_device() {};
@@ -83,9 +135,9 @@ public:
 	(in time.h) of the time when the first data byte was captured
 	*/
 	virtual int read_frame(cv::Mat &, struct timeval &) { return 1; }
-	virtual int get_control_values(__u32, __s32 &, __s32 &, __s32 &) { return 1; }
-	virtual int set_control_value(__u32, int) { return 1; }
-	virtual int switch_exposure_type(int) { return 1; }
+	virtual int get_control_values(const CamControl &, double &) { return 1; }
+	virtual int set_control_value(const CamControl &, const int &) { return 1; }
+	virtual int switch_exposure_type(const CamControl &) { return 1; }
 	virtual int set_format() { return 1; } // overloads below method using zero index
 	virtual int set_format(const unsigned int /* index into availableFormats */) { return 1; }
 	virtual int set_format(const std::string /* overloads with string of format from Formats::get_description()*/) { return 1; }

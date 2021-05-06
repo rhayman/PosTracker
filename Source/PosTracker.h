@@ -6,12 +6,22 @@
 #include <memory>
 
 #include <queue>
-#include "../common.h"
 #include <ProcessorHeaders.h>
 
+enum class BORDER
+{
+	LEFT,
+	RIGHT,
+	TOP,
+	BOTTOM
+};
+
+enum class CamControl;
 class CameraBase;
 class PosTS;
 class DisplayMask;
+class Formats;
+
 
 class PosTracker : public GenericProcessor, public Thread
 {
@@ -58,8 +68,8 @@ public:
 	void playPauseLiveStream(bool val) { m_switchPausePlay = val; }
 
 	// returns 0 if control is ok, 1 if not
-	int getControlValues(__u32, __s32 &, __s32 &, __s32 &);
-	void changeExposureTo(int);
+	int getControlValues(const CamControl &, double &);
+	void changeExposureTo(const CamControl &);
 
 	void adjustBrightness(int val);
 	void adjustContrast(int val);

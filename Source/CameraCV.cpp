@@ -2,7 +2,6 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include "../common.h"
 
 #include "CameraCV.h"
 
@@ -95,7 +94,7 @@ std::string CameraCV::get_format_name()
 int CameraCV::open_device()
 {
 	fprintf(stdout, "Attempting to open %s\n", dev_name.c_str());
-	if ( cap.open(0, cv::CAP_FFMPEG) ) {
+	if ( cap.open(0) ) {
 		fprintf(stdout, "Successfully opened %s\n", dev_name.c_str());
 		is_ready = true;
 		return 0;
@@ -141,29 +140,37 @@ void CameraCV::close_device() {
 	is_ready = false;
 }
 
-int CameraCV::switch_exposure_type(int autoOrManual)
+int CameraCV::switch_exposure_type(const CamControl & ctrl)
 {
-	cap.set(cv::CAP_PROP_AUTO_EXPOSURE, autoOrManual);
+	if ( ctrl == CamControl::kExposureAuto)
+		cap.set(cv::CAP_PROP_AUTO_EXPOSURE, 1);
+	else
+		cap.set(cv::CAP_PROP_AUTO_EXPOSURE, 0);
 	return 0;
 }
 
-int CameraCV::set_control_value(__u32 id, int val)
+int CameraCV::set_control_value(const CamControl & ctrl, const int & val)
 {
-	if (id == V4L2_CID_BRIGHTNESS)
-		cap.set(cv::CAP_PROP_BRIGHTNESS, val);
-	if (id == V4L2_CID_CONTRAST)
-		cap.set(cv::CAP_PROP_CONTRAST, val);
-	if (id == V4L2_CID_EXPOSURE_ABSOLUTE) {
-		//cap.set(cv::CAP_PROP_AUTO_EXPOSURE, 1);
-		cap.set(cv::CAP_PROP_EXPOSURE, 10-val);
+	if (ctrl == CamControl::kBrightness)
+		cap.set(cv::CAP_PROP_BRIGHTNESS, static_cast<double>(val));
+	if (ctrl == CamControl::kContrast)
+		cap.set(cv::CAP_PROP_CONTRAST, static_cast<double>(val));
+	if (ctrl == CamControl::kExposureAbsolute) {
+		cap.set(cv::CAP_PROP_EXPOSURE, static_cast<double>(10-val));
 	}
 	return 0;
 }
 
-int CameraCV::get_control_values(__u32 id, __s32 & min, __s32 & max, __s32 & step) {
-	min = 0;
-	max = 100;
-	step = 1;
+int CameraCV::get_control_values(const CamControl & ctrl, double & val) {
+	if (ctrl == CamControl::kBrightness)
+		val = cap.get(cv::CAP_PROP_BRIGHTNESS);
+	if (ctrl == CamControl::kContrast)
+		val = cap.get(cv::CAP_PROP_CONTRAST);
+	if (ctrl == CamControl::kExposureAbsolute) {
+		val = cap.get(cv::CAP_PROP_EXPOSURE);
+	}
+	if (val == 0) // a property that is not supported by the backend used by cap
+		return 1;
 	return 0;
 }
 

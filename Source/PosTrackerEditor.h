@@ -5,78 +5,16 @@
 #include <EditorHeaders.h>
 #include "PosTracker.h"
 
-#include "../common.h"
-
-class CameraControlSlider;
-class FrameControlSlider;
-class InfoLabel;
-
-enum class InfoLabelType
-{
+enum class InfoLabelType {
 	FPS,
 	XPOS,
 	YPOS
 };
 
-class PosTrackerEditor : public GenericEditor, public ComboBox::Listener
-{
-public:
-	PosTrackerEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors);
-	~PosTrackerEditor() {};
-
-	void editorShown(Label*, TextEditor& textEditorShown);
-
-	void comboBoxChanged(ComboBox* cb);
-	void buttonEvent(Button* button);
-	void updateSettings();
-	void update();
-
-	void setInfoValue(InfoLabelType, double);
-
-	void sliderValueChanged(Slider * sliderChanged);
-
-private:
-	PosTracker * m_proc;
-
-	std::unique_ptr<ComboBox> sourceCombo;
-	std::unique_ptr<ComboBox> resolution;
-	std::unique_ptr<UtilityButton> refreshBtn;
-
-	std::unique_ptr<ToggleButton> showVideo;
-	std::unique_ptr<ToggleButton> autoExposure;
-	std::unique_ptr<ToggleButton> overlayPath;
-
-	std::unique_ptr<CameraControlSlider> brightnessSldr;
-	std::unique_ptr<CameraControlSlider> contrastSldr;
-	std::unique_ptr<CameraControlSlider> exposureSldr;
-	std::unique_ptr<CameraControlSlider> thresholdSldr;
-
-	std::unique_ptr<Label> brightnessVal;
-	std::unique_ptr<Label> contrastVal;
-	std::unique_ptr<Label> exposureVal;
-	std::unique_ptr<Label> thresholdLbl;
-
-	std::unique_ptr<Label> brightLbl;
-	std::unique_ptr<Label> contrLbl;
-	std::unique_ptr<Label> exposureLbl;
-
-	std::unique_ptr<FrameControlSlider> leftRightSlider;
-	std::unique_ptr<FrameControlSlider> topBottomSlider;
-
-	std::unique_ptr<Label> leftRightLbl;
-	std::unique_ptr<Label> topBottomLbl;
-
-	std::unique_ptr<InfoLabel> fpslabel;
-	std::unique_ptr<InfoLabel> xPoslabel;
-	std::unique_ptr<InfoLabel> yPoslabel;
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PosTrackerEditor);
-};
 
 /*
 Define some classes to make things look nice and play nicer with the 
 webcam
-
 */
 
 class CameraControlSlider : public Slider, public Button::Listener
@@ -142,5 +80,62 @@ private:
 	PosTracker * m_proc;
 	Font m_font;
 };
+
+class PosTrackerEditor : public GenericEditor, public ComboBox::Listener
+{
+public:
+	PosTrackerEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors);
+	~PosTrackerEditor() {};
+
+	void editorShown(Label*, TextEditor& textEditorShown);
+
+	void comboBoxChanged(ComboBox* cb);
+	void buttonEvent(Button* button);
+	void updateSettings();
+	void update();
+
+	void setInfoValue(InfoLabelType, double);
+
+	void sliderValueChanged(Slider * sliderChanged);
+
+private:
+	PosTracker * m_proc;
+
+	std::unique_ptr<ComboBox> sourceCombo;
+	std::unique_ptr<ComboBox> resolution;
+	std::unique_ptr<UtilityButton> refreshBtn;
+
+	std::unique_ptr<ToggleButton> showVideo;
+	std::unique_ptr<ToggleButton> autoExposure;
+	std::unique_ptr<ToggleButton> overlayPath;
+
+	std::unique_ptr<CameraControlSlider> brightnessSldr;
+	std::unique_ptr<CameraControlSlider> contrastSldr;
+	std::unique_ptr<CameraControlSlider> exposureSldr;
+	std::unique_ptr<CameraControlSlider> thresholdSldr;
+
+	std::unique_ptr<Label> brightnessVal;
+	std::unique_ptr<Label> contrastVal;
+	std::unique_ptr<Label> exposureVal;
+	std::unique_ptr<Label> thresholdLbl;
+
+	std::unique_ptr<Label> brightLbl;
+	std::unique_ptr<Label> contrLbl;
+	std::unique_ptr<Label> exposureLbl;
+
+	std::unique_ptr<FrameControlSlider> leftRightSlider;
+	std::unique_ptr<FrameControlSlider> topBottomSlider;
+
+	std::unique_ptr<Label> leftRightLbl;
+	std::unique_ptr<Label> topBottomLbl;
+
+	std::unique_ptr<InfoLabel> fpslabel;
+	std::unique_ptr<InfoLabel> xPoslabel;
+	std::unique_ptr<InfoLabel> yPoslabel;
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PosTrackerEditor);
+};
+
+
 
 #endif

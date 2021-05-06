@@ -1,11 +1,8 @@
 #ifndef CAMERACV_H_
 #define CAMERACV_H_
 
-#include "CameraBase.h"
-#include <opencv2/opencv.hpp>
-#include <opencv2/core/mat.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/videoio.hpp>
+#include "CameraBase.h"
 
 class CameraCV : public CameraBase
 {
@@ -28,9 +25,9 @@ public:
 	*/
 	int read_frame(cv::Mat &, struct timeval &) override;
 
-	int get_control_values(__u32, __s32 &, __s32 &, __s32 &) override;
-	int set_control_value(__u32, int) override;
-	int switch_exposure_type(int) override;
+	int get_control_values(const CamControl &, double &) override;
+	int set_control_value(const CamControl &, const int &) override;
+	int switch_exposure_type(const CamControl &) override;
 	int set_format() override; // overloads below method using zero index
 	int set_format(const unsigned int /* index into availableFormats */) override;
 	int set_format(const std::string /* overloads with string of format from Formats::get_description()*/) override;

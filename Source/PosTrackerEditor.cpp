@@ -1,5 +1,5 @@
 #include "PosTrackerEditor.h"
-#include "PosTracker.h"
+#include "common.h"
 
 PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaultParameterEditors=true)
 : GenericEditor(parentNode, useDefaultParameterEditors)
@@ -71,7 +71,6 @@ PosTrackerEditor::PosTrackerEditor(GenericProcessor * parentNode, bool useDefaul
 	addAndMakeVisible(overlayPath.get());
 
 	// Values used for control ranges & step
-	__s32 min, max, step;
 	// Brightness slider and label
 	brightnessSldr = std::make_unique<CameraControlSlider>(font);
 	brightnessSldr->setBounds(210, 30, 50,50);
@@ -306,12 +305,12 @@ void PosTrackerEditor::buttonEvent(Button* button)
 	{
 		if ( autoExposure->getToggleState() == true )
 		{
-			m_proc->changeExposureTo(V4L2_EXPOSURE_AUTO);
+			m_proc->changeExposureTo(CamControl::kExposureAuto);
 			m_proc->autoExposure(true);
 		}
 		else if ( autoExposure->getToggleState() == false ) {
 			m_proc->autoExposure(false);
-			m_proc->changeExposureTo(V4L2_EXPOSURE_MANUAL);
+			m_proc->changeExposureTo(CamControl::kExposureManual);
 		}
 	}
 
@@ -334,8 +333,10 @@ void PosTrackerEditor::comboBoxChanged(ComboBox* cb)
 		int idx = cb->getSelectedId();
 		std::string dev_name = cb->getItemText(idx-1).toStdString();
 		if (m_proc->getDeviceName() != dev_name) {
+			std::cout << "in here" << std::endl;
 			m_proc->createNewCamera(dev_name);
-			m_proc->getDeviceName();
+			auto name = m_proc->getDeviceName();
+			std::cout << "got name = " << name << std::endl;
 		}
 		auto fmts = m_proc->getDeviceFormats();
 		for (int i = 0; i < fmts.size(); ++i)
@@ -414,33 +415,30 @@ void PosTrackerEditor::updateSettings()
 
 		m_proc->makeVideoMask();
 
-		// Ranges and step for controls
-		__s32 min = 0;
-		__s32 max = 100;
-		__s32 step = 10;
 	    // return code for control (0 ok, 1 fucked)
 	    int control_ok = 1;
 		// ------------- BRIGHTNESS ------------------
-	    control_ok = m_proc->getControlValues(V4L2_CID_BRIGHTNESS, min, max, step);
-	    Array<double>brightness_range{double(min), double(max)};
+		double val;
+	    control_ok = m_proc->getControlValues(CamControl::kBrightness, val);
+	    Array<double>brightness_range{double(0), double(100)};
 	    if ( control_ok == 0 ) { // all good
-	    	int new_val = m_proc->getBrightness();
+	    	auto new_val = m_proc->getBrightness();
 		    brightnessSldr->setValue(new_val);
 		    brightnessSldr->setValues(brightness_range);
-		    brightnessSldr->setRange(min, max, step);
+		    brightnessSldr->setRange(0, 100, 5);
 		    m_proc->adjustBrightness(new_val);
 		    brightnessSldr->setActive(true);
 	    }
 	    else
 		    brightnessSldr->setActive(false);
 	    // CONTRAST
-	    control_ok = m_proc->getControlValues(V4L2_CID_CONTRAST, min, max, step);
-	    Array<double>contrast_range{double(min), double(max)};
+	    control_ok = m_proc->getControlValues(CamControl::kContrast, val);
+	    Array<double>contrast_range{double(0), double(100)};
 	    if ( control_ok == 0 ) {
-	    	int new_val = m_proc->getContrast();
+	    	auto new_val = m_proc->getContrast();
 		    contrastSldr->setValue(new_val);
 		    contrastSldr->setValues(contrast_range);
-		    contrastSldr->setRange(min, max, step);
+		    contrastSldr->setRange(0, 100, 5);
 		    m_proc->adjustContrast(new_val);
 		    contrastSldr->setActive(true);
 	    }
@@ -448,15 +446,15 @@ void PosTrackerEditor::updateSettings()
 	    	contrastSldr->setActive(false);
 
 	    // EXPOSURE
-	    control_ok = m_proc->getControlValues(V4L2_CID_EXPOSURE_ABSOLUTE, min, max, step);
-	    Array<double>exposure_range{double(min), double(max)};
+	    control_ok = m_proc->getControlValues(CamControl::kExposureAbsolute, val);
+	    Array<double>exposure_range{double(0), double(100)};
 	    bool use_auto_exposure = m_proc->autoExposure();
 	    if ( (control_ok == 0) && ( ! use_auto_exposure ) ) {
 	    	int new_val = m_proc->getExposure();
 	    	autoExposure->setToggleState(false, sendNotification);
 		    exposureSldr->setValue(new_val);
 		    exposureSldr->setValues(exposure_range);
-		    exposureSldr->setRange(min, max, step);
+		    exposureSldr->setRange(0, 100, 5);
 		    m_proc->adjustExposure(new_val);
 		    exposureSldr->setActive(true);
 	    }
