@@ -92,7 +92,7 @@ foreach( src_file IN ITEMS ${SRC_FILES})
 endforeach()
 
 #additional libraries, if needed
-find_package( OpenCV 3.4.0 REQUIRED core highgui xfeatures2d features2d imgproc )
+find_package( OpenCV REQUIRED core highgui imgproc )
 #or
 #find_library(LIBNAME_LIBRARIES NAMES libname)
 #find_path(LIBNAME_INCLUDE_DIRS includefile.h)
