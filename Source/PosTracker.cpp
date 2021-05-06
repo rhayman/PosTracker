@@ -1,7 +1,6 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/tracking.hpp>
 #include <opencv2/imgproc.hpp>
 #include "PosTracker.h"
 #include "PosTrackerEditor.h"
@@ -631,61 +630,61 @@ unsigned int PosTracker::getFrameRate() {
 
 void PosTracker::saveCustomParametersToXml(XmlElement* xml)
 {
-	xml->setAttribute("Type", "PosTracker");
-	XmlElement * paramXml = xml->createNewChildElement("Parameters");
-	paramXml->setAttribute("Brightness", getBrightness());
-	paramXml->setAttribute("Contrast", getContrast());
-	paramXml->setAttribute("Exposure", getExposure());
-	if ( displayMask ) {
-		paramXml->setAttribute("LeftBorder", displayMask->getEdge(BORDER::LEFT));
-		paramXml->setAttribute("RightBorder", displayMask->getEdge(BORDER::RIGHT));
-		paramXml->setAttribute("TopBorder", displayMask->getEdge(BORDER::TOP));
-		paramXml->setAttribute("BottomBorder", displayMask->getEdge(BORDER::BOTTOM));
-	}
-	paramXml->setAttribute("AutoExposure", auto_exposure);
-	paramXml->setAttribute("OverlayPath", path_overlay);
+	// xml->setAttribute("Type", "PosTracker");
+	// XmlElement * paramXml = xml->createNewChildElement("Parameters");
+	// paramXml->setAttribute("Brightness", getBrightness());
+	// paramXml->setAttribute("Contrast", getContrast());
+	// paramXml->setAttribute("Exposure", getExposure());
+	// if ( displayMask ) {
+	// 	paramXml->setAttribute("LeftBorder", displayMask->getEdge(BORDER::LEFT));
+	// 	paramXml->setAttribute("RightBorder", displayMask->getEdge(BORDER::RIGHT));
+	// 	paramXml->setAttribute("TopBorder", displayMask->getEdge(BORDER::TOP));
+	// 	paramXml->setAttribute("BottomBorder", displayMask->getEdge(BORDER::BOTTOM));
+	// }
+	// paramXml->setAttribute("AutoExposure", auto_exposure);
+	// paramXml->setAttribute("OverlayPath", path_overlay);
 
-	XmlElement * deviceXml = xml->createNewChildElement("Devices");
-	deviceXml->setAttribute("Camera", getDeviceName());
-	deviceXml->setAttribute("Format", getFormatName());
+	// XmlElement * deviceXml = xml->createNewChildElement("Devices");
+	// deviceXml->setAttribute("Camera", getDeviceName());
+	// deviceXml->setAttribute("Format", getFormatName());
 }
 
 void PosTracker::loadCustomParametersFromXml()
 {
-	forEachXmlChildElementWithTagName(*parametersAsXml, paramXml, "Parameters")
-	{
-		if ( paramXml->hasAttribute("Brightness") )
-			brightness = paramXml->getIntAttribute("Brightness");
-		if ( paramXml->hasAttribute("Contrast") )
-			contrast = paramXml->getIntAttribute("Contrast");
-		if ( paramXml->hasAttribute("Exposure"))
-			exposure = paramXml->getIntAttribute("Exposure");
-		if ( paramXml->hasAttribute("LeftBorder") )
-			displayMask->setEdge(BORDER::LEFT, paramXml->getIntAttribute("LeftBorder"));
-		if ( paramXml->hasAttribute("RightBorder") )
-			displayMask->setEdge(BORDER::RIGHT, paramXml->getIntAttribute("RightBorder"));
-		if ( paramXml->hasAttribute("TopBorder") )
-			displayMask->setEdge(BORDER::TOP, paramXml->getIntAttribute("TopBorder"));
-		if ( paramXml->hasAttribute("BottomBorder") )
-			displayMask->setEdge(BORDER::BOTTOM, paramXml->getIntAttribute("BottomBorder"));
-		if ( paramXml->hasAttribute("AutoExposure") )
-			auto_exposure = paramXml->getBoolAttribute("AutoExposure");
-		if ( paramXml->hasAttribute("OverlayPath") )
-			path_overlay = paramXml->getBoolAttribute("OverlayPath");
-	}
-	forEachXmlChildElementWithTagName(*parametersAsXml, deviceXml, "Devices")
-	{
-		if ( deviceXml->hasAttribute("Camera") )
-			createNewCamera(deviceXml->getStringAttribute("Camera").toStdString());
-		if ( deviceXml->hasAttribute("Format") )
-		{
-			if ( currentCam->ready() )
-			{
-				getDeviceList();
-			}
-			std::string fmt = deviceXml->getStringAttribute("Format").toStdString();
-			setDeviceFormat(fmt);
-		}
-	}
+	// forEachXmlChildElementWithTagName(*parametersAsXml, paramXml, "Parameters")
+	// {
+	// 	if ( paramXml->hasAttribute("Brightness") )
+	// 		brightness = paramXml->getIntAttribute("Brightness");
+	// 	if ( paramXml->hasAttribute("Contrast") )
+	// 		contrast = paramXml->getIntAttribute("Contrast");
+	// 	if ( paramXml->hasAttribute("Exposure"))
+	// 		exposure = paramXml->getIntAttribute("Exposure");
+	// 	if ( paramXml->hasAttribute("LeftBorder") )
+	// 		displayMask->setEdge(BORDER::LEFT, paramXml->getIntAttribute("LeftBorder"));
+	// 	if ( paramXml->hasAttribute("RightBorder") )
+	// 		displayMask->setEdge(BORDER::RIGHT, paramXml->getIntAttribute("RightBorder"));
+	// 	if ( paramXml->hasAttribute("TopBorder") )
+	// 		displayMask->setEdge(BORDER::TOP, paramXml->getIntAttribute("TopBorder"));
+	// 	if ( paramXml->hasAttribute("BottomBorder") )
+	// 		displayMask->setEdge(BORDER::BOTTOM, paramXml->getIntAttribute("BottomBorder"));
+	// 	if ( paramXml->hasAttribute("AutoExposure") )
+	// 		auto_exposure = paramXml->getBoolAttribute("AutoExposure");
+	// 	if ( paramXml->hasAttribute("OverlayPath") )
+	// 		path_overlay = paramXml->getBoolAttribute("OverlayPath");
+	// }
+	// forEachXmlChildElementWithTagName(*parametersAsXml, deviceXml, "Devices")
+	// {
+	// 	if ( deviceXml->hasAttribute("Camera") )
+	// 		createNewCamera(deviceXml->getStringAttribute("Camera").toStdString());
+	// 	if ( deviceXml->hasAttribute("Format") )
+	// 	{
+	// 		if ( currentCam->ready() )
+	// 		{
+	// 			getDeviceList();
+	// 		}
+	// 		std::string fmt = deviceXml->getStringAttribute("Format").toStdString();
+	// 		setDeviceFormat(fmt);
+	// 	}
+	// }
 	updateSettings();
 }
