@@ -624,8 +624,7 @@ unsigned int PosTracker::getFrameRate() {
 			return format->get_framerate();
 		}
 	}
-	else
-		return 0;
+	return 0;
 }
 
 void PosTracker::saveCustomParametersToXml(XmlElement* xml)
