@@ -94,5 +94,5 @@ endforeach()
 #additional libraries, if needed
 find_package( OpenCV REQUIRED core highgui imgproc )
 target_link_libraries(${PLUGIN_NAME} ${OpenCV_LIBS})
-target_include_directories(${PLUGIN_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_include_directories(${PLUGIN_NAME} PRIVATE ${OpenCV_INCLUDE_DIRS})
 
