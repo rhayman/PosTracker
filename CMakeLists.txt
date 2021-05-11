@@ -92,10 +92,10 @@ foreach( src_file IN ITEMS ${SRC_FILES})
 endforeach()
 
 #additional libraries, if needed
-find_package( OpenCV REQUIRED core highgui imgproc )
-#or
-#find_library(LIBNAME_LIBRARIES NAMES libname)
-#find_path(LIBNAME_INCLUDE_DIRS includefile.h)
-#
-target_link_libraries(${PLUGIN_NAME} ${OpenCV_LIBS})
-target_include_directories(${PLUGIN_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS})
+if (LINUX)
+	find_package( OpenCV REQUIRED core highgui imgproc )
+	target_link_libraries(${PLUGIN_NAME} ${OpenCV_LIBS})
+	target_include_directories(${PLUGIN_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS})
+elseif(MSVC)
+# test to see if the libs folder gets picked up
+endif()
