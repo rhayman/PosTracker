@@ -7,10 +7,6 @@
 *.pyc
 *.py~
 
-# Compiled binaries/ directories containing them
-bin/
-build/
-
 # Precompiled Headers
 *.gch
 *.pch
