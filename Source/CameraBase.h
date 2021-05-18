@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <opencv2/opencv.hpp>
+#include <opencv2/videoio/registry.hpp>
 #include "common.h"
 #ifdef __unix__
 #include <unistd.h>
@@ -64,8 +65,8 @@ public:
 	struct v4l2_frmival_stepwise stepwise_intervals;
 	unsigned int numerator = 1;
 	unsigned int denominator = 30;
-	unsigned int width = 640;
-	unsigned int height = 480;
+	unsigned int width = 800;
+	unsigned int height = 600;
 
 	friend bool operator==(const Formats& lhs, const Formats& rhs)
 	{
@@ -94,8 +95,12 @@ public:
 		std::vector<std::string> device_list;
 		cv::VideoCapture _cap;
 		_cap.open(0);
+		std::cout << "Getting device list..." << std::endl;
 		if ( _cap.isOpened() )
 			device_list.push_back("0");
+		std::cout << "number of devices = " << device_list.size() << std::endl;
+		_cap.release();
+		cv::destroyAllWindows();
 		return device_list;
 	};
 	/*
@@ -110,8 +115,8 @@ public:
 		Formats *  fmt = new Formats();
 		fmt->denominator = 30;
 		fmt->numerator = 1;
-		fmt->height = 480;
-		fmt->width = 640;
+		fmt->height = 600;
+		fmt->width = 800;
 		availableFormats.push_back(fmt);
 		currentFmt = fmt;
 		return availableFormats;

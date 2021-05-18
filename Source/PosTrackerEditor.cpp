@@ -380,8 +380,11 @@ void PosTrackerEditor::updateSettings()
 	{
 		return;
 	}
+	std::cout << "m_proc->isCamReady() = " << m_proc->isCamReady() << std::endl;
 	if ( m_proc->isCamReady() )
 	{
+			std::cout << "m_proc->isCamReady() = " << m_proc->isCamReady() << std::endl;
+
 		// THIS WHOLE CHUNK NEEDS IMPROVING
 		// mainly deal with getting the sliders values correctly
 		std::pair<int,int> resolution = m_proc->getResolution();
@@ -420,14 +423,17 @@ void PosTrackerEditor::updateSettings()
 		// ------------- BRIGHTNESS ------------------
 		double val;
 	    control_ok = m_proc->getControlValues(CamControl::kBrightness, val);
-	    Array<double>brightness_range{double(0), double(100)};
+	    std::cout << "control_ok = " << control_ok << std::endl;
+		Array<double>brightness_range{double(0), double(100)};
 	    if ( control_ok == 0 ) { // all good
+			std::cout << "in brightness" << std::endl;
 	    	auto new_val = m_proc->getBrightness();
 		    brightnessSldr->setValue(new_val);
 		    brightnessSldr->setValues(brightness_range);
 		    brightnessSldr->setRange(0, 100, 1);
 		    m_proc->adjustBrightness(new_val);
 		    brightnessSldr->setActive(true);
+			std::cout << "end brightness" << std::endl;
 	    }
 	    else
 		    brightnessSldr->setActive(false);

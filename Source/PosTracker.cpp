@@ -293,8 +293,12 @@ void PosTracker::startRecording()
 
 int PosTracker::getControlValues(const CamControl & ctrl, double & val)
 {
-	if ( camReady )
-		return currentCam->get_control_values(ctrl, val);
+	if ( camReady ) {
+		std::cout << "camReady" << camReady << std::endl;
+		auto ret = currentCam->get_control_values(ctrl, val);
+		std::cout << "ret" << ret << std::endl;
+		return ret;
+	}
 	else
 		return 1;
 }

@@ -2,6 +2,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/videoio/registry.hpp>
 
 #include "CameraCV.h"
 
@@ -93,8 +94,19 @@ std::string CameraCV::get_format_name()
 
 int CameraCV::open_device()
 {
+	int apiID = cv::CAP_ANY;
+	auto backends = cv::videoio_registry::getBackends();
+	std::cout << "Available backends:" << std::endl;
+	for (auto backend : backends ) {
+		auto name = cv::videoio_registry::getBackendName(backend);
+		std::cout << "backend name = " << name << std::endl;
+		if (backend == cv::CAP_DSHOW)
+			apiID = backend;
+	}
+		
 	fprintf(stdout, "Attempting to open %s\n", dev_name.c_str());
-	if ( cap.open(0) ) {
+	
+	if ( cap.open(0, apiID) ) {
 		fprintf(stdout, "Successfully opened %s\n", dev_name.c_str());
 		is_ready = true;
 		return 0;
@@ -162,8 +174,11 @@ int CameraCV::set_control_value(const CamControl & ctrl, const int & val)
 }
 
 int CameraCV::get_control_values(const CamControl & ctrl, double & val) {
-	if (ctrl == CamControl::kBrightness)
+	if (ctrl == CamControl::kBrightness) {
+		std::cout << "getting brightness" << std::endl;
 		val = cap.get(cv::CAP_PROP_BRIGHTNESS);
+		std::cout << "val = " << val << std::endl;
+	}
 	if (ctrl == CamControl::kContrast)
 		val = cap.get(cv::CAP_PROP_CONTRAST);
 	if (ctrl == CamControl::kExposureAbsolute) {
