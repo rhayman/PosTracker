@@ -102,6 +102,9 @@ public:
 
 	void * get_frame_ptr() { return m_frame_ptr; }
 
+	void saveCustomParametersToXml(XmlElement*);
+	void loadCustomParametersFromXml();
+
 	std::shared_ptr<PosTS> pos_tracker;
 private:
 	std::string m_dev_name;
