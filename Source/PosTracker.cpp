@@ -578,7 +578,10 @@ std::string PosTracker::getDeviceName()
 
 std::string PosTracker::getFormatName()
 {
-	return currentCam->get_format_name();
+	if ( currentCam )
+		return currentCam->get_format_name();
+	else
+		return std::string();
 }
 
 std::vector<std::string> PosTracker::getDeviceList()
@@ -657,40 +660,42 @@ void PosTracker::saveCustomParametersToXml(XmlElement* xml)
 
 void PosTracker::loadCustomParametersFromXml()
 {
-	forEachXmlChildElementWithTagName(*parametersAsXml, paramXml, "Parameters")
-	{
-		if ( paramXml->hasAttribute("Brightness") )
-			brightness = paramXml->getIntAttribute("Brightness");
-		if ( paramXml->hasAttribute("Contrast") )
-			contrast = paramXml->getIntAttribute("Contrast");
-		if ( paramXml->hasAttribute("Exposure"))
-			exposure = paramXml->getIntAttribute("Exposure");
-		if ( paramXml->hasAttribute("LeftBorder") )
-			displayMask->setEdge(BORDER::LEFT, paramXml->getIntAttribute("LeftBorder"));
-		if ( paramXml->hasAttribute("RightBorder") )
-			displayMask->setEdge(BORDER::RIGHT, paramXml->getIntAttribute("RightBorder"));
-		if ( paramXml->hasAttribute("TopBorder") )
-			displayMask->setEdge(BORDER::TOP, paramXml->getIntAttribute("TopBorder"));
-		if ( paramXml->hasAttribute("BottomBorder") )
-			displayMask->setEdge(BORDER::BOTTOM, paramXml->getIntAttribute("BottomBorder"));
-		if ( paramXml->hasAttribute("AutoExposure") )
-			auto_exposure = paramXml->getBoolAttribute("AutoExposure");
-		if ( paramXml->hasAttribute("OverlayPath") )
-			path_overlay = paramXml->getBoolAttribute("OverlayPath");
-	}
-	forEachXmlChildElementWithTagName(*parametersAsXml, deviceXml, "Devices")
-	{
-		if ( deviceXml->hasAttribute("Camera") )
-			createNewCamera(deviceXml->getStringAttribute("Camera").toStdString());
-		if ( deviceXml->hasAttribute("Format") )
+	if (parametersAsXml != nullptr) {
+		forEachXmlChildElementWithTagName(*parametersAsXml, paramXml, "Parameters")
 		{
-			if ( currentCam->ready() )
-			{
-				getDeviceList();
-			}
-			std::string fmt = deviceXml->getStringAttribute("Format").toStdString();
-			setDeviceFormat(fmt);
+			if ( paramXml->hasAttribute("Brightness") )
+				brightness = paramXml->getIntAttribute("Brightness");
+			if ( paramXml->hasAttribute("Contrast") )
+				contrast = paramXml->getIntAttribute("Contrast");
+			if ( paramXml->hasAttribute("Exposure"))
+				exposure = paramXml->getIntAttribute("Exposure");
+			if ( paramXml->hasAttribute("LeftBorder") )
+				displayMask->setEdge(BORDER::LEFT, paramXml->getIntAttribute("LeftBorder"));
+			if ( paramXml->hasAttribute("RightBorder") )
+				displayMask->setEdge(BORDER::RIGHT, paramXml->getIntAttribute("RightBorder"));
+			if ( paramXml->hasAttribute("TopBorder") )
+				displayMask->setEdge(BORDER::TOP, paramXml->getIntAttribute("TopBorder"));
+			if ( paramXml->hasAttribute("BottomBorder") )
+				displayMask->setEdge(BORDER::BOTTOM, paramXml->getIntAttribute("BottomBorder"));
+			if ( paramXml->hasAttribute("AutoExposure") )
+				auto_exposure = paramXml->getBoolAttribute("AutoExposure");
+			if ( paramXml->hasAttribute("OverlayPath") )
+				path_overlay = paramXml->getBoolAttribute("OverlayPath");
 		}
+		forEachXmlChildElementWithTagName(*parametersAsXml, deviceXml, "Devices")
+		{
+			if ( deviceXml->hasAttribute("Camera") )
+				createNewCamera(deviceXml->getStringAttribute("Camera").toStdString());
+			if ( deviceXml->hasAttribute("Format") )
+			{
+				if ( currentCam->ready() )
+				{
+					getDeviceList();
+				}
+				std::string fmt = deviceXml->getStringAttribute("Format").toStdString();
+				setDeviceFormat(fmt);
+			}
+		}
+		updateSettings();
 	}
-	updateSettings();
 }
